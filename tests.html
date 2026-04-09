@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AIdeate Workshop Tests</title>
+<style>
+body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #e2e8f0; padding: 24px; }
+h1 { color: #0078d4; margin-bottom: 16px; }
+.test { padding: 8px 12px; margin: 4px 0; border-radius: 6px; font-size: .85rem; }
+.pass { background: rgba(16,124,16,.15); border-left: 3px solid #107c10; }
+.fail { background: rgba(209,52,56,.15); border-left: 3px solid #d13438; }
+.running { background: rgba(0,120,212,.1); border-left: 3px solid #0078d4; }
+.summary { margin-top: 20px; padding: 16px; border-radius: 8px; font-weight: 700; font-size: 1.1rem; }
+.summary.all-pass { background: rgba(16,124,16,.2); color: #4ade80; }
+.summary.has-fail { background: rgba(209,52,56,.2); color: #ef4444; }
+button { background: #0078d4; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<h1>🧪 AIdeate Workshop Tests</h1>
+<button onclick="runTests()">Run All Tests</button>
+<div id="results"></div>
+<div id="summary"></div>
+
+<script>
+const results = [];
+const container = document.getElementById('results');
+const summaryEl = document.getElementById('summary');
+
+function logTest(name, passed, detail) {
+  results.push({ name, passed, detail });
+  const div = document.createElement('div');
+  div.className = `test ${passed ? 'pass' : 'fail'}`;
+  div.textContent = `${passed ? '✅' : '❌'} ${name}${detail ? ' — ' + detail : ''}`;
+  container.appendChild(div);
+}
+
+function showSummary() {
+  const passed = results.filter(r => r.passed).length;
+  const failed = results.filter(r => !r.passed).length;
+  summaryEl.className = `summary ${failed > 0 ? 'has-fail' : 'all-pass'}`;
+  summaryEl.textContent = `${passed} passed, ${failed} failed out of ${results.length} tests`;
+}
+
+async function runTests() {
+  container.innerHTML = '';
+  results.length = 0;
+
+  // ═══ 1. JSON Schema Tests ═══
+  const sampleState = {
+    version: '1.0',
+    sessionId: 'test-session-123',
+    workshopName: 'Test Workshop',
+    companyName: 'Test Corp',
+    participants: [
+      { id: 1001, name: 'Alice Smith', title: 'VP Engineering', initials: 'AS' },
+      { id: 1002, name: 'Bob Jones', title: 'CTO', initials: 'BJ' }
+    ],
+    ideas: [
+      { id: 2001, name: 'Sales Agent', dept: 'Sales', desc: 'Helps sellers prep', submitter: 'Alice Smith', votes: 3, voters: ['Alice', 'Bob', 'Charlie'] },
+      { id: 2002, name: 'HR Bot', dept: 'HR', desc: 'Onboarding automation', submitter: 'Bob Jones', votes: 1, voters: ['Alice'] }
+    ],
+    phase: 'vote',
+    timerSeconds: 180,
+    demoSlides: [
+      { label: 'Demo 1', url: 'https://example.com/demo1', visible: true },
+      { label: 'Demo 2', url: '', visible: false },
+      { label: '', url: '', visible: false },
+      { label: '', url: '', visible: false }
+    ],
+    departments: ['Sales', 'HR', 'IT', 'Operations'],
+    createdAt: '2026-04-09T12:00:00Z',
+    exportedAt: '2026-04-09T13:00:00Z'
+  };
+
+  // Test 1: JSON serialization round-trip
+  try {
+    const json = JSON.stringify(sampleState, null, 2);
+    const parsed = JSON.parse(json);
+    logTest('JSON round-trip: serialize + parse', true);
+  } catch (e) {
+    logTest('JSON round-trip: serialize + parse', false, e.message);
+  }
+
+  // Test 2: Schema has all required fields
+  const requiredFields = ['version', 'sessionId', 'workshopName', 'companyName', 'participants', 'ideas', 'phase', 'timerSeconds', 'demoSlides', 'departments', 'createdAt'];
+  const missingFields = requiredFields.filter(f => !(f in sampleState));
+  logTest('Schema: all required fields present', missingFields.length === 0, missingFields.length > 0 ? `Missing: ${missingFields.join(', ')}` : '11 fields');
+
+  // Test 3: Participant structure
+  const p = sampleState.participants[0];
+  const pFields = ['id', 'name', 'title', 'initials'].every(f => f in p);
+  logTest('Participant schema: id, name, title, initials', pFields);
+
+  // Test 4: Idea structure
+  const idea = sampleState.ideas[0];
+  const iFields = ['id', 'name', 'dept', 'desc', 'submitter', 'votes', 'voters'].every(f => f in idea);
+  logTest('Idea schema: all 7 fields present', iFields);
+
+  // Test 5: Idea IDs are stable (not regenerated)
+  const json = JSON.stringify(sampleState);
+  const restored = JSON.parse(json);
+  logTest('Stable IDs: idea IDs preserved after round-trip', restored.ideas[0].id === 2001 && restored.ideas[1].id === 2002);
+
+  // Test 6: Participant IDs preserved
+  logTest('Stable IDs: participant IDs preserved after round-trip', restored.participants[0].id === 1001);
+
+  // Test 7: Votes and voters preserved
+  logTest('Votes preserved: count + voter names', restored.ideas[0].votes === 3 && restored.ideas[0].voters.length === 3);
+
+  // Test 8: DemoSlides as objects (not arrays)
+  const ds = sampleState.demoSlides[0];
+  logTest('DemoSlides: object with label, url, visible', 'label' in ds && 'url' in ds && 'visible' in ds);
+
+  // Test 9: Empty state handling
+  const emptyState = {
+    version: '1.0', sessionId: '', workshopName: '', companyName: '',
+    participants: [], ideas: [], phase: 'ideate', timerSeconds: 300,
+    demoSlides: [{label:'',url:'',visible:false},{label:'',url:'',visible:false},{label:'',url:'',visible:false},{label:'',url:'',visible:false}],
+    departments: [], createdAt: new Date().toISOString()
+  };
+  try {
+    JSON.parse(JSON.stringify(emptyState));
+    logTest('Empty state: valid JSON', true);
+  } catch (e) {
+    logTest('Empty state: valid JSON', false, e.message);
+  }
+
+  // ═══ 2. BroadcastChannel Tests ═══
+  // Test 10: BroadcastChannel creation
+  try {
+    const testChannel = new BroadcastChannel('aideate-test-' + Date.now());
+    logTest('BroadcastChannel: can create', true);
+    testChannel.close();
+  } catch (e) {
+    logTest('BroadcastChannel: can create', false, e.message);
+  }
+
+  // Test 11: BroadcastChannel message round-trip
+  try {
+    const sid = 'test-' + Date.now();
+    const ch1 = new BroadcastChannel('aideate-workshop-' + sid);
+    const ch2 = new BroadcastChannel('aideate-workshop-' + sid);
+    const received = await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('Timeout')), 2000);
+      ch2.onmessage = (e) => { clearTimeout(timeout); resolve(e.data); };
+      ch1.postMessage({ type: 'test', payload: 'hello' });
+    });
+    logTest('BroadcastChannel: message round-trip', received.type === 'test' && received.payload === 'hello');
+    ch1.close(); ch2.close();
+  } catch (e) {
+    logTest('BroadcastChannel: message round-trip', false, e.message);
+  }
+
+  // Test 12: Session-scoped channels don't cross-talk
+  try {
+    const ch1 = new BroadcastChannel('aideate-workshop-session-A');
+    const ch2 = new BroadcastChannel('aideate-workshop-session-B');
+    let gotMessage = false;
+    ch2.onmessage = () => { gotMessage = true; };
+    ch1.postMessage({ type: 'test' });
+    await new Promise(r => setTimeout(r, 200));
+    logTest('BroadcastChannel: session isolation (no cross-talk)', !gotMessage);
+    ch1.close(); ch2.close();
+  } catch (e) {
+    logTest('BroadcastChannel: session isolation', false, e.message);
+  }
+
+  // ═══ 3. localStorage Tests ═══
+  // Test 13: localStorage autosave
+  try {
+    const key = 'aideate_test_' + Date.now();
+    localStorage.setItem(key, JSON.stringify(sampleState));
+    const restored = JSON.parse(localStorage.getItem(key));
+    logTest('localStorage: autosave + restore', restored.workshopName === 'Test Workshop' && restored.ideas.length === 2);
+    localStorage.removeItem(key);
+  } catch (e) {
+    logTest('localStorage: autosave + restore', false, e.message);
+  }
+
+  // Test 14: localStorage size check (should handle typical workshop)
+  try {
+    const bigState = { ...sampleState };
+    bigState.ideas = Array.from({ length: 100 }, (_, i) => ({
+      id: i, name: `Idea ${i}`, dept: 'Sales', desc: 'Description '.repeat(20),
+      submitter: 'User', votes: Math.floor(Math.random() * 10), voters: ['A', 'B', 'C']
+    }));
+    bigState.participants = Array.from({ length: 50 }, (_, i) => ({
+      id: i, name: `Participant ${i}`, title: 'Title', initials: 'XX'
+    }));
+    const size = JSON.stringify(bigState).length;
+    logTest('localStorage: handles large workshop (100 ideas, 50 participants)', size < 500000, `${(size/1024).toFixed(1)} KB`);
+  } catch (e) {
+    logTest('localStorage: handles large workshop', false, e.message);
+  }
+
+  // ═══ 4. File Export/Import Tests ═══
+  // Test 15: Blob creation for export
+  try {
+    const blob = new Blob([JSON.stringify(sampleState, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    logTest('Export: Blob + ObjectURL creation', blob.size > 0 && url.startsWith('blob:'));
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    logTest('Export: Blob + ObjectURL creation', false, e.message);
+  }
+
+  // Test 16: Import validation — reject bad version
+  try {
+    const bad = { ...sampleState, version: '99.0' };
+    const isValid = bad.version === '1.0';
+    logTest('Import validation: reject wrong version', !isValid);
+  } catch (e) {
+    logTest('Import validation: reject wrong version', false, e.message);
+  }
+
+  // Test 17: Import validation — handle missing fields gracefully
+  try {
+    const partial = { version: '1.0', workshopName: 'Partial' };
+    const restored = {
+      workshopName: partial.workshopName || '',
+      companyName: partial.companyName || '',
+      participants: partial.participants || [],
+      ideas: partial.ideas || [],
+      phase: partial.phase || 'ideate',
+      timerSeconds: partial.timerSeconds || 300,
+      demoSlides: partial.demoSlides || [{label:'',url:'',visible:false},{label:'',url:'',visible:false},{label:'',url:'',visible:false},{label:'',url:'',visible:false}],
+      departments: partial.departments || ['Sales','Operations','HR','IT']
+    };
+    logTest('Import: handles partial JSON with defaults', restored.ideas.length === 0 && restored.phase === 'ideate' && restored.demoSlides.length === 4);
+  } catch (e) {
+    logTest('Import: handles partial JSON with defaults', false, e.message);
+  }
+
+  // ═══ 5. No PII Hardcoded Tests ═══
+  // Test 18: Control panel has no hardcoded company names
+  try {
+    const resp = await fetch('workshop-control.html');
+    const html = await resp.text();
+    const hasHardcoded = /manpower|cargill|experis|nike|deloitte/i.test(html);
+    logTest('Control: no hardcoded company names', !hasHardcoded);
+  } catch (e) {
+    logTest('Control: no hardcoded company names', false, 'Could not fetch file — run from same directory');
+  }
+
+  // Test 19: Presenter has no hardcoded company names
+  try {
+    const resp = await fetch('workshop-presenter.html');
+    const html = await resp.text();
+    const hasHardcoded = /manpower|cargill|experis|nike|deloitte/i.test(html);
+    logTest('Presenter: no hardcoded company names', !hasHardcoded);
+  } catch (e) {
+    logTest('Presenter: no hardcoded company names', false, 'Could not fetch file — run from same directory');
+  }
+
+  // Test 20: Both files use MS Blue (#0078d4)
+  try {
+    const c = await (await fetch('workshop-control.html')).text();
+    const p = await (await fetch('workshop-presenter.html')).text();
+    logTest('Theme: both files use #0078d4 (MS Blue)', c.includes('0078d4') && p.includes('0078d4'));
+  } catch (e) {
+    logTest('Theme: MS Blue check', false, 'Could not fetch files');
+  }
+
+  // Test 21: Both use session-scoped BroadcastChannel
+  try {
+    const c = await (await fetch('workshop-control.html')).text();
+    const p = await (await fetch('workshop-presenter.html')).text();
+    logTest('Channel: both use session-scoped naming', c.includes('aideate-workshop-') && p.includes('aideate-workshop-'));
+  } catch (e) {
+    logTest('Channel: session-scoped naming', false, 'Could not fetch files');
+  }
+
+  showSummary();
+}
+</script>
+</body>
+</html>

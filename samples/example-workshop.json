@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "sessionId": "example-001",
+  "workshopName": "AI Use-Case Workshop",
+  "companyName": "Contoso Inc.",
+  "participants": [
+    { "id": 1001, "name": "Alice Johnson", "title": "VP Engineering", "initials": "AJ" },
+    { "id": 1002, "name": "Bob Smith", "title": "Director of IT", "initials": "BS" }
+  ],
+  "ideas": [
+    { "id": 2001, "name": "Customer Support Agent", "dept": "Customer Service", "desc": "AI agent handling tier-1 support tickets automatically", "submitter": "Alice Johnson", "votes": 0, "voters": [] },
+    { "id": 2002, "name": "Sales Prep Agent", "dept": "Sales", "desc": "Prepares account briefs before client meetings", "submitter": "Bob Smith", "votes": 0, "voters": [] }
+  ],
+  "phase": "ideate",
+  "timerSeconds": 300,
+  "demoSlides": [
+    { "label": "", "url": "", "visible": false },
+    { "label": "", "url": "", "visible": false },
+    { "label": "", "url": "", "visible": false },
+    { "label": "", "url": "", "visible": false }
+  ],
+  "departments": ["Sales", "Operations", "HR", "IT", "Finance", "Marketing", "Customer Service", "Engineering", "Legal", "Product"],
+  "createdAt": "2026-04-09T12:00:00Z"
+}

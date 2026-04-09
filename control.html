@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIdeate Control Panel</title>
+<style>
+:root {
+  --ms-blue: #0078d4; --bg: #1a1a2e; --card: #16213e; --border: #2a3a5c;
+  --text: #e2e8f0; --muted: #94a3b8;
+  --green: #107c10; --purple: #742774; --orange: #ff8c00; --red: #d13438;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 16px; overflow-y: auto; height: 100vh; }
+
+h1 { font-size: 1.2rem; margin-bottom: 4px; }
+h1 span { color: var(--ms-blue); }
+.subtitle { color: var(--muted); font-size: .8rem; margin-bottom: 16px; }
+
+.section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+.section h2 { font-size: .9rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.section h2 .badge { font-size: .65rem; padding: 2px 8px; border-radius: 8px; font-weight: 700; }
+
+.row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.row label { font-size: .8rem; color: var(--muted); min-width: 80px; }
+
+input, select, textarea {
+  background: var(--bg); border: 1px solid var(--border); color: var(--text);
+  padding: 6px 10px; border-radius: 6px; font-size: .85rem; font-family: inherit;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--ms-blue); }
+input[type="number"] { width: 70px; }
+textarea { width: 100%; resize: vertical; }
+
+button {
+  padding: 6px 14px; border-radius: 6px; border: none; font-weight: 600;
+  font-size: .8rem; cursor: pointer; transition: all .15s;
+}
+.btn-blue { background: var(--ms-blue); color: #fff; }
+.btn-blue:hover { background: #106ebe; }
+.btn-green { background: var(--green); color: #fff; }
+.btn-green:hover { background: #0e6b0e; }
+.btn-red { background: var(--red); color: #fff; }
+.btn-red:hover { background: #b52e31; }
+.btn-purple { background: var(--purple); color: #fff; }
+.btn-purple:hover { background: #5f1f5f; }
+.btn-orange { background: var(--orange); color: #000; }
+.btn-orange:hover { background: #e07c00; }
+.btn-sm { padding: 4px 10px; font-size: .75rem; }
+.btn-lg { padding: 10px 20px; font-size: .95rem; }
+
+.phase-btns { display: flex; gap: 6px; }
+.phase-btns button { flex: 1; }
+.phase-btns button.active-phase { box-shadow: 0 0 0 2px var(--ms-blue); }
+
+.idea-list { max-height: 300px; overflow-y: auto; }
+.idea-row {
+  display: flex; align-items: center; gap: 8px; padding: 8px;
+  background: var(--bg); border-radius: 6px; margin-bottom: 4px; font-size: .82rem;
+}
+.idea-row .idea-name { flex: 1; font-weight: 600; }
+.idea-row .idea-dept { font-size: .7rem; color: var(--muted); }
+.idea-row .vote-controls { display: flex; gap: 4px; align-items: center; }
+.idea-row .vote-num { font-weight: 800; min-width: 24px; text-align: center; font-size: 1rem; color: var(--ms-blue); }
+
+.voter-input { display: flex; gap: 6px; margin-bottom: 8px; }
+.voter-input input { flex: 1; }
+
+.timer-controls { display: flex; gap: 8px; align-items: center; }
+.timer-display { font-size: 1.4rem; font-weight: 800; font-family: monospace; min-width: 80px; text-align: center; }
+
+.log { font-size: .7rem; color: var(--muted); max-height: 120px; overflow-y: auto; font-family: monospace; background: var(--bg); padding: 8px; border-radius: 6px; }
+
+.participant-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.participant-chip {
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(0,120,212,.12); border: 1px solid rgba(0,120,212,.25);
+  padding: 3px 8px 3px 4px; border-radius: 14px; font-size: .75rem; color: var(--ms-blue);
+}
+.participant-chip .avatar {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--ms-blue); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: .55rem; font-weight: 700;
+}
+.participant-chip .remove { cursor: pointer; opacity: .5; margin-left: 2px; }
+.participant-chip .remove:hover { opacity: 1; }
+
+.import-export { display: flex; gap: 8px; }
+.import-export button { flex: 1; padding: 12px 16px; font-size: .9rem; }
+
+.ai-paste-area {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px; margin-top: 8px;
+}
+.ai-paste-area textarea { min-height: 60px; font-size: .8rem; }
+.ai-result {
+  background: rgba(116,39,116,.08); border: 1px solid rgba(116,39,116,.25);
+  border-radius: 8px; padding: 12px; margin-top: 8px; font-size: .82rem; display: none;
+}
+.ai-result .field { margin-bottom: 6px; }
+.ai-result .field label { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; display: block; }
+.ai-result .field .val.editable {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  padding: 4px 8px; width: 100%; font-family: inherit; font-size: .82rem; color: var(--text); font-weight: 600;
+}
+.ai-badge { font-size: .6rem; padding: 2px 6px; border-radius: 6px; background: rgba(116,39,116,.2); color: var(--purple); font-weight: 700; vertical-align: middle; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.collapsible-header { cursor: pointer; user-select: none; }
+.collapsible-header .arrow { transition: transform .2s; display: inline-block; font-size: .7rem; }
+.collapsible-header .arrow.open { transform: rotate(90deg); }
+.collapsible-body { display: none; margin-top: 10px; }
+.collapsible-body.open { display: block; }
+</style>
+</head>
+<body>
+
+<!-- 1. HEADER -->
+<h1>🎛️ <span>AIdeate</span> Control Panel</h1>
+<p class="subtitle">Local-first • All data stays on your device <span id="sessionBadge" style="font-size:.65rem;background:rgba(0,120,212,.15);color:var(--ms-blue);padding:1px 6px;border-radius:6px;margin-left:6px;font-family:monospace;cursor:pointer;" title="Click to copy session ID" onclick="navigator.clipboard.writeText(state.sessionId);this.textContent='Copied!';setTimeout(()=>this.textContent='session: '+state.sessionId,1200)"></span></p>
+
+<!-- 2. WORKSHOP SETUP -->
+<div class="section">
+  <h2>🏢 Workshop Setup</h2>
+  <div class="row">
+    <label>Workshop</label>
+    <input type="text" id="workshopName" placeholder="Workshop name" style="flex:1;" oninput="onWorkshopInfoChange()">
+  </div>
+  <div class="row" style="margin-bottom:0;">
+    <label>Company</label>
+    <input type="text" id="companyName" placeholder="Company name" style="flex:1;" oninput="onWorkshopInfoChange()">
+  </div>
+</div>
+
+<!-- 3. IMPORT / EXPORT -->
+<div class="section">
+  <h2>💾 Import / Export</h2>
+  <div class="import-export">
+    <button class="btn-blue btn-lg" onclick="importWorkshop()">📥 Import Workshop (.json)</button>
+    <button class="btn-green btn-lg" onclick="exportWorkshop()">📤 Export Workshop (.json)</button>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+    <p style="font-size:.7rem;color:var(--muted);">Back up your workshop data locally. All PII stays on your device.</p>
+    <button class="btn-sm" style="background:var(--border);color:var(--muted);" onclick="clearAutosave()">🗑️ Clear Autosave</button>
+  </div>
+</div>
+
+<!-- 4. PHASE CONTROL -->
+<div class="section">
+  <h2>📍 Phase <span class="badge" style="background:rgba(0,120,212,.2);color:var(--ms-blue);" id="currentPhase">IDEATE</span></h2>
+  <div class="phase-btns">
+    <button class="btn-blue active-phase" onclick="setPhase('ideate', this)">💡 Ideate</button>
+    <button class="btn-purple" onclick="setPhase('vote', this)">🗳️ Vote</button>
+    <button class="btn-green" onclick="setPhase('prioritize', this)">📊 Results</button>
+  </div>
+</div>
+
+<!-- 5. PARTICIPANTS -->
+<div class="section">
+  <h2>👥 Participants <span class="badge" style="background:rgba(0,120,212,.2);color:var(--ms-blue);" id="pCountBadge">0</span></h2>
+  <div class="row">
+    <input type="text" id="newParticipantName" placeholder="Name" style="flex:1;" onkeydown="if(event.key==='Enter')addParticipant()">
+    <input type="text" id="newParticipantTitle" placeholder="Title" style="width:140px;" onkeydown="if(event.key==='Enter')addParticipant()">
+    <button class="btn-blue btn-sm" onclick="addParticipant()">+ Add</button>
+  </div>
+  <div class="participant-list" id="participantList"></div>
+</div>
+
+<!-- 6. TIMER -->
+<div class="section">
+  <h2>⏱️ Timer</h2>
+  <div class="timer-controls">
+    <div class="timer-display" id="timerDisplay">05:00</div>
+    <input type="number" id="timerMinutes" value="5" min="1" max="60" style="width:50px;">
+    <span style="font-size:.8rem;color:var(--muted);">min</span>
+    <button class="btn-green btn-sm" onclick="startTimer()">▶ Start</button>
+    <button class="btn-red btn-sm" onclick="stopTimer()">⏸ Stop</button>
+    <button class="btn-sm" style="background:var(--border);color:var(--text);" onclick="resetTimer()">↺ Reset</button>
+  </div>
+</div>
+
+<!-- 7. DEMO URLs (collapsible) -->
+<div class="section">
+  <h2 class="collapsible-header" onclick="toggleCollapsible(this)">🖥️ Demo URLs <span class="arrow">▶</span></h2>
+  <div class="collapsible-body" id="demoUrlsBody">
+    <p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">These appear as full-screen slides in the presenter.</p>
+    <div id="demoUrlInputs"></div>
+    <button class="btn-blue btn-sm" style="margin-top:8px;" onclick="broadcastDemoUrls()">📡 Send to Presenter</button>
+  </div>
+</div>
+
+<!-- 8. IDEAS -->
+<div class="section">
+  <h2>💡 Ideas <span class="badge" style="background:rgba(16,124,16,.2);color:var(--green);" id="ideaCountBadge">0</span></h2>
+
+  <div class="row" style="margin-bottom:4px;">
+    <label style="min-width:auto;font-size:.75rem;">Template</label>
+    <select id="templateSelect" style="flex:1;" onchange="loadTemplate()">
+      <option value="">Select template...</option>
+    </select>
+  </div>
+
+  <div style="margin-top:8px;">
+    <div class="row">
+      <input type="text" id="newIdeaName" placeholder="Use case name" style="flex:1;">
+      <select id="newIdeaDept"></select>
+    </div>
+    <div class="row">
+      <input type="text" id="newIdeaDesc" placeholder="Brief description" style="flex:1;">
+      <input type="text" id="newIdeaSubmitter" placeholder="Submitter" style="width:120px;">
+      <button class="btn-green" onclick="addIdea()">+ Add</button>
+    </div>
+  </div>
+
+  <div class="idea-list" id="ideaList"></div>
+</div>
+
+<!-- 9. AI PASTE FROM CHAT -->
+<div class="section">
+  <h2>✨ Paste from Chat <span class="ai-badge">AI-Powered</span></h2>
+  <p style="font-size:.75rem;color:var(--muted);margin-bottom:8px;">Paste rough text from chat — AI will extract the idea name, description, department, and submitter.</p>
+  <div class="ai-paste-area">
+    <textarea id="chatPasteInput" placeholder="Paste from chat, e.g.:&#10;&#10;Sarah: what about an agent that auto-generates project status reports from Jira and emails?" rows="4"></textarea>
+    <div class="row" style="margin-top:8px; margin-bottom:0;">
+      <button class="btn-purple" onclick="aiFormatIdea()" id="aiFormatBtn">✨ Format with AI</button>
+      <button class="btn-sm" style="background:var(--border);color:var(--text);" onclick="document.getElementById('chatPasteInput').value=''; hideAiResult();">Clear</button>
+      <span id="aiStatus" style="font-size:.75rem;color:var(--muted);margin-left:auto;"></span>
+    </div>
+  </div>
+  <div class="ai-result" id="aiResult">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+      <span class="ai-badge">✨ AI Formatted</span>
+      <span style="font-size:.7rem;color:var(--muted);">Review & edit, then click Add</span>
+    </div>
+    <div class="field">
+      <label>Use Case Name</label>
+      <input class="val editable" id="aiName" type="text">
+    </div>
+    <div class="field">
+      <label>Department</label>
+      <select class="val editable" id="aiDept" style="width:100%;"></select>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <input class="val editable" id="aiDesc" type="text">
+    </div>
+    <div class="field">
+      <label>Submitted By</label>
+      <input class="val editable" id="aiSubmitter" type="text">
+    </div>
+    <div class="row" style="margin-top:10px;margin-bottom:0;">
+      <button class="btn-green" onclick="addAiIdea()">✓ Add to Workshop</button>
+      <button class="btn-sm" style="background:var(--border);color:var(--text);" onclick="hideAiResult()">Discard</button>
+    </div>
+  </div>
+</div>
+
+<!-- 10. VOTE CONTROL -->
+<div class="section">
+  <h2>🗳️ Vote Control</h2>
+  <div class="voter-input">
+    <input type="text" id="voterName" placeholder="Participant name (who's voting)" list="voterDatalist">
+    <datalist id="voterDatalist"></datalist>
+  </div>
+  <p style="font-size:.75rem;color:var(--muted);margin-bottom:8px;">Click +/- on each idea to record votes:</p>
+  <div id="voteList"></div>
+</div>
+
+<!-- 11. ACTIVITY LOG -->
+<div class="section">
+  <h2>📝 Activity Log</h2>
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+// ═══ HELPERS ═══
+function generateSessionId() {
+  return Math.random().toString(36).slice(2, 8);
+}
+
+// ═══ STATE ═══
+let state = {
+  sessionId: generateSessionId(),
+  workshopName: '',
+  companyName: '',
+  phase: 'ideate',
+  participants: [],
+  ideas: [],
+  timerSeconds: 300,
+  timerRunning: false,
+  demoSlides: [
+    { label: 'Demo 1', url: '', visible: false },
+    { label: 'Demo 2', url: '', visible: false },
+    { label: 'Demo 3', url: '', visible: false },
+    { label: 'Demo 4', url: '', visible: false }
+  ],
+  departments: ['Sales', 'Operations', 'HR', 'IT', 'Finance', 'Marketing', 'Customer Service', 'Engineering', 'Legal', 'Product'],
+  createdAt: new Date().toISOString()
+};
+
+let timerInterval = null;
+let ghToken = localStorage.getItem('gh_token') || '';
+
+// ═══ AUTOSAVE ═══
+const AUTOSAVE_KEY = 'aideate_autosave';
+
+function autosave() {
+  localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(state));
+}
+
+function restoreAutosave() {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data.sessionId) return false;
+    state.sessionId = data.sessionId;
+    state.workshopName = data.workshopName || '';
+    state.companyName = data.companyName || '';
+    state.participants = data.participants || [];
+    state.ideas = data.ideas || [];
+    state.phase = data.phase || 'ideate';
+    state.timerSeconds = data.timerSeconds || 300;
+    state.demoSlides = data.demoSlides || state.demoSlides;
+    state.departments = data.departments || state.departments;
+    state.createdAt = data.createdAt || state.createdAt;
+    return true;
+  } catch { return false; }
+}
+
+function clearAutosave() {
+  localStorage.removeItem(AUTOSAVE_KEY);
+  log('Autosave cleared');
+}
+
+// ═══ BROADCAST CHANNEL ═══
+let channel = new BroadcastChannel('aideate-workshop-' + state.sessionId);
+
+function initChannel() {
+  channel.onmessage = (e) => {
+    if (e.data.type === 'request_state') {
+      channel.postMessage({ type: 'full_state', state: {
+        ...state,
+        participants: state.participants.length
+      }});
+      channel.postMessage({ type: 'set_roster', roster: state.participants });
+    }
+  };
+}
+
+function reconnectChannel(newSessionId) {
+  channel.close();
+  state.sessionId = newSessionId;
+  channel = new BroadcastChannel('aideate-workshop-' + state.sessionId);
+  initChannel();
+  updateSessionBadge();
+}
+
+initChannel();
+
+function send(msg) {
+  channel.postMessage(msg);
+  log(msg.type + (msg.idea?.name ? `: ${msg.idea.name}` : '') + (msg.voter ? ` by ${msg.voter}` : ''));
+}
+
+function log(text) {
+  const el = document.getElementById('log');
+  const time = new Date().toLocaleTimeString();
+  el.innerHTML = `<div>[${time}] ${text}</div>` + el.innerHTML;
+}
+
+function updateSessionBadge() {
+  const badge = document.getElementById('sessionBadge');
+  if (badge) badge.textContent = 'session: ' + state.sessionId;
+}
+
+// ═══ WORKSHOP SETUP ═══
+function onWorkshopInfoChange() {
+  state.workshopName = document.getElementById('workshopName').value.trim();
+  state.companyName = document.getElementById('companyName').value.trim();
+  send({ type: 'set_workshop_info', workshopName: state.workshopName, companyName: state.companyName });
+  autosave();
+}
+
+// ═══ IMPORT / EXPORT ═══
+function exportWorkshop() {
+  const data = {
+    version: '1.0',
+    sessionId: state.sessionId,
+    workshopName: state.workshopName,
+    companyName: state.companyName,
+    participants: state.participants,
+    ideas: state.ideas,
+    phase: state.phase,
+    timerSeconds: state.timerSeconds,
+    demoSlides: state.demoSlides,
+    departments: state.departments,
+    createdAt: state.createdAt || new Date().toISOString(),
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `aideate-workshop-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  log('Exported workshop: ' + (state.workshopName || 'Untitled'));
+}
+
+function importWorkshop() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.version !== '1.0') { alert('Unsupported version'); return; }
+        state.workshopName = data.workshopName || '';
+        state.companyName = data.companyName || '';
+        state.participants = data.participants || [];
+        state.ideas = data.ideas || [];
+        state.phase = data.phase || 'ideate';
+        state.timerSeconds = data.timerSeconds || 300;
+        state.demoSlides = data.demoSlides || state.demoSlides;
+        state.departments = data.departments || state.departments;
+        state.createdAt = data.createdAt;
+        // Reconnect channel with imported sessionId (or generate new one)
+        reconnectChannel(data.sessionId || generateSessionId());
+        autosave();
+        channel.postMessage({ type: 'full_state', state: { ...state, participants: state.participants.length } });
+        channel.postMessage({ type: 'set_roster', roster: state.participants });
+        renderAll();
+        log('Imported workshop: ' + (data.workshopName || 'Untitled'));
+      } catch (err) {
+        alert('Invalid JSON file: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// ═══ PHASE ═══
+function setPhase(phase, btn) {
+  state.phase = phase;
+  send({ type: 'set_phase', phase });
+  document.getElementById('currentPhase').textContent = phase.toUpperCase();
+  document.querySelectorAll('.phase-btns button').forEach(b => b.classList.remove('active-phase'));
+  if (btn) btn.classList.add('active-phase');
+  autosave();
+}
+
+// ═══ PARTICIPANTS ═══
+function addParticipant() {
+  const name = document.getElementById('newParticipantName').value.trim();
+  const title = document.getElementById('newParticipantTitle').value.trim();
+  if (!name) return;
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const p = { id: Date.now(), name, title, initials };
+  state.participants.push(p);
+  document.getElementById('newParticipantName').value = '';
+  document.getElementById('newParticipantTitle').value = '';
+  renderParticipants();
+  send({ type: 'set_participants', count: state.participants.length });
+  send({ type: 'set_roster', roster: state.participants });
+  autosave();
+}
+
+function removeParticipant(id) {
+  state.participants = state.participants.filter(p => p.id !== id);
+  renderParticipants();
+  send({ type: 'set_participants', count: state.participants.length });
+  send({ type: 'set_roster', roster: state.participants });
+  autosave();
+}
+
+function renderParticipants() {
+  document.getElementById('pCountBadge').textContent = state.participants.length;
+  document.getElementById('participantList').innerHTML = state.participants.map(p => `
+    <div class="participant-chip">
+      <div class="avatar">${p.initials}</div>
+      <span>${p.name}</span>
+      ${p.title ? `<span style="opacity:.5;font-size:.65rem;">(${p.title})</span>` : ''}
+      <span class="remove" onclick="removeParticipant(${p.id})">✕</span>
+    </div>
+  `).join('');
+  updateVoterDatalist();
+}
+
+function updateVoterDatalist() {
+  const dl = document.getElementById('voterDatalist');
+  if (dl) dl.innerHTML = state.participants.map(p => `<option value="${p.name}">`).join('');
+}
+
+// ═══ TIMER ═══
+function startTimer() {
+  const mins = parseInt(document.getElementById('timerMinutes').value) || 5;
+  if (!state.timerRunning) state.timerSeconds = mins * 60;
+  state.timerRunning = true;
+  send({ type: 'timer_start', seconds: state.timerSeconds });
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    state.timerSeconds--;
+    renderTimerLocal();
+    if (state.timerSeconds <= 0) stopTimer();
+  }, 1000);
+  renderTimerLocal();
+}
+
+function stopTimer() {
+  state.timerRunning = false;
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  send({ type: 'timer_stop' });
+}
+
+function resetTimer() {
+  stopTimer();
+  const mins = parseInt(document.getElementById('timerMinutes').value) || 5;
+  state.timerSeconds = mins * 60;
+  renderTimerLocal();
+}
+
+function renderTimerLocal() {
+  const m = Math.floor(state.timerSeconds / 60);
+  const s = state.timerSeconds % 60;
+  document.getElementById('timerDisplay').textContent =
+    `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+// ═══ DEMO SLIDES ═══
+function renderDemoUrls() {
+  const container = document.getElementById('demoUrlInputs');
+  container.innerHTML = state.demoSlides.map((slide, i) => `
+    <div class="row">
+      <label style="min-width:50px;">Slide ${i + 1}</label>
+      <input type="text" value="${slide.label || ''}" placeholder="Label"
+             style="width:100px;" oninput="state.demoSlides[${i}].label=this.value; autosave()">
+      <input type="text" value="${slide.url || ''}" placeholder="https://..."
+             style="flex:1;" oninput="state.demoSlides[${i}].url=this.value; autosave()">
+      <label style="min-width:auto;font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:3px;">
+        <input type="checkbox" ${slide.visible ? 'checked' : ''}
+               onchange="state.demoSlides[${i}].visible=this.checked; autosave()"> Show
+      </label>
+    </div>
+  `).join('');
+}
+
+function broadcastDemoUrls() {
+  send({ type: 'set_demo_urls', slides: state.demoSlides });
+}
+
+function toggleCollapsible(header) {
+  const arrow = header.querySelector('.arrow');
+  const body = header.nextElementSibling;
+  arrow.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+// ═══ DEPARTMENT SELECTS ═══
+function populateDeptSelects() {
+  const selects = [document.getElementById('newIdeaDept'), document.getElementById('aiDept')];
+  selects.forEach(sel => {
+    if (!sel) return;
+    sel.innerHTML = state.departments.map(d => `<option value="${d}">${d}</option>`).join('');
+  });
+}
+
+// ═══ TEMPLATES ═══
+function loadTemplate() {
+  const sel = document.getElementById('templateSelect');
+  if (!sel.value) return;
+  // Placeholder for future templates
+  sel.value = '';
+}
+
+// ═══ IDEAS ═══
+function addIdea() {
+  const name = document.getElementById('newIdeaName').value.trim();
+  const dept = document.getElementById('newIdeaDept').value;
+  const desc = document.getElementById('newIdeaDesc').value.trim();
+  const submitter = document.getElementById('newIdeaSubmitter').value.trim();
+  if (!name) return;
+
+  const id = Date.now();
+  const idea = { id, name, dept, desc, submitter: submitter || 'Facilitator', votes: 0, voters: [] };
+  state.ideas.push(idea);
+  send({ type: 'add_idea', idea });
+
+  document.getElementById('newIdeaName').value = '';
+  document.getElementById('newIdeaDesc').value = '';
+  document.getElementById('newIdeaSubmitter').value = '';
+  renderIdeaList();
+  autosave();
+}
+
+function removeIdea(id) {
+  state.ideas = state.ideas.filter(i => i.id !== id);
+  send({ type: 'remove_idea', id });
+  renderIdeaList();
+  autosave();
+}
+
+// ═══ VOTING ═══
+function addVote(id) {
+  const voter = document.getElementById('voterName').value.trim() ||
+    `P${(state.ideas.find(i => i.id === id)?.voters.length || 0) + 1}`;
+  const idea = state.ideas.find(i => i.id === id);
+  if (idea) {
+    idea.votes++;
+    idea.voters.push(voter);
+    send({ type: 'add_vote', ideaId: id, voter, count: 1 });
+    renderIdeaList();
+    autosave();
+  }
+}
+
+function removeVote(id) {
+  const idea = state.ideas.find(i => i.id === id);
+  if (idea && idea.votes > 0) {
+    idea.votes--;
+    idea.voters.pop();
+    send({ type: 'remove_vote', ideaId: id });
+    renderIdeaList();
+    autosave();
+  }
+}
+
+// ═══ RENDER ═══
+function renderIdeaList() {
+  document.getElementById('ideaCountBadge').textContent = state.ideas.length;
+  const sorted = [...state.ideas].sort((a, b) => b.votes - a.votes);
+  const html = sorted.map(i => `
+    <div class="idea-row">
+      <span class="idea-name">${i.name}</span>
+      <span class="idea-dept">${i.dept}</span>
+      <div class="vote-controls">
+        <button class="btn-sm btn-red" onclick="removeVote(${i.id})" title="Remove vote">−</button>
+        <span class="vote-num">${i.votes}</span>
+        <button class="btn-sm btn-green" onclick="addVote(${i.id})" title="Add vote">+</button>
+        <button class="btn-sm" style="background:var(--border);color:var(--red);margin-left:8px;" onclick="removeIdea(${i.id})" title="Delete idea">✕</button>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('ideaList').innerHTML = html;
+  document.getElementById('voteList').innerHTML = html;
+}
+
+function renderAll() {
+  document.getElementById('workshopName').value = state.workshopName;
+  document.getElementById('companyName').value = state.companyName;
+  document.getElementById('currentPhase').textContent = state.phase.toUpperCase();
+  // Sync phase buttons
+  document.querySelectorAll('.phase-btns button').forEach(b => {
+    b.classList.remove('active-phase');
+    if (b.textContent.includes('Ideate') && state.phase === 'ideate') b.classList.add('active-phase');
+    if (b.textContent.includes('Vote') && state.phase === 'vote') b.classList.add('active-phase');
+    if (b.textContent.includes('Results') && state.phase === 'prioritize') b.classList.add('active-phase');
+  });
+  populateDeptSelects();
+  renderParticipants();
+  renderTimerLocal();
+  renderDemoUrls();
+  renderIdeaList();
+  updateSessionBadge();
+}
+
+// ═══ AI PASTE FROM CHAT ═══
+async function aiFormatIdea() {
+  const raw = document.getElementById('chatPasteInput').value.trim();
+  if (!raw) return;
+
+  if (!ghToken) {
+    ghToken = prompt('Enter your GitHub Personal Access Token (needs Models API access).\nGet one at: https://github.com/settings/tokens\n\nThis is stored locally in your browser.');
+    if (!ghToken) return;
+    localStorage.setItem('gh_token', ghToken);
+  }
+
+  const btn = document.getElementById('aiFormatBtn');
+  const status = document.getElementById('aiStatus');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Formatting...';
+  status.textContent = 'Calling GitHub Models API...';
+
+  const deptList = state.departments.join(', ');
+  try {
+    const response = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${ghToken}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: `You extract and format AI agent use case ideas from raw chat text. Return ONLY valid JSON with these fields:
+{
+  "name": "Short use case name (5-8 words max, title case)",
+  "department": "One of: ${deptList}",
+  "description": "Clean 1-2 sentence description of what the agent does and its business value",
+  "submitter": "Person who suggested it (extract from chat text, or 'Workshop Participant' if unclear)"
+}
+No markdown, no explanation, just the JSON object.`
+          },
+          {
+            role: 'user',
+            content: `Extract and format this raw workshop chat into a clean AI agent use case:\n\n${raw}`
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 300
+      })
+    });
+
+    if (response.status === 401) {
+      ghToken = '';
+      localStorage.removeItem('gh_token');
+      throw new Error('Invalid GitHub token. Please try again.');
+    }
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    let parsed;
+    try {
+      const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      parsed = JSON.parse(jsonStr);
+    } catch {
+      throw new Error('AI returned invalid format. Try rephrasing.');
+    }
+
+    document.getElementById('aiName').value = parsed.name || '';
+    document.getElementById('aiDept').value = parsed.department || state.departments[0];
+    document.getElementById('aiDesc').value = parsed.description || '';
+    document.getElementById('aiSubmitter').value = parsed.submitter || 'Workshop Participant';
+
+    document.getElementById('aiResult').style.display = 'block';
+    status.textContent = '✓ Formatted successfully';
+    log(`AI formatted: "${parsed.name}" from ${parsed.submitter}`);
+  } catch (err) {
+    status.textContent = `Error: ${err.message}`;
+    log(`AI error: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✨ Format with AI';
+  }
+}
+
+function addAiIdea() {
+  const name = document.getElementById('aiName').value.trim();
+  const dept = document.getElementById('aiDept').value;
+  const desc = document.getElementById('aiDesc').value.trim();
+  const submitter = document.getElementById('aiSubmitter').value.trim();
+  if (!name) return;
+
+  const id = Date.now();
+  const idea = { id, name, dept, desc, submitter: submitter || 'Workshop Participant', votes: 0, voters: [] };
+  state.ideas.push(idea);
+  send({ type: 'add_idea', idea });
+  renderIdeaList();
+  hideAiResult();
+  document.getElementById('chatPasteInput').value = '';
+  document.getElementById('aiStatus').textContent = '';
+  autosave();
+}
+
+function hideAiResult() {
+  document.getElementById('aiResult').style.display = 'none';
+}
+
+// ═══ GITHUB TOKEN MANAGEMENT ═══
+function clearGhToken() {
+  ghToken = '';
+  localStorage.removeItem('gh_token');
+  log('GitHub token cleared');
+}
+
+// ═══ INIT ═══
+const didRestore = restoreAutosave();
+if (didRestore) {
+  // Reconnect channel with restored sessionId
+  reconnectChannel(state.sessionId);
+}
+populateDeptSelects();
+renderDemoUrls();
+renderTimerLocal();
+renderIdeaList();
+renderParticipants();
+updateSessionBadge();
+if (didRestore) log('Restored from autosave (session: ' + state.sessionId + ')');
+log('Control panel ready — open workshop-presenter.html in another window');
+if (ghToken) log('GitHub token loaded from storage');
+autosave();
+</script>
+</body>
+</html>

@@ -807,16 +807,10 @@ function clearGhToken() {
 // ═══ INIT ═══
 const didRestore = restoreAutosave();
 if (didRestore) {
-  // Reconnect channel with restored sessionId
   reconnectChannel(state.sessionId);
 }
-populateDeptSelects();
-renderDemoUrls();
-renderTimerLocal();
-renderIdeaList();
-renderParticipants();
-updateSessionBadge();
-if (didRestore) log('Restored from autosave (session: ' + state.sessionId + ')');
+renderAll();
+if (didRestore) log('✅ Restored workshop from local cache (session: ' + state.sessionId + ')');
 log('Control panel ready — open index.html in another window');
 if (ghToken) log('GitHub token loaded from storage');
 autosave();

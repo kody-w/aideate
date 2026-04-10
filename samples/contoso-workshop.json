@@ -1,0 +1,98 @@
+{
+  "version": "1.0",
+  "sessionId": "contoso-2026",
+  "workshopName": "AI Use-Case Workshop",
+  "companyName": "Contoso Inc.",
+  "participants": [
+    { "id": 1001, "name": "Sarah Chen", "title": "VP Engineering", "initials": "SC" },
+    { "id": 1002, "name": "Marcus Johnson", "title": "Director of IT", "initials": "MJ" },
+    { "id": 1003, "name": "Priya Patel", "title": "Head of Operations", "initials": "PP" },
+    { "id": 1004, "name": "David Kim", "title": "Sales Manager", "initials": "DK" },
+    { "id": 1005, "name": "Rachel Torres", "title": "HR Business Partner", "initials": "RT" },
+    { "id": 1006, "name": "James Wright", "title": "CFO", "initials": "JW" }
+  ],
+  "ideas": [
+    {
+      "id": 2001,
+      "name": "Customer Support Triage Agent",
+      "dept": "Customer Service",
+      "desc": "AI agent that reads incoming support tickets, classifies severity, routes to the right team, and drafts an initial response — cutting first-response time from 4 hours to under 10 minutes.",
+      "submitter": "Sarah Chen",
+      "votes": 5,
+      "voters": ["Sarah Chen", "Marcus Johnson", "Priya Patel", "David Kim", "Rachel Torres"]
+    },
+    {
+      "id": 2002,
+      "name": "Sales Meeting Prep Agent",
+      "dept": "Sales",
+      "desc": "Before every client meeting, this agent pulls CRM data, recent emails, LinkedIn updates, and news mentions to generate a 1-page account brief with talking points and upsell opportunities.",
+      "submitter": "David Kim",
+      "votes": 4,
+      "voters": ["David Kim", "Sarah Chen", "James Wright", "Priya Patel"]
+    },
+    {
+      "id": 2003,
+      "name": "Invoice Processing Autopilot",
+      "dept": "Finance",
+      "desc": "Reads incoming invoices (PDF/email), extracts line items, matches to POs, flags discrepancies, and queues approved invoices for payment — eliminating 20 hours/week of manual AP work.",
+      "submitter": "James Wright",
+      "votes": 4,
+      "voters": ["James Wright", "Priya Patel", "Marcus Johnson", "Rachel Torres"]
+    },
+    {
+      "id": 2004,
+      "name": "Employee Onboarding Concierge",
+      "dept": "HR",
+      "desc": "Guides new hires through their first 30 days: schedules orientation meetings, provisions accounts, answers policy questions, and checks in weekly to make sure nothing fell through the cracks.",
+      "submitter": "Rachel Torres",
+      "votes": 3,
+      "voters": ["Rachel Torres", "Marcus Johnson", "Sarah Chen"]
+    },
+    {
+      "id": 2005,
+      "name": "IT Helpdesk Auto-Resolver",
+      "dept": "IT",
+      "desc": "Handles common IT tickets automatically — password resets, VPN issues, software access requests. Resolves 60% of tier-1 tickets without human intervention and escalates the rest with full context.",
+      "submitter": "Marcus Johnson",
+      "votes": 3,
+      "voters": ["Marcus Johnson", "Sarah Chen", "Priya Patel"]
+    },
+    {
+      "id": 2006,
+      "name": "Weekly Status Report Generator",
+      "dept": "Operations",
+      "desc": "Pulls data from Jira, Teams, and email to auto-generate project status reports every Friday. Highlights blockers, tracks milestones, and emails the summary to stakeholders.",
+      "submitter": "Priya Patel",
+      "votes": 2,
+      "voters": ["Priya Patel", "James Wright"]
+    },
+    {
+      "id": 2007,
+      "name": "Contract Review Assistant",
+      "dept": "Legal",
+      "desc": "Scans vendor contracts for non-standard clauses, liability risks, and missing terms. Generates a redline summary so legal can focus on negotiation instead of reading 40-page PDFs.",
+      "submitter": "James Wright",
+      "votes": 2,
+      "voters": ["James Wright", "David Kim"]
+    },
+    {
+      "id": 2008,
+      "name": "Marketing Content Repurposer",
+      "dept": "Marketing",
+      "desc": "Takes a single blog post or case study and generates 5 LinkedIn posts, 3 tweets, an email newsletter snippet, and a slide for the sales deck — all in brand voice.",
+      "submitter": "David Kim",
+      "votes": 1,
+      "voters": ["David Kim"]
+    }
+  ],
+  "phase": "prioritize",
+  "timerSeconds": 300,
+  "demoSlides": [
+    { "label": "", "url": "", "visible": false },
+    { "label": "", "url": "", "visible": false },
+    { "label": "", "url": "", "visible": false },
+    { "label": "", "url": "", "visible": false }
+  ],
+  "departments": ["Sales", "Operations", "HR", "IT", "Finance", "Marketing", "Customer Service", "Engineering", "Legal", "Product"],
+  "createdAt": "2026-04-10T18:00:00Z"
+}

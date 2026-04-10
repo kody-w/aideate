@@ -90,7 +90,7 @@
 
   /* Export button */
   .export-btn {
-    position: fixed; bottom: 20px; left: 24px; z-index: 100;
+    position: fixed; top: 12px; right: 24px; z-index: 100;
     background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.1); color: var(--muted);
     padding: 6px 14px; border-radius: 16px; font-size: .7rem; cursor: pointer;
     backdrop-filter: blur(8px); transition: all .3s; opacity: .4;
@@ -368,8 +368,8 @@
 <div class="progress-bar" id="progressBar"></div>
 <div class="key-hint">← → arrow keys to navigate · F for fullscreen</div>
 <button class="export-btn" id="exportBtn" onclick="exportState()" title="Export workshop state">💾 Export</button>
-<a class="export-btn" href="control.html" target="_blank" style="left:110px; text-decoration:none;" title="Open control panel">🎛️ Control</a>
-<button class="export-btn" id="presenterInstallBtn" onclick="installPWA()" style="left:210px; display:none;" title="Install app for offline use">📲 Install</button>
+<a class="export-btn" href="control.html" target="_blank" style="right:110px; text-decoration:none;" title="Open control panel">🎛️ Control</a>
+<button class="export-btn" id="presenterInstallBtn" onclick="installPWA()" style="right:210px; display:none;" title="Install app for offline use">📲 Install</button>
 
 <!-- ════════════════════════════════════════════ -->
 <!-- SLIDE 1: Welcome                            -->

@@ -235,7 +235,7 @@ async function runTests() {
   // ═══ 5. No PII Hardcoded Tests ═══
   // Test 18: Control panel has no hardcoded company names
   try {
-    const resp = await fetch('workshop-control.html');
+    const resp = await fetch('control.html');
     const html = await resp.text();
     const hasHardcoded = /manpower|cargill|experis|nike|deloitte/i.test(html);
     logTest('Control: no hardcoded company names', !hasHardcoded);
@@ -245,7 +245,7 @@ async function runTests() {
 
   // Test 19: Presenter has no hardcoded company names
   try {
-    const resp = await fetch('workshop-presenter.html');
+    const resp = await fetch('index.html');
     const html = await resp.text();
     const hasHardcoded = /manpower|cargill|experis|nike|deloitte/i.test(html);
     logTest('Presenter: no hardcoded company names', !hasHardcoded);
@@ -255,8 +255,8 @@ async function runTests() {
 
   // Test 20: Both files use MS Blue (#0078d4)
   try {
-    const c = await (await fetch('workshop-control.html')).text();
-    const p = await (await fetch('workshop-presenter.html')).text();
+    const c = await (await fetch('control.html')).text();
+    const p = await (await fetch('index.html')).text();
     logTest('Theme: both files use #0078d4 (MS Blue)', c.includes('0078d4') && p.includes('0078d4'));
   } catch (e) {
     logTest('Theme: MS Blue check', false, 'Could not fetch files');
@@ -264,11 +264,159 @@ async function runTests() {
 
   // Test 21: Both use session-scoped BroadcastChannel
   try {
-    const c = await (await fetch('workshop-control.html')).text();
-    const p = await (await fetch('workshop-presenter.html')).text();
+    const c = await (await fetch('control.html')).text();
+    const p = await (await fetch('index.html')).text();
     logTest('Channel: both use session-scoped naming', c.includes('aideate-workshop-') && p.includes('aideate-workshop-'));
   } catch (e) {
     logTest('Channel: session-scoped naming', false, 'Could not fetch files');
+  }
+
+  // ═══ 6. PWA Tests ═══
+
+  // Test 22: manifest.json is valid and loadable
+  try {
+    const resp = await fetch('manifest.json');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const manifest = await resp.json();
+    logTest('PWA: manifest.json is valid JSON', true);
+  } catch (e) {
+    logTest('PWA: manifest.json is valid JSON', false, e.message);
+  }
+
+  // Test 23: manifest has required PWA fields
+  try {
+    const manifest = await (await fetch('manifest.json')).json();
+    const required = ['name', 'short_name', 'start_url', 'display', 'icons', 'theme_color', 'background_color'];
+    const missing = required.filter(f => !(f in manifest));
+    logTest('PWA: manifest has all required fields', missing.length === 0, missing.length > 0 ? `Missing: ${missing.join(', ')}` : '7 fields');
+  } catch (e) {
+    logTest('PWA: manifest required fields', false, e.message);
+  }
+
+  // Test 24: manifest display is minimal-ui (not standalone, to support 2-window flow)
+  try {
+    const manifest = await (await fetch('manifest.json')).json();
+    logTest('PWA: display is minimal-ui', manifest.display === 'minimal-ui', manifest.display);
+  } catch (e) {
+    logTest('PWA: display mode', false, e.message);
+  }
+
+  // Test 25: manifest theme_color is MS Blue
+  try {
+    const manifest = await (await fetch('manifest.json')).json();
+    logTest('PWA: theme_color is #0078d4', manifest.theme_color === '#0078d4');
+  } catch (e) {
+    logTest('PWA: theme_color', false, e.message);
+  }
+
+  // Test 26: manifest has at least one icon
+  try {
+    const manifest = await (await fetch('manifest.json')).json();
+    logTest('PWA: has icons array with entries', Array.isArray(manifest.icons) && manifest.icons.length > 0);
+  } catch (e) {
+    logTest('PWA: icons', false, e.message);
+  }
+
+  // Test 27: icon.svg is loadable
+  try {
+    const resp = await fetch('icon.svg');
+    const text = await resp.text();
+    logTest('PWA: icon.svg loads and is SVG', resp.ok && text.includes('<svg'));
+  } catch (e) {
+    logTest('PWA: icon.svg', false, e.message);
+  }
+
+  // Test 28: sw.js is loadable
+  try {
+    const resp = await fetch('sw.js');
+    const text = await resp.text();
+    logTest('PWA: sw.js loads and contains install handler', resp.ok && text.includes("addEventListener('install'"));
+  } catch (e) {
+    logTest('PWA: sw.js', false, e.message);
+  }
+
+  // Test 29: Service worker can be registered
+  try {
+    if ('serviceWorker' in navigator) {
+      const reg = await navigator.serviceWorker.register('sw.js');
+      logTest('PWA: service worker registration succeeds', !!reg.scope);
+      // Unregister test SW to avoid side effects
+      await reg.unregister();
+    } else {
+      logTest('PWA: service worker registration succeeds', false, 'serviceWorker not supported');
+    }
+  } catch (e) {
+    logTest('PWA: service worker registration', false, e.message);
+  }
+
+  // Test 30: Both HTML files have manifest link
+  try {
+    const c = await (await fetch('control.html')).text();
+    const p = await (await fetch('index.html')).text();
+    logTest('PWA: both files link manifest.json', c.includes('manifest.json') && p.includes('manifest.json'));
+  } catch (e) {
+    logTest('PWA: manifest link', false, e.message);
+  }
+
+  // Test 31: Both HTML files have theme-color meta
+  try {
+    const c = await (await fetch('control.html')).text();
+    const p = await (await fetch('index.html')).text();
+    logTest('PWA: both files have theme-color meta', c.includes('theme-color') && p.includes('theme-color'));
+  } catch (e) {
+    logTest('PWA: theme-color meta', false, e.message);
+  }
+
+  // Test 32: Both HTML files register service worker
+  try {
+    const c = await (await fetch('control.html')).text();
+    const p = await (await fetch('index.html')).text();
+    logTest('PWA: both files register sw.js', c.includes("register('sw.js')") && p.includes("register('sw.js')"));
+  } catch (e) {
+    logTest('PWA: SW registration code', false, e.message);
+  }
+
+  // Test 33: Control panel has download button
+  try {
+    const c = await (await fetch('control.html')).text();
+    logTest('PWA: control panel has download link', c.includes('Download App') && c.includes('archive/refs/heads/main.zip'));
+  } catch (e) {
+    logTest('PWA: download button', false, e.message);
+  }
+
+  // Test 34: Control panel has install button
+  try {
+    const c = await (await fetch('control.html')).text();
+    logTest('PWA: control panel has install button', c.includes('installBtn') && c.includes('installPWA'));
+  } catch (e) {
+    logTest('PWA: install button', false, e.message);
+  }
+
+  // Test 35: Presenter has control panel link
+  try {
+    const p = await (await fetch('index.html')).text();
+    logTest('PWA: presenter has control panel link', p.includes('control.html') && p.includes('Control'));
+  } catch (e) {
+    logTest('PWA: control link in presenter', false, e.message);
+  }
+
+  // Test 36: BroadcastChannel in control.html is guarded with try/catch
+  try {
+    const c = await (await fetch('control.html')).text();
+    const hasGuard = c.includes('BroadcastChannel unavailable');
+    logTest('PWA: control BroadcastChannel has error guard', hasGuard);
+  } catch (e) {
+    logTest('PWA: BroadcastChannel guard', false, e.message);
+  }
+
+  // Test 37: sw.js caches all critical app files
+  try {
+    const sw = await (await fetch('sw.js')).text();
+    const criticalFiles = ['index.html', 'control.html', 'manifest.json', 'icon.svg'];
+    const allCached = criticalFiles.every(f => sw.includes(f));
+    logTest('PWA: sw.js caches all critical files', allCached);
+  } catch (e) {
+    logTest('PWA: SW cache list', false, e.message);
   }
 
   showSummary();

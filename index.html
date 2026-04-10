@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AIdeate Workshop — Presenter</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0078d4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 <style>
   :root {
     --ms-blue: #0078d4;
@@ -362,6 +368,8 @@
 <div class="progress-bar" id="progressBar"></div>
 <div class="key-hint">← → arrow keys to navigate · F for fullscreen</div>
 <button class="export-btn" id="exportBtn" onclick="exportState()" title="Export workshop state">💾 Export</button>
+<a class="export-btn" href="control.html" target="_blank" style="left:110px; text-decoration:none;" title="Open control panel">🎛️ Control</a>
+<button class="export-btn" id="presenterInstallBtn" onclick="installPWA()" style="left:210px; display:none;" title="Install app for offline use">📲 Install</button>
 
 <!-- ════════════════════════════════════════════ -->
 <!-- SLIDE 1: Welcome                            -->
@@ -1229,6 +1237,34 @@ function escAttr(str) {
   updateSlideNumbers();
   updateProgressBar();
 })();
+
+// ══════════════════════════════════════════════
+// PWA: Service Worker + Install
+// ══════════════════════════════════════════════
+let deferredInstallPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(err => {
+    console.warn('SW registration failed:', err);
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const btn = document.getElementById('presenterInstallBtn');
+  if (btn) btn.style.display = '';
+});
+
+function installPWA() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(result => {
+    deferredInstallPrompt = null;
+    const btn = document.getElementById('presenterInstallBtn');
+    if (btn) btn.style.display = 'none';
+  });
+}
 </script>
 </body>
 </html>

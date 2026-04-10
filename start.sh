@@ -4,11 +4,11 @@
 cd "$(dirname "$0")"
 PORT=${1:-8765}
 echo "🚀 AIdeate Workshop starting on http://localhost:$PORT"
-echo "   Control Panel: http://localhost:$PORT/workshop-control.html"
-echo "   Presenter:     http://localhost:$PORT/workshop-presenter.html"
+echo "   Control Panel: http://localhost:$PORT/control.html"
+echo "   Presenter:     http://localhost:$PORT/index.html"
 echo ""
 echo "   Press Ctrl+C to stop"
 echo ""
-open "http://localhost:$PORT/workshop-control.html"
-open "http://localhost:$PORT/workshop-presenter.html"
+open "http://localhost:$PORT/control.html"
+open "http://localhost:$PORT/index.html"
 python3 -m http.server $PORT

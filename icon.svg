@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0078d4"/>
+  <text x="256" y="320" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-size="240" font-weight="800" fill="#fff">Ai</text>
+  <circle cx="400" cy="120" r="48" fill="#742774" opacity=".9"/>
+  <path d="M380 120 l15-20 l5 15 l20-5 l-15 20 l15 20 l-20-5 l-5 15 l-15-20 l-20 5 l15-20 l-15-20z" fill="#fff" opacity=".9"/>
+</svg>

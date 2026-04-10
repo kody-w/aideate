@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AIdeate Control Panel</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0078d4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 <style>
 :root {
   --ms-blue: #0078d4; --bg: #1a1a2e; --card: #16213e; --border: #2a3a5c;
@@ -133,7 +139,7 @@ button {
   </div>
 </div>
 
-<!-- 3. IMPORT / EXPORT -->
+<!-- 3. IMPORT / EXPORT / DOWNLOAD -->
 <div class="section">
   <h2>💾 Import / Export</h2>
   <div class="import-export">
@@ -143,6 +149,11 @@ button {
   <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
     <p style="font-size:.7rem;color:var(--muted);">Back up your workshop data locally. All PII stays on your device.</p>
     <button class="btn-sm" style="background:var(--border);color:var(--muted);" onclick="clearAutosave()">🗑️ Clear Autosave</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:10px;">
+    <button id="installBtn" class="btn-blue btn-sm" style="display:none;" onclick="installPWA()">📲 Install App</button>
+    <a href="https://github.com/kody-w/aideate/archive/refs/heads/main.zip" class="btn-sm" style="background:var(--border);color:var(--text);text-decoration:none;display:inline-flex;align-items:center;gap:4px;" download>📥 Download App (.zip)</a>
+    <a href="index.html" target="_blank" class="btn-sm" style="background:var(--border);color:var(--text);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">🖥️ Open Presenter</a>
   </div>
 </div>
 
@@ -335,7 +346,13 @@ function clearAutosave() {
 }
 
 // ═══ BROADCAST CHANNEL ═══
-let channel = new BroadcastChannel('aideate-workshop-' + state.sessionId);
+let channel;
+try {
+  channel = new BroadcastChannel('aideate-workshop-' + state.sessionId);
+} catch(e) {
+  console.warn('BroadcastChannel unavailable:', e.message);
+  channel = { postMessage(){}, close(){}, onmessage: null };
+}
 
 function initChannel() {
   channel.onmessage = (e) => {
@@ -350,9 +367,14 @@ function initChannel() {
 }
 
 function reconnectChannel(newSessionId) {
-  channel.close();
+  try { channel.close(); } catch(e) {}
   state.sessionId = newSessionId;
-  channel = new BroadcastChannel('aideate-workshop-' + state.sessionId);
+  try {
+    channel = new BroadcastChannel('aideate-workshop-' + state.sessionId);
+  } catch(e) {
+    console.warn('BroadcastChannel unavailable:', e.message);
+    channel = { postMessage(){}, close(){}, onmessage: null };
+  }
   initChannel();
   updateSessionBadge();
 }
@@ -795,9 +817,38 @@ renderIdeaList();
 renderParticipants();
 updateSessionBadge();
 if (didRestore) log('Restored from autosave (session: ' + state.sessionId + ')');
-log('Control panel ready — open workshop-presenter.html in another window');
+log('Control panel ready — open index.html in another window');
 if (ghToken) log('GitHub token loaded from storage');
 autosave();
+
+// ═══ PWA: Service Worker + Install ═══
+let deferredInstallPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    log('Service worker registered (scope: ' + reg.scope + ')');
+  }).catch(err => {
+    console.warn('SW registration failed:', err);
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.style.display = '';
+});
+
+function installPWA() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(result => {
+    log('Install ' + result.outcome);
+    deferredInstallPrompt = null;
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.style.display = 'none';
+  });
+}
 </script>
 </body>
 </html>

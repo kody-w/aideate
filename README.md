@@ -1,6 +1,6 @@
 # AIdeate — AI Use-Case Prioritization Workshop
 
-A local-first, privacy-safe workshop tool for identifying and prioritizing AI use cases with customers. Built as static HTML — no server, no build step, no data leaves your device.
+A local-first, privacy-safe workshop tool for identifying and prioritizing AI use cases with customers. Built as static HTML — no server, no build step, no data leaves your device. Installable as a PWA for fully offline use.
 
 ## Quick Start
 
@@ -13,6 +13,26 @@ This opens two browser windows:
 - **Control Panel** (`control.html`) — operate offscreen on your second monitor
 
 Arrow keys navigate slides. The control panel syncs live to the presenter via BroadcastChannel.
+
+## Install & Offline Use
+
+AIdeate works three ways:
+
+### 1. GitHub Pages (online)
+Just visit the hosted URL. Works immediately in any browser.
+
+### 2. Install as PWA (recommended for repeat use)
+From the control panel, click **📲 Install App** (when your browser supports it). The app installs to your device and works fully offline — no server needed.
+
+### 3. Download for local use
+Click **📥 Download App (.zip)** in the control panel to download the full app. Extract and run:
+
+```bash
+cd aideate-main
+./start.sh
+```
+
+Or just open `control.html` and `index.html` directly in your browser.
 
 ## How It Works
 
@@ -35,6 +55,7 @@ Arrow keys navigate slides. The control panel syncs live to the presenter via Br
 - **Ideas** — add manually or paste from Teams chat
 - **AI Formatting** — paste rough chat text, AI extracts structured use case (requires GitHub token)
 - **Vote Control** — +/- per idea with voter names
+- **Download/Install** — PWA install + offline ZIP download
 
 ## Privacy & Security
 
@@ -43,6 +64,7 @@ Arrow keys navigate slides. The control panel syncs live to the presenter via Br
 - **No server calls** — except optional AI formatting (GitHub Models API, your token)
 - **Session-scoped** — BroadcastChannel uses unique session IDs (no cross-talk)
 - **GitHub Pages ready** — static files, HTTPS, no backend
+- **Offline capable** — service worker caches all files for offline use
 
 ## JSON Import/Export
 
@@ -83,14 +105,17 @@ Export saves everything — import restores it instantly:
 |------|---------|
 | `index.html` | Presenter view (screen share this) |
 | `control.html` | Offscreen control panel |
-| `tests.html` | 21 automated tests |
+| `tests.html` | 37 automated tests |
 | `start.sh` | Local HTTP server launcher |
+| `manifest.json` | PWA web app manifest |
+| `sw.js` | Service worker for offline caching |
+| `icon.svg` | App icon |
 | `samples/` | Example workshop JSON files |
 
 ## Requirements
 
 - Modern browser (Chrome, Edge, Firefox, Safari)
-- For local use: Python 3 (for `start.sh` HTTP server)
+- For local use: Python 3 (for `start.sh` HTTP server) or just open the HTML files directly
 - For GitHub Pages: just push and enable Pages
 
 ## License

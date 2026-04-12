@@ -118,6 +118,12 @@ Export saves everything — import restores it instantly:
 - For local use: Python 3 (for `start.sh` HTTP server) or just open the HTML files directly
 - For GitHub Pages: just push and enable Pages
 
+## Disclaimer
+
+AIdeate is an experimental tool created by the Power Customer Advisory Team (Power CAT). Although the underlying browser features used by AIdeate are fully supported (such as BroadcastChannel, localStorage, Service Workers, etc.), AIdeate itself represents an example implementation of these features and is **not a supported Microsoft product**. It is provided "as-is" without warranty of any kind. Microsoft makes no guarantees regarding its suitability, reliability, or availability. Use of this tool is at your own risk.
+
+Support for this project is limited to the [GitHub Issues](https://github.com/kody-w/aideate/issues) page. For issues with underlying browser features or platform capabilities, please refer to the respective browser vendor documentation.
+
 ## License
 
-Internal Microsoft tool — not for external distribution.
+MIT

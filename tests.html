@@ -379,7 +379,7 @@ async function runTests() {
   // Test 33: Control panel has download button
   try {
     const c = await (await fetch('control.html')).text();
-    logTest('PWA: control panel has download link', c.includes('Download App') && c.includes('archive/refs/heads/main.zip'));
+    logTest('PWA: control panel has download link', c.includes('Download App') && c.includes('downloadAppZip'));
   } catch (e) {
     logTest('PWA: download button', false, e.message);
   }

@@ -120,7 +120,7 @@ Export saves everything — import restores it instantly:
 
 ## Disclaimer
 
-AIdeate is an experimental tool created by the Power Customer Advisory Team (Power CAT). Although the underlying browser features used by AIdeate are fully supported (such as BroadcastChannel, localStorage, Service Workers, etc.), AIdeate itself represents an example implementation of these features and is **not a supported Microsoft product**. It is provided "as-is" without warranty of any kind. Microsoft makes no guarantees regarding its suitability, reliability, or availability. Use of this tool is at your own risk.
+AIdeate is an experimental tool created by the AI Business & Applied Strategy Team (AIBAST) at Microsoft. Although the underlying browser features used by AIdeate are fully supported (such as BroadcastChannel, localStorage, Service Workers, etc.), AIdeate itself represents an example implementation of these features and is **not a supported Microsoft product**. It is provided "as-is" without warranty of any kind. Microsoft makes no guarantees regarding its suitability, reliability, or availability. Use of this tool is at your own risk.
 
 Support for this project is limited to the [GitHub Issues](https://github.com/kody-w/aideate/issues) page. For issues with underlying browser features or platform capabilities, please refer to the respective browser vendor documentation.
 

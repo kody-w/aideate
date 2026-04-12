@@ -458,7 +458,14 @@
       From our discovery sessions, we've identified AI agent opportunities focused on workflows that go beyond 1st-party Copilot features.
     </p>
     <div id="preparedCards">
-      <div class="prepared-placeholder">💡 Ideas will appear here as they're added from the control panel</div>
+      <div class="prepared-placeholder">
+        <div style="margin-bottom:12px;">💡 Load a project file to populate the use-case menu</div>
+        <button onclick="document.getElementById('projectFileInput').click()"
+          style="background:rgba(251,146,60,.25); color:#fb923c; border:1px solid rgba(251,146,60,.4); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">
+          📂 Load Project (.json)
+        </button>
+        <input type="file" id="projectFileInput" accept=".json" style="display:none;" onchange="loadProjectFile(this)">
+      </div>
     </div>
   </div>
   <div class="slide-number"></div>
@@ -1019,7 +1026,14 @@ function renderPreparedSlide() {
   const container = document.getElementById('preparedCards');
 
   if (state.ideas.length === 0) {
-    container.innerHTML = '<div class="prepared-placeholder">💡 Ideas will appear here as they\'re added from the control panel</div>';
+    container.innerHTML = `<div class="prepared-placeholder">
+      <div style="margin-bottom:12px;">💡 Load a project file to populate the use-case menu</div>
+      <button onclick="document.getElementById('projectFileInput').click()"
+        style="background:rgba(251,146,60,.25); color:#fb923c; border:1px solid rgba(251,146,60,.4); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">
+        📂 Load Project (.json)
+      </button>
+      <input type="file" id="projectFileInput" accept=".json" style="display:none;" onchange="loadProjectFile(this)">
+    </div>`;
     return;
   }
 
@@ -1032,6 +1046,44 @@ function renderPreparedSlide() {
       </div>
     `).join('') +
     '</div>';
+}
+
+function loadProjectFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      // Apply workshop metadata
+      if (data.workshopName) state.workshopName = data.workshopName;
+      if (data.companyName) state.companyName = data.companyName;
+      if (data.workshopDuration) state.workshopDuration = data.workshopDuration;
+      if (data.departments) state.departments = data.departments;
+      // Load ideas
+      if (Array.isArray(data.ideas)) {
+        state.ideas = data.ideas.map((idea, i) => ({
+          id: idea.id || Date.now() + i,
+          name: idea.name || '',
+          dept: idea.dept || '',
+          desc: idea.desc || '',
+          submitter: idea.submitter || 'Pre-loaded',
+          votes: idea.votes || 0,
+          voters: idea.voters || []
+        }));
+      }
+      // Load participants/roster
+      if (Array.isArray(data.participants)) {
+        state.roster = data.participants;
+        state.participants = data.participants.length;
+      }
+      renderAllSlides();
+      saveState();
+    } catch (e) {
+      console.error('Failed to load project file:', e);
+    }
+  };
+  reader.readAsText(file);
 }
 
 function renderDemoSlides() {

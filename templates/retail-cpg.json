@@ -1,0 +1,32 @@
+{
+  "industry": "Retail & Consumer Goods",
+  "source": "AIBAST RAR Agent Library — retail_cpg_stacks",
+  "departments": ["Merchandising", "Marketing", "Supply Chain", "Store Operations", "E-Commerce", "Customer Insights", "Finance"],
+  "ideas": [
+    {
+      "name": "Personalized Marketing",
+      "dept": "Marketing",
+      "desc": "Enables customer segmentation, personalized campaign design, dynamic content personalization, and marketing performance analysis for retail and CPG brands. Segments by purchase behavior and LTV, designs targeted campaigns, and A/B tests content."
+    },
+    {
+      "name": "Inventory Visibility",
+      "dept": "Supply Chain",
+      "desc": "Delivers real-time inventory dashboards, stock-out alerts, replenishment planning, and channel allocation optimization for omni-channel retail and CPG operations. Tracks stock across stores, warehouses, and in-transit."
+    },
+    {
+      "name": "Returns & Complaints Resolution",
+      "dept": "Customer Insights",
+      "desc": "Automates return processing, classifies customer complaints, recommends optimal resolutions, and identifies complaint trends for retail and CPG customer service teams. Surfaces product quality issues for merchandising."
+    },
+    {
+      "name": "Store Associate Copilot",
+      "dept": "Store Operations",
+      "desc": "Provides store associates with instant product lookup, guided customer assistance scripts, daily task checklists, and real-time performance dashboards to improve in-store operations."
+    },
+    {
+      "name": "Supply Chain Disruption Alert",
+      "dept": "Supply Chain",
+      "desc": "Monitors supply chain networks for disruption events, performs risk assessments, generates mitigation playbooks, and identifies qualified alternative suppliers to maintain retail continuity."
+    }
+  ]
+}

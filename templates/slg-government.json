@@ -1,0 +1,32 @@
+{
+  "industry": "State & Local Government",
+  "source": "AIBAST RAR Agent Library — slg_government_stacks",
+  "departments": ["Public Works", "Permitting", "Citizen Services", "Finance", "IT", "Legal", "Public Safety"],
+  "ideas": [
+    {
+      "name": "Building Permit Processing",
+      "dept": "Permitting",
+      "desc": "Local government building permit processing with status tracking, review checklists, inspector assignment, and fee calculation. Reviews applications against zoning requirements (setbacks, height, coverage, parking) and assigns inspectors by specialty and zone."
+    },
+    {
+      "name": "Citizen Service Request (311)",
+      "dept": "Citizen Services",
+      "desc": "Municipal service request management with intake, routing, status tracking, and resolution summaries. Routes requests across 10 categories (potholes, streetlights, trash, graffiti, water) to departments with SLA enforcement by priority level."
+    },
+    {
+      "name": "FOIA Request Assistant",
+      "dept": "Legal",
+      "desc": "FOIA request processing support with request analysis, document search, redaction review, and response preparation. Searches across 7 document repositories, applies 6 exemption categories, and uses response templates for grant/partial/denial."
+    },
+    {
+      "name": "Grants Management",
+      "dept": "Finance",
+      "desc": "State and local government grants portfolio management with application tracking, reporting calendars, and budget monitoring. Manages multi-phase application workflows from pre-application through closeout with budget category tracking."
+    },
+    {
+      "name": "Utility Billing Assistance",
+      "dept": "Finance",
+      "desc": "Municipal utility billing support with account inquiries, usage analysis, payment plans, and assistance program eligibility. Supports tiered rate structures and connects residents to LIHWAP, senior discounts, and arrearage forgiveness programs."
+    }
+  ]
+}

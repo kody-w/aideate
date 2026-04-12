@@ -1,0 +1,32 @@
+{
+  "industry": "Manufacturing",
+  "source": "AIBAST RAR Agent Library — manufacturing_stacks",
+  "departments": ["Production", "Quality", "Maintenance", "Supply Chain", "Logistics", "Engineering", "Customer Service"],
+  "ideas": [
+    {
+      "name": "Production Line Optimization",
+      "dept": "Production",
+      "desc": "Analyzes production line OEE (Availability x Performance x Quality), identifies bottleneck stations, and generates throughput optimization plans with shift-level scheduling. Includes station-by-station cycle time vs. takt analysis and defect Pareto."
+    },
+    {
+      "name": "Predictive Maintenance Scheduling",
+      "dept": "Maintenance",
+      "desc": "Generates predictive maintenance schedules from equipment telemetry and failure models, optimizing technician assignments to minimize unplanned downtime. Monitors sensor data (vibration, temperature, oil pressure), models 30/60/90-day failure probability."
+    },
+    {
+      "name": "Inventory Rebalancing",
+      "dept": "Supply Chain",
+      "desc": "Optimizes multi-warehouse inventory distribution by analyzing stock levels against demand forecasts and generating cost-effective transfer plans. Tracks SKU-level surplus/deficit across facilities with inter-warehouse transfer cost optimization."
+    },
+    {
+      "name": "Order Status Communication",
+      "dept": "Customer Service",
+      "desc": "Tracks manufacturing orders through fulfillment, generates proactive delay notifications, and drafts customer status updates with shipment details. Identifies delays with root cause, revised dates, recovery actions, and cost impact."
+    },
+    {
+      "name": "Supplier Risk Monitoring",
+      "dept": "Supply Chain",
+      "desc": "Monitors supplier risk across quality, delivery, financial, and geopolitical dimensions with scorecards, disruption alerts, and alternative-sourcing plans. Weighted scoring (quality 30%, delivery 25%, financial 25%, geopolitical 20%) with backup supplier recommendations."
+    }
+  ]
+}

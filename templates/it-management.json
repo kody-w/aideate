@@ -1,0 +1,37 @@
+{
+  "industry": "IT Management",
+  "source": "AIBAST RAR Agent Library — it_management_stacks + general_stacks",
+  "departments": ["Service Desk", "Infrastructure", "Security", "Applications", "Governance", "Vendor Management", "Project Management"],
+  "ideas": [
+    {
+      "name": "IT Helpdesk",
+      "dept": "Service Desk",
+      "desc": "AI-powered IT helpdesk with automated troubleshooting, knowledge retrieval, remote remediation, and ticket management. Resolves tier-1 tickets (password resets, VPN, software access) without human intervention."
+    },
+    {
+      "name": "IT Ticket Management",
+      "dept": "Service Desk",
+      "desc": "IT ticket management with dashboards, priority assignment, SLA tracking, and resolution reporting. Auto-categorizes incoming tickets, tracks resolution metrics, and surfaces recurring issue patterns."
+    },
+    {
+      "name": "Procurement Agent",
+      "dept": "Governance",
+      "desc": "Procurement management for purchase requests, vendor comparison, approval routing, and spend analysis. Compares vendors on cost, capability, and compliance for IT hardware and software acquisitions."
+    },
+    {
+      "name": "Procurement Support",
+      "dept": "Vendor Management",
+      "desc": "Procurement support for requisition tracking, contract lookups, supplier performance, and budget checks. Tracks active contracts, monitors vendor performance against SLAs, and validates budget availability."
+    },
+    {
+      "name": "Find Accurate Models",
+      "dept": "Applications",
+      "desc": "AI/ML model search and comparison by accuracy benchmarks, deployment readiness, and cost analysis. Helps IT teams evaluate and select the right AI models for organizational use cases."
+    },
+    {
+      "name": "ServiceNow Integration",
+      "dept": "Service Desk",
+      "desc": "ServiceNow integration for incident creation, knowledge search, assignment routing, and status updates. Bridges voice/chat channels to ServiceNow with automated ticket creation and assignment group routing."
+    }
+  ]
+}

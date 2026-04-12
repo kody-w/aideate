@@ -1,0 +1,32 @@
+{
+  "industry": "Healthcare",
+  "source": "AIBAST RAR Agent Library — healthcare_stacks",
+  "departments": ["Clinical Operations", "Patient Access", "Revenue Cycle", "Compliance", "Administration", "Nursing", "Pharmacy"],
+  "ideas": [
+    {
+      "name": "Care Gap Closure",
+      "dept": "Clinical Operations",
+      "desc": "Analyzes HEDIS quality measure gaps, prioritizes patient outreach, manages campaigns, and provides HEDIS compliance dashboards. Covers breast cancer screening, diabetes HbA1c, colorectal screening, blood pressure control, and adolescent well-care."
+    },
+    {
+      "name": "Clinical Notes Summarizer",
+      "dept": "Clinical Operations",
+      "desc": "Summarizes patient encounters, performs medication reviews, generates problem lists, and produces referral summaries from clinical documentation. Flags polypharmacy risks and highlights abnormal lab results."
+    },
+    {
+      "name": "Patient Intake Automation",
+      "dept": "Patient Access",
+      "desc": "Manages patient intake forms, insurance verification, appointment scheduling, and pre-visit summary preparation. Verifies coverage in real-time, matches patients to available provider slots, and generates questionnaires by visit type."
+    },
+    {
+      "name": "Prior Authorization",
+      "dept": "Revenue Cycle",
+      "desc": "Manages prior authorization requests, clinical criteria checks, status tracking, and appeal preparation for healthcare payers. Auto-checks payer-specific rules by CPT code, tracks approval rates, and drafts appeal letters for denials."
+    },
+    {
+      "name": "Staff Credentialing",
+      "dept": "Administration",
+      "desc": "Manages staff credential tracking, expiration alerts, verification audits, and onboarding checklists for healthcare organizations. Tracks medical licenses, DEA registrations, board certifications, BLS/ACLS/PALS, and CME hours."
+    }
+  ]
+}

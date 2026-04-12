@@ -1,0 +1,57 @@
+{
+  "industry": "Financial Services",
+  "source": "AIBAST RAR Agent Library — financial_services_stacks",
+  "departments": ["Risk & Compliance", "Operations", "Wealth Management", "Lending", "Claims", "Customer Service", "Analytics"],
+  "ideas": [
+    {
+      "name": "Fraud Detection & Alert Triage",
+      "dept": "Risk & Compliance",
+      "desc": "Financial fraud detection with alert triage, transaction analysis, pattern recognition, and investigation case management. Monitors transactions in real-time, scores risk, and detects patterns like card cloning, account takeover, bust-out, and synthetic identity."
+    },
+    {
+      "name": "Claims Processing",
+      "dept": "Claims",
+      "desc": "Insurance claims processing with intake, adjudication review, fraud detection, and settlement recommendations. Manages claims lifecycle, calculates settlements with deductibles and coverage limits, and refers suspicious claims to SIU."
+    },
+    {
+      "name": "Customer Onboarding (KYC/AML)",
+      "dept": "Operations",
+      "desc": "Financial services customer onboarding with KYC verification, account setup, document checklists, and status tracking. Runs ID, SSN, address, OFAC, PEP, and adverse media checks with enhanced due diligence for high-risk applicants."
+    },
+    {
+      "name": "Customer Sentiment & Churn",
+      "dept": "Analytics",
+      "desc": "Customer sentiment analysis, churn prediction, retention action planning, and segment analytics for financial services. Scores churn risk from NPS, transaction trends, complaints, and engagement, then recommends retention actions with cost and success rates."
+    },
+    {
+      "name": "Financial Advisor Copilot",
+      "dept": "Wealth Management",
+      "desc": "Financial advisor support with client reviews, portfolio summaries, recommendation engine, and compliance checks. Generates rebalancing trade lists, validates against Reg BI and suitability rules, and flags concentration risk."
+    },
+    {
+      "name": "Loan Origination Assistant",
+      "dept": "Lending",
+      "desc": "Loan origination support with application review, credit analysis, document verification, and decision recommendations. Calculates DTI and LTV, checks product-specific criteria, and generates approve/conditional/refer decisions."
+    },
+    {
+      "name": "Portfolio Rebalancing",
+      "dept": "Wealth Management",
+      "desc": "Portfolio rebalancing with drift analysis, trade recommendations, tax impact assessment, and execution planning. Identifies holdings exceeding drift thresholds, estimates tax liability on sells, and suggests tax-efficient alternatives."
+    },
+    {
+      "name": "Regulatory Compliance (SOX/Dodd-Frank/BSA)",
+      "dept": "Risk & Compliance",
+      "desc": "Financial services regulatory compliance with SOX, Dodd-Frank, BSA tracking, remediation planning, and examiner preparation. Tracks compliance scores across regulations, manages remediation actions, and prepares for OCC, FinCEN, and CFPB examinations."
+    },
+    {
+      "name": "Underwriting Support",
+      "dept": "Risk & Compliance",
+      "desc": "Insurance underwriting support with risk evaluation, pricing recommendations, guideline compliance, and exception review. Scores and tiers applications (Preferred/Standard/Substandard/Decline) across commercial property, auto, and professional liability."
+    },
+    {
+      "name": "Wealth Insights Generator",
+      "dept": "Wealth Management",
+      "desc": "Wealth management insights with market briefs, client analytics, opportunity alerts, and performance attribution. Surfaces actionable signals like education funding, liquidity events, estate planning, and RMD optimization."
+    }
+  ]
+}

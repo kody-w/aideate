@@ -1,0 +1,57 @@
+{
+  "industry": "General / Cross-Industry",
+  "source": "AIBAST RAR Agent Library — general_stacks",
+  "departments": ["Sales", "Operations", "HR", "IT", "Finance", "Marketing", "Customer Service", "Engineering", "Legal", "Product"],
+  "ideas": [
+    {
+      "name": "AI Customer Assistant",
+      "dept": "Customer Service",
+      "desc": "AI-powered customer service assistant for inquiries, knowledge search, escalation routing, and satisfaction surveys. Handles common questions, searches knowledge bases, and routes complex issues with full context."
+    },
+    {
+      "name": "Sales Coach",
+      "dept": "Sales",
+      "desc": "AI-powered sales coaching with call reviews, skill assessments, coaching plans, and performance dashboards. Reviews recorded calls, identifies coaching opportunities, and tracks rep improvement over time."
+    },
+    {
+      "name": "Speech to CRM",
+      "dept": "Sales",
+      "desc": "Transcribes sales calls, extracts entities, maps to CRM fields, and previews record updates. Automatically captures meeting notes, action items, and key data points into CRM records."
+    },
+    {
+      "name": "Email Drafting",
+      "dept": "Marketing",
+      "desc": "AI-powered email drafting for outreach, follow-ups, proposals, and template management with personalization. Generates context-aware emails from templates with smart personalization."
+    },
+    {
+      "name": "Cross-Selling Opportunities",
+      "dept": "Sales",
+      "desc": "Identifies cross-selling opportunities via product affinity analysis, customer ownership mapping, and revenue impact projections. Surfaces upsell opportunities based on purchase patterns and product gaps."
+    },
+    {
+      "name": "Customer 360",
+      "dept": "Customer Service",
+      "desc": "Unified customer profiles merging CRM, support, and billing data with health scores and next-best-action recommendations. Provides a single view of each customer across all touchpoints."
+    },
+    {
+      "name": "IT Ticket Management",
+      "dept": "IT",
+      "desc": "IT ticket management with dashboards, priority assignment, SLA tracking, and resolution reporting. Auto-categorizes tickets, assigns priority, and tracks resolution against SLA targets."
+    },
+    {
+      "name": "Procurement Support",
+      "dept": "Finance",
+      "desc": "Procurement support for requisition tracking, contract lookups, supplier performance, and budget checks. Streamlines purchase requests with automated approval routing and spend analysis."
+    },
+    {
+      "name": "Product Reference",
+      "dept": "Product",
+      "desc": "Product catalog with feature comparison, pricing tiers, and compatibility checking. Enables sales and support teams to instantly look up product details, compare options, and verify compatibility."
+    },
+    {
+      "name": "Triage Bot",
+      "dept": "Customer Service",
+      "desc": "Inquiry classification, routing, priority assessment, and handoff summary generation. Classifies inbound inquiries, determines urgency, routes to the right team, and prepares handoff summaries."
+    }
+  ]
+}

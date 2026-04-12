@@ -1,0 +1,32 @@
+{
+  "industry": "Professional Services",
+  "source": "AIBAST RAR Agent Library — professional_services_stacks",
+  "departments": ["Consulting", "Project Management", "Business Development", "Finance", "Legal", "Knowledge Management", "HR"],
+  "ideas": [
+    {
+      "name": "Resource Utilization",
+      "dept": "Consulting",
+      "desc": "Tracks consultant utilization and capacity, forecasts demand, analyzes bench costs, and generates staffing recommendations to meet targets. Monitors utilization by level (Senior 85%, Manager 80%) with bench cost analysis and project pipeline matching."
+    },
+    {
+      "name": "Client Health Score",
+      "dept": "Project Management",
+      "desc": "Computes client health scores from NPS, margins, utilization, and escalation data to identify at-risk accounts and drive retention strategies. Tracks project budget burn rate, milestone delivery, and CSAT signals."
+    },
+    {
+      "name": "Contract Risk Review",
+      "dept": "Legal",
+      "desc": "Scans contracts for risky clauses, evaluates compliance with internal policies, and produces renegotiation briefs with prioritized amendments. Flags scope creep risk, liability exposure, IP ownership gaps, and non-standard payment terms."
+    },
+    {
+      "name": "Proposal Copilot",
+      "dept": "Business Development",
+      "desc": "Generates competitive proposals with pricing models, win-theme analysis from historical data, and competitive positioning against known bidders. Pulls from past proposals, case studies, and SME bios."
+    },
+    {
+      "name": "Time Entry & Billing",
+      "dept": "Finance",
+      "desc": "Processes time entries against billing rules, surfaces unbilled hours, audits entries for compliance, and prepares invoice packages. Reminds consultants to submit timesheets and validates against project codes."
+    }
+  ]
+}

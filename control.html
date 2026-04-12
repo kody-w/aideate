@@ -218,28 +218,28 @@ button {
     <select id="templateSelect" style="flex:1;" onchange="loadTemplate()">
       <option value="">Load industry use cases...</option>
       <optgroup label="Cross-Industry">
-        <option value="general">General / Cross-Industry</option>
+        <option value="templates/general.json">General / Cross-Industry</option>
       </optgroup>
       <optgroup label="Commercial">
-        <option value="b2b_sales">B2B Sales</option>
-        <option value="b2c_sales">B2C Sales / Retail Commerce</option>
-        <option value="retail_cpg">Retail & Consumer Goods</option>
-        <option value="professional_services">Professional Services</option>
-        <option value="software_dp">Software & Digital Products</option>
+        <option value="templates/b2b-sales.json">B2B Sales</option>
+        <option value="templates/b2c-sales.json">B2C Sales / Retail Commerce</option>
+        <option value="templates/retail-cpg.json">Retail & Consumer Goods</option>
+        <option value="templates/professional-services.json">Professional Services</option>
+        <option value="templates/software-digital.json">Software & Digital Products</option>
       </optgroup>
       <optgroup label="Industry-Specific">
-        <option value="healthcare">Healthcare</option>
-        <option value="financial_services">Financial Services</option>
-        <option value="manufacturing">Manufacturing</option>
-        <option value="energy">Energy & Utilities</option>
+        <option value="templates/healthcare.json">Healthcare</option>
+        <option value="templates/financial-services.json">Financial Services</option>
+        <option value="templates/manufacturing.json">Manufacturing</option>
+        <option value="templates/energy.json">Energy & Utilities</option>
       </optgroup>
       <optgroup label="Public Sector">
-        <option value="federal_government">Federal Government</option>
-        <option value="slg_government">State & Local Government</option>
+        <option value="templates/federal-government.json">Federal Government</option>
+        <option value="templates/slg-government.json">State & Local Government</option>
       </optgroup>
       <optgroup label="Back Office">
-        <option value="human_resources">Human Resources</option>
-        <option value="it_management">IT Management</option>
+        <option value="templates/human-resources.json">Human Resources</option>
+        <option value="templates/it-management.json">IT Management</option>
       </optgroup>
     </select>
     <button class="btn-green btn-sm" onclick="loadTemplate()" title="Load selected template">Load</button>
@@ -635,200 +635,45 @@ function populateDeptSelects() {
 }
 
 // ═══ TEMPLATES ═══
-const INDUSTRY_TEMPLATES = {
-  general: {
-    departments: ['Sales','Operations','HR','IT','Finance','Marketing','Customer Service','Engineering','Legal','Product'],
-    ideas: [
-      { name: 'Customer Support Triage Agent', dept: 'Customer Service', desc: 'Reads incoming support tickets, classifies severity, routes to the right team, and drafts an initial response — cutting first-response time from hours to minutes.' },
-      { name: 'Sales Meeting Prep Agent', dept: 'Sales', desc: 'Before every client meeting, pulls CRM data, recent emails, LinkedIn updates, and news mentions to generate a 1-page account brief with talking points.' },
-      { name: 'Invoice Processing Autopilot', dept: 'Finance', desc: 'Reads incoming invoices (PDF/email), extracts line items, matches to POs, flags discrepancies, and queues approved invoices for payment.' },
-      { name: 'Employee Onboarding Concierge', dept: 'HR', desc: 'Guides new hires through their first 30 days: schedules orientation, provisions accounts, answers policy questions, and checks in weekly.' },
-      { name: 'IT Helpdesk Auto-Resolver', dept: 'IT', desc: 'Handles common IT tickets automatically — password resets, VPN issues, software access requests. Resolves tier-1 tickets without human intervention.' },
-      { name: 'Weekly Status Report Generator', dept: 'Operations', desc: 'Pulls data from project management tools and email to auto-generate project status reports. Highlights blockers, tracks milestones.' },
-      { name: 'Contract Review Assistant', dept: 'Legal', desc: 'Scans vendor contracts for non-standard clauses, liability risks, and missing terms. Generates a redline summary so legal can focus on negotiation.' },
-      { name: 'Marketing Content Repurposer', dept: 'Marketing', desc: 'Takes a single blog post or case study and generates LinkedIn posts, email newsletter snippets, and sales deck slides — all in brand voice.' },
-    ]
-  },
-  b2b_sales: {
-    departments: ['Sales','Sales Operations','Account Management','Marketing','Customer Success','Finance','Legal','Product'],
-    ideas: [
-      { name: 'Account Intelligence Briefing', dept: 'Sales', desc: 'Generates 360-degree account briefings with stakeholder mapping, competitive positioning, and deal risk assessment before every executive meeting.' },
-      { name: 'Deal Progression Analyzer', dept: 'Sales Operations', desc: 'Monitors pipeline health in real-time, detects stalled deals, identifies bottleneck stages, and recommends next-best-actions to advance opportunities.' },
-      { name: 'Proposal Generation Agent', dept: 'Sales', desc: 'Auto-generates tailored proposals from CRM data, past wins, and solution templates — including pricing, scope, and customer-specific value props.' },
-      { name: 'Sales Qualification Copilot', dept: 'Sales', desc: 'Scores inbound leads and opportunities against ICP criteria, enriches with firmographic data, and recommends pursue/pass with reasoning.' },
-      { name: 'Win/Loss Analysis Agent', dept: 'Sales Operations', desc: 'Analyzes closed deals to identify competitive win/loss patterns, common objections, and pricing sensitivities by segment and competitor.' },
-      { name: 'Cross-Sell Opportunity Finder', dept: 'Account Management', desc: 'Scans existing customer product usage, contract data, and support history to surface upsell and cross-sell opportunities with timing recommendations.' },
-    ]
-  },
-  b2c_sales: {
-    departments: ['E-Commerce','Marketing','Customer Experience','Customer Service','Merchandising','Analytics','IT'],
-    ideas: [
-      { name: 'Cart Abandonment Recovery Agent', dept: 'E-Commerce', desc: 'Detects abandoned carts in real-time, identifies recovery likelihood, and triggers personalized re-engagement campaigns across email, SMS, and push.' },
-      { name: 'Personalized Shopping Assistant', dept: 'Customer Experience', desc: 'AI-driven product recommendation chatbot that understands customer preferences, browsing history, and context to suggest relevant products.' },
-      { name: 'Customer Loyalty & Rewards Agent', dept: 'Marketing', desc: 'Manages loyalty program tiers, tracks points, identifies at-risk members, and generates personalized reward offers to drive retention.' },
-      { name: 'Omnichannel Engagement Orchestrator', dept: 'Marketing', desc: 'Orchestrates customer journeys across web, mobile, email, and in-store — ensuring consistent messaging and optimal channel selection per customer.' },
-      { name: 'Returns & Exchange Processor', dept: 'Customer Service', desc: 'Automates return eligibility checks, generates shipping labels, processes refunds, and identifies patterns in return reasons for merchandising insights.' },
-      { name: 'Conversational Sales Chat Agent', dept: 'E-Commerce', desc: 'Handles live chat on the storefront — answers product questions, checks inventory, applies promotions, and guides customers through checkout.' },
-    ]
-  },
-  healthcare: {
-    departments: ['Clinical Operations','Patient Access','Revenue Cycle','Compliance','IT','Administration','Nursing','Pharmacy'],
-    ideas: [
-      { name: 'Patient Intake Automation', dept: 'Patient Access', desc: 'Digitizes patient intake forms, verifies insurance eligibility in real-time, matches patients to available provider slots, and generates pre-visit summaries.' },
-      { name: 'Care Gap Closure Agent', dept: 'Clinical Operations', desc: 'Identifies preventive care gaps (screenings, vaccinations, follow-ups) from EHR data and triggers outreach to patients with personalized scheduling.' },
-      { name: 'Clinical Notes Summarizer', dept: 'Clinical Operations', desc: 'Summarizes lengthy clinical documentation into structured problem lists, medication changes, and follow-up actions — saving providers 30+ minutes per day.' },
-      { name: 'Prior Authorization Copilot', dept: 'Revenue Cycle', desc: 'Automates prior auth submissions — pulls clinical criteria, maps to payer requirements, drafts appeal letters for denials, and tracks approval status.' },
-      { name: 'Staff Credentialing Agent', dept: 'Administration', desc: 'Tracks provider credentials, licenses, and certifications. Alerts before expirations, pre-fills renewal applications, and maintains audit-ready records.' },
-      { name: 'Medication Interaction Checker', dept: 'Pharmacy', desc: 'Cross-references new prescriptions against patient medication lists, allergies, and lab results to flag interactions and suggest alternatives.' },
-    ]
-  },
-  financial_services: {
-    departments: ['Risk & Compliance','Operations','Wealth Management','Lending','Claims','Customer Service','IT','Analytics'],
-    ideas: [
-      { name: 'Fraud Detection & Alert Triage', dept: 'Risk & Compliance', desc: 'Monitors transactions in real-time, scores risk using behavioral patterns, and triages alerts — reducing false positives while catching account takeover and card cloning.' },
-      { name: 'Customer Onboarding (KYC/AML)', dept: 'Operations', desc: 'Automates Know Your Customer checks — verifies identity documents, screens watchlists, assesses risk, and provisions accounts with full audit trail.' },
-      { name: 'Claims Processing Accelerator', dept: 'Claims', desc: 'Ingests claim submissions, extracts key data, validates coverage, identifies fraud indicators, and routes to adjusters with a recommended decision.' },
-      { name: 'Financial Advisor Copilot', dept: 'Wealth Management', desc: 'Generates client-ready portfolio reviews, rebalancing recommendations, and market commentaries tailored to each client\'s risk profile and goals.' },
-      { name: 'Loan Origination Assistant', dept: 'Lending', desc: 'Guides applicants through mortgage/loan applications, pulls credit data, calculates DTI ratios, and generates pre-approval decisions with rate options.' },
-      { name: 'Regulatory Compliance Reporter', dept: 'Risk & Compliance', desc: 'Automates regulatory filings (SOX, Basel, GDPR), monitors policy changes, and generates audit-ready compliance reports on demand.' },
-      { name: 'Customer Churn Predictor', dept: 'Analytics', desc: 'Analyzes transaction patterns, engagement signals, and service interactions to predict churn risk and recommend proactive retention actions.' },
-    ]
-  },
-  manufacturing: {
-    departments: ['Production','Quality','Maintenance','Supply Chain','Logistics','Engineering','EHS','Customer Service'],
-    ideas: [
-      { name: 'Production Line Optimizer', dept: 'Production', desc: 'Analyzes OEE metrics, identifies bottleneck stations, recommends cycle time improvements, and optimizes shift staffing to maximize throughput.' },
-      { name: 'Predictive Maintenance Scheduler', dept: 'Maintenance', desc: 'Monitors equipment sensor data to predict failures before they happen, schedules preventive maintenance windows, and orders parts automatically.' },
-      { name: 'Inventory Rebalancing Agent', dept: 'Supply Chain', desc: 'Tracks raw material and finished goods inventory across locations, identifies imbalances, and generates transfer or reorder recommendations.' },
-      { name: 'Quality Defect Analyzer', dept: 'Quality', desc: 'Categorizes defects by type and frequency, traces root causes to specific stations or shifts, and recommends corrective actions with Pareto analysis.' },
-      { name: 'Supplier Risk Monitor', dept: 'Supply Chain', desc: 'Continuously monitors supplier financial health, geopolitical risk, lead time trends, and quality scores — alerting procurement to diversify before disruption.' },
-      { name: 'Order Status Communication Agent', dept: 'Customer Service', desc: 'Proactively updates customers on order status, predicts delivery dates based on production schedules, and flags delays with revised ETAs.' },
-    ]
-  },
-  energy: {
-    departments: ['Operations','Regulatory & Compliance','Field Services','Engineering','Environmental','Finance','Safety','IT'],
-    ideas: [
-      { name: 'Regulatory Reporting Automator', dept: 'Regulatory & Compliance', desc: 'Compiles EPA, FERC, and state filings by pulling data from CEMS, SAP, and GIS systems — validates completeness, flags anomalies, and tracks deadlines.' },
-      { name: 'Asset Maintenance Forecaster', dept: 'Operations', desc: 'Predicts equipment degradation from sensor data, weather patterns, and maintenance history — scheduling interventions to maximize asset life and minimize outage risk.' },
-      { name: 'Emission Tracking Dashboard', dept: 'Environmental', desc: 'Aggregates GHG and air quality data across facilities, calculates scope 1/2/3 emissions, and generates reports aligned to EPA and ESG frameworks.' },
-      { name: 'Field Service Dispatch Agent', dept: 'Field Services', desc: 'Optimizes technician routing based on skill match, location, urgency, and parts availability — reducing truck rolls and improving first-time fix rates.' },
-      { name: 'Permit & License Manager', dept: 'Regulatory & Compliance', desc: 'Tracks all regulatory permits and licenses across facilities, alerts before expirations, pre-fills renewal applications, and maintains compliance audit trail.' },
-      { name: 'Grid Load Forecaster', dept: 'Engineering', desc: 'Predicts energy demand using weather, historical usage, and event data — optimizing generation dispatch and reducing peak-load costs.' },
-    ]
-  },
-  federal_government: {
-    departments: ['Mission Programs','Budget & Finance','IT & Cyber','Acquisitions','HR & Workforce','Legal','Communications','Data & Analytics'],
-    ideas: [
-      { name: 'Mission Reporting Assistant', dept: 'Mission Programs', desc: 'Generates quarterly mission summaries, KPI dashboards, and stakeholder briefs — pulling from program data to create OMB-ready reports automatically.' },
-      { name: 'Acquisition Support Agent', dept: 'Acquisitions', desc: 'Assists contracting officers with market research, requirements drafting, evaluation criteria, and source selection documentation aligned to FAR/DFARS.' },
-      { name: 'Federal Grants Oversight Agent', dept: 'Budget & Finance', desc: 'Monitors grant performance against milestones, flags spending anomalies, tracks compliance with uniform guidance, and generates closeout reports.' },
-      { name: 'Regulatory Compliance Tracker', dept: 'Legal', desc: 'Monitors changes to federal regulations, maps impact to agency programs, and generates compliance action plans with assigned owners and deadlines.' },
-      { name: 'Workforce Clearance & Onboarding', dept: 'HR & Workforce', desc: 'Tracks security clearance applications through investigation stages, automates onboarding checklists, and provisions systems access upon adjudication.' },
-      { name: 'FOIA Request Processor', dept: 'Communications', desc: 'Ingests FOIA requests, searches document repositories, flags sensitive content for redaction review, and tracks response deadlines.' },
-    ]
-  },
-  slg_government: {
-    departments: ['Public Works','Permitting','Citizen Services','Finance','IT','Parks & Recreation','Legal','Public Safety'],
-    ideas: [
-      { name: 'Building Permit Processor', dept: 'Permitting', desc: 'Reviews permit applications against zoning codes and building regulations, identifies missing documents, routes to inspectors, and updates applicants on status.' },
-      { name: 'Citizen Service Request Agent', dept: 'Citizen Services', desc: 'Handles 311 requests — categorizes issues (potholes, streetlights, noise), routes to the right department, and provides status updates to residents.' },
-      { name: 'FOIA Request Assistant', dept: 'Legal', desc: 'Manages public records requests end-to-end — logs requests, searches archives, flags exempt content, tracks statutory deadlines, and generates responses.' },
-      { name: 'Grants Management Agent', dept: 'Finance', desc: 'Tracks federal and state grant applications, monitors spending against budgets, ensures compliance with reporting requirements, and alerts on deadlines.' },
-      { name: 'Utility Billing Assistant', dept: 'Finance', desc: 'Handles customer billing inquiries, explains rate structures, processes payment arrangements, and flags anomalous usage patterns for investigation.' },
-      { name: 'Public Meeting Summarizer', dept: 'Citizen Services', desc: 'Transcribes and summarizes city council and board meetings, extracts action items, and publishes searchable meeting minutes for public access.' },
-    ]
-  },
-  professional_services: {
-    departments: ['Consulting','Project Management','Business Development','Finance','HR','Legal','Knowledge Management','IT'],
-    ideas: [
-      { name: 'Resource Utilization Optimizer', dept: 'Consulting', desc: 'Tracks consultant utilization vs. targets, forecasts bench time, and recommends staffing assignments to maximize billable hours and skill-fit.' },
-      { name: 'Client Health Score Agent', dept: 'Project Management', desc: 'Monitors project health across accounts — budget burn rate, milestone delivery, CSAT signals, and escalation frequency — generating early warning alerts.' },
-      { name: 'Contract Risk Reviewer', dept: 'Legal', desc: 'Scans engagement contracts for scope creep risk, liability exposure, IP ownership gaps, and non-standard payment terms — flagging issues before signing.' },
-      { name: 'Proposal Copilot', dept: 'Business Development', desc: 'Generates RFP responses by pulling from past proposals, case studies, and SME bios — drafting tailored win themes and pricing models.' },
-      { name: 'Time Entry & Billing Agent', dept: 'Finance', desc: 'Reminds consultants to submit timesheets, validates entries against project codes, calculates billing, and generates client-ready invoices.' },
-      { name: 'Knowledge Capture Agent', dept: 'Knowledge Management', desc: 'Extracts lessons learned, reusable frameworks, and client insights from project closeout docs and makes them searchable for future engagements.' },
-    ]
-  },
-  retail_cpg: {
-    departments: ['Merchandising','Marketing','Supply Chain','Store Operations','E-Commerce','Customer Insights','Finance','IT'],
-    ideas: [
-      { name: 'Personalized Campaign Builder', dept: 'Marketing', desc: 'Segments customers by purchase behavior and lifetime value, designs targeted campaigns, generates personalized content, and A/B tests subject lines.' },
-      { name: 'Inventory Visibility Agent', dept: 'Supply Chain', desc: 'Provides real-time stock visibility across stores, warehouses, and in-transit — recommending transfers to prevent stockouts and reduce overstock.' },
-      { name: 'Returns & Complaints Analyzer', dept: 'Customer Insights', desc: 'Categorizes return reasons and complaint themes, identifies product quality issues, and generates actionable insights for merchandising and suppliers.' },
-      { name: 'Store Associate Copilot', dept: 'Store Operations', desc: 'Mobile assistant for floor staff — instant product lookup, inventory checks, competitor price matching, and guided selling recommendations.' },
-      { name: 'Supply Chain Disruption Alert', dept: 'Supply Chain', desc: 'Monitors supplier lead times, port delays, weather events, and raw material prices — alerting planners to disruptions with alternative sourcing options.' },
-      { name: 'Demand Forecasting Agent', dept: 'Merchandising', desc: 'Predicts demand by SKU, store, and season using historical sales, promotions, and external signals — optimizing buy plans and markdown timing.' },
-    ]
-  },
-  software_dp: {
-    departments: ['Product','Engineering','Customer Success','Sales','Marketing','Support','Data & Analytics','Legal'],
-    ideas: [
-      { name: 'Competitive Intelligence Agent', dept: 'Product', desc: 'Monitors competitor releases, pricing changes, G2/Gartner reviews, and job postings to generate weekly competitive briefings with strategic implications.' },
-      { name: 'Customer Onboarding Orchestrator', dept: 'Customer Success', desc: 'Guides new SaaS customers through setup — configures workspace, imports data, assigns training modules, and tracks time-to-value milestones.' },
-      { name: 'License Renewal & Expansion Agent', dept: 'Sales', desc: 'Monitors usage patterns and contract timelines, predicts renewal risk, identifies expansion opportunities, and drafts renewal proposals with pricing.' },
-      { name: 'Product Feedback Synthesizer', dept: 'Product', desc: 'Aggregates feedback from support tickets, NPS surveys, app reviews, and sales calls — clusters themes, quantifies impact, and generates prioritized feature briefs.' },
-      { name: 'Support Ticket Resolution Agent', dept: 'Support', desc: 'Auto-resolves common support tickets using knowledge base, generates step-by-step guides, and escalates complex issues with full diagnostic context.' },
-      { name: 'Release Notes Generator', dept: 'Engineering', desc: 'Reads commit history and JIRA tickets to auto-generate customer-facing release notes, internal changelog, and marketing feature announcements.' },
-    ]
-  },
-  human_resources: {
-    departments: ['Talent Acquisition','Employee Relations','Benefits & Compensation','Learning & Development','HR Operations','Compliance','Payroll'],
-    ideas: [
-      { name: 'HR Policy Q&A Agent', dept: 'HR Operations', desc: 'Answers employee questions about PTO, benefits, expense policies, and workplace guidelines — pulling from the latest policy documents and handbooks.' },
-      { name: 'Resume Screening Copilot', dept: 'Talent Acquisition', desc: 'Screens inbound applications against job requirements, scores candidates, highlights relevant experience, and generates shortlists for recruiters.' },
-      { name: 'Benefits Enrollment Guide', dept: 'Benefits & Compensation', desc: 'Walks employees through open enrollment — explains plan options, compares costs, recommends coverage based on family size and usage patterns.' },
-      { name: 'Performance Review Drafting Agent', dept: 'Employee Relations', desc: 'Generates draft performance reviews from goal tracking data, peer feedback, and project contributions — saving managers hours per review cycle.' },
-      { name: 'Training Recommendation Engine', dept: 'Learning & Development', desc: 'Analyzes skill gaps from performance data and career goals, then recommends personalized learning paths from available training catalog.' },
-      { name: 'Offboarding Checklist Agent', dept: 'HR Operations', desc: 'Manages employee departures — triggers access revocation, schedules exit interviews, processes final pay, and transfers knowledge documentation.' },
-    ]
-  },
-  it_management: {
-    departments: ['Service Desk','Infrastructure','Security','Applications','Project Management','Governance','Vendor Management'],
-    ideas: [
-      { name: 'IT Ticket Triage & Resolution', dept: 'Service Desk', desc: 'Auto-categorizes incoming tickets, resolves common issues (password resets, access requests), and routes complex problems with diagnostic context.' },
-      { name: 'Infrastructure Monitoring Agent', dept: 'Infrastructure', desc: 'Correlates alerts across servers, networks, and cloud services to identify root cause, reduces alert noise, and recommends remediation actions.' },
-      { name: 'Security Incident Responder', dept: 'Security', desc: 'Triages security alerts, enriches with threat intelligence, contains affected systems, and generates incident reports with timeline and remediation steps.' },
-      { name: 'Software License Optimizer', dept: 'Governance', desc: 'Tracks software license usage across the organization, identifies unused or underused licenses, and recommends consolidation to reduce costs.' },
-      { name: 'Change Management Assistant', dept: 'Applications', desc: 'Reviews change requests against ITIL criteria, assesses risk and impact, schedules implementation windows, and notifies affected stakeholders.' },
-      { name: 'Vendor SLA Monitor', dept: 'Vendor Management', desc: 'Tracks vendor performance against SLA commitments — uptime, response times, resolution rates — and flags violations with contract clause references.' },
-    ]
-  }
-};
-
 function loadTemplate() {
   const sel = document.getElementById('templateSelect');
-  if (!sel.value) return;
-  const template = INDUSTRY_TEMPLATES[sel.value];
-  if (!template) return;
+  const filePath = sel.value;
+  if (!filePath) return;
 
   const label = sel.options[sel.selectedIndex].text;
-  if (state.ideas.length > 0 && !confirm('This will add ' + template.ideas.length + ' starter ideas for ' + label + ' to your existing ideas. Continue?')) {
-    sel.value = '';
-    return;
-  }
-
-  // Merge departments (add new ones, keep existing)
-  const deptSet = new Set(state.departments);
-  template.departments.forEach(d => deptSet.add(d));
-  state.departments = [...deptSet];
-
-  // Add template ideas
-  template.ideas.forEach(t => {
-    const idea = { id: Date.now() + Math.floor(Math.random() * 10000), name: t.name, dept: t.dept, desc: t.desc, submitter: 'Template', votes: 0, voters: [] };
-    state.ideas.push(idea);
-    send({ type: 'add_idea', idea });
-  });
-
-  // Broadcast updated departments
-  send({ type: 'full_state', state: { ...state, participants: state.participants.length } });
-  send({ type: 'set_roster', roster: state.participants });
-
-  populateDeptSelects();
-  renderIdeaList();
-  autosave();
-  log('Loaded ' + template.ideas.length + ' ideas from ' + label + ' template');
-  document.getElementById('templateHint').style.display = 'block';
   sel.value = '';
+
+  fetch(filePath)
+    .then(r => { if (!r.ok) throw new Error('Could not load template'); return r.json(); })
+    .then(template => {
+      if (state.ideas.length > 0 && !confirm('This will add ' + template.ideas.length + ' starter ideas for ' + label + ' to your existing ideas. Continue?')) return;
+
+      // Merge departments (add new ones, keep existing)
+      const deptSet = new Set(state.departments);
+      (template.departments || []).forEach(d => deptSet.add(d));
+      state.departments = [...deptSet];
+
+      // Add template ideas
+      template.ideas.forEach(t => {
+        const idea = { id: Date.now() + Math.floor(Math.random() * 10000), name: t.name, dept: t.dept, desc: t.desc, submitter: 'Template', votes: 0, voters: [] };
+        state.ideas.push(idea);
+        send({ type: 'add_idea', idea });
+      });
+
+      // Broadcast updated departments
+      send({ type: 'full_state', state: { ...state, participants: state.participants.length } });
+      send({ type: 'set_roster', roster: state.participants });
+
+      populateDeptSelects();
+      renderIdeaList();
+      autosave();
+      log('Loaded ' + template.ideas.length + ' ideas from ' + label + ' template (' + (template.source || '') + ')');
+      document.getElementById('templateHint').style.display = 'block';
+    })
+    .catch(err => {
+      alert('Failed to load template: ' + err.message);
+      log('Template load error: ' + err.message);
+    });
 }
 
 // ═══ IDEAS ═══

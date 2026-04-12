@@ -1,12 +1,26 @@
 // AIdeate Service Worker — offline-first PWA support
-const CACHE_VERSION = 'aideate-v1';
+const CACHE_VERSION = 'aideate-v2';
 const ASSETS = [
   './',
   './index.html',
   './control.html',
   './manifest.json',
   './icon.svg',
-  './samples/example-workshop.json'
+  './samples/example-workshop.json',
+  './templates/general.json',
+  './templates/b2b-sales.json',
+  './templates/b2c-sales.json',
+  './templates/healthcare.json',
+  './templates/financial-services.json',
+  './templates/manufacturing.json',
+  './templates/energy.json',
+  './templates/federal-government.json',
+  './templates/slg-government.json',
+  './templates/professional-services.json',
+  './templates/retail-cpg.json',
+  './templates/software-digital.json',
+  './templates/human-resources.json',
+  './templates/it-management.json'
 ];
 
 // Install: pre-cache all app files

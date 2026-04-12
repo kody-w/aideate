@@ -1,0 +1,42 @@
+{
+  "industry": "B2C Sales",
+  "source": "AIBAST RAR Agent Library — b2c_sales_stacks",
+  "departments": ["E-Commerce", "Customer Experience", "Marketing", "Customer Service", "Merchandising", "Analytics"],
+  "ideas": [
+    {
+      "name": "Cart Abandonment Recovery",
+      "dept": "E-Commerce",
+      "desc": "Cart abandonment analysis with recovery campaigns, incentive optimization, and conversion tracking for e-commerce. Analyzes abandonment patterns, manages multi-step recovery sequences (reminder, urgency, incentive emails), and optimizes incentives per customer segment."
+    },
+    {
+      "name": "Customer 360 & Speech",
+      "dept": "Customer Experience",
+      "desc": "Unified customer profiles with interaction history, sentiment analysis, and next-best-action recommendations across all channels. Maintains full customer profiles with LTV, preferences, and purchase history across mobile, chat, email, and phone."
+    },
+    {
+      "name": "Customer Loyalty & Rewards",
+      "dept": "Marketing",
+      "desc": "Loyalty program management with dashboards, points tracking, reward recommendations, and tier analytics. Manages multi-tier loyalty systems, tracks engagement activities, and recommends personalized rewards based on member preferences."
+    },
+    {
+      "name": "Omnichannel Engagement",
+      "dept": "Marketing",
+      "desc": "Omnichannel engagement analytics with channel performance, journey mapping, optimization, and campaign attribution. Tracks performance across email, SMS, social, web, mobile app, and in-store with ROAS analysis."
+    },
+    {
+      "name": "Personalized Shopping Assistant",
+      "dept": "E-Commerce",
+      "desc": "Personalized retail shopping with product recommendations, style profiling, inventory checks, and outfit building. Delivers product recommendations using match scoring based on style, brand affinity, color, and budget fit."
+    },
+    {
+      "name": "Returns & Exchange",
+      "dept": "Customer Service",
+      "desc": "Retail returns and exchange management with initiation, eligibility checking, exchange options, and refund tracking. Automates return policy checks, calculates refund amounts with restocking fees, and tracks return shipments."
+    },
+    {
+      "name": "Sales Chat",
+      "dept": "E-Commerce",
+      "desc": "Retail sales chat support with product inquiries, availability checks, promotion lookups, and order assistance. Handles live chat with auto-applied promotions, multi-location inventory, and 8 payment methods including BNPL."
+    }
+  ]
+}

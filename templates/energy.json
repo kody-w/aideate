@@ -1,0 +1,32 @@
+{
+  "industry": "Energy & Utilities",
+  "source": "AIBAST RAR Agent Library — energy_stacks",
+  "departments": ["Operations", "Regulatory & Compliance", "Field Services", "Engineering", "Environmental", "Finance", "Safety"],
+  "ideas": [
+    {
+      "name": "Asset Maintenance Forecast",
+      "dept": "Operations",
+      "desc": "Predictive maintenance forecasting, asset health monitoring, budget projections, and work order planning for energy infrastructure including turbines, transformers, and pipelines. Tracks condition scores, failure rates, and generates prioritized work orders."
+    },
+    {
+      "name": "Emission Tracking",
+      "dept": "Environmental",
+      "desc": "Monitors GHG emissions by facility, tracks regulatory compliance, develops reduction plans, and analyzes carbon offset opportunities. Covers Scope 1/2/3 emissions (CO2, CH4, N2O) with reduction cost modeling and offset project evaluation."
+    },
+    {
+      "name": "Field Service Dispatch",
+      "dept": "Field Services",
+      "desc": "Manages field service dispatch, route optimization, technician assignment, and emergency response for energy infrastructure. Matches technicians by certification, zone, and capacity with efficiency-based scoring."
+    },
+    {
+      "name": "Permit & License Management",
+      "dept": "Regulatory & Compliance",
+      "desc": "Tracks permits and licenses across energy facilities, manages renewal calendars, identifies compliance gaps, and monitors applications. Covers Title V, NPDES, RCRA, pipeline operating, and spill prevention permits."
+    },
+    {
+      "name": "Regulatory Reporting",
+      "dept": "Regulatory & Compliance",
+      "desc": "Manages regulatory report status, data validation, submission tracking, and audit readiness for EPA, FERC, and state filings. Validates data quality from CEMS, SAP, PIMS, and GIS source systems."
+    }
+  ]
+}

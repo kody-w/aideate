@@ -1,0 +1,67 @@
+{
+  "industry": "B2B Sales",
+  "source": "AIBAST RAR Agent Library — b2b_sales_stacks",
+  "departments": ["Sales", "Sales Operations", "Account Management", "Business Development", "Marketing", "Customer Success", "Finance"],
+  "ideas": [
+    {
+      "name": "Account Intelligence",
+      "dept": "Sales",
+      "desc": "360-degree account briefings with stakeholder mapping, competitive analysis, and deal risk assessment. Surfaces org charts, news, stakeholder interests, competitive positioning, and produces executive-ready briefing documents from CRM and engagement data."
+    },
+    {
+      "name": "Deal Progression",
+      "dept": "Sales Operations",
+      "desc": "Pipeline health analysis, stalled-deal detection, action plan generation, and pipeline acceleration. Tracks deal progression across the full pipeline, identifies stalled opportunities using stage-velocity benchmarks, and generates blocker-specific action plans."
+    },
+    {
+      "name": "Competitive Intelligence",
+      "dept": "Sales",
+      "desc": "Analyzes competitive landscapes, win/loss patterns, and generates battlecards for enterprise deals. Reviews win/loss records, generates positioning guides, and builds counter-positioning strategies."
+    },
+    {
+      "name": "Meeting Prep",
+      "dept": "Sales",
+      "desc": "Generates pre-meeting briefs, talking points, objection prep, and follow-up templates. Combines account intelligence, stakeholder data, and competitive context into actionable meeting materials."
+    },
+    {
+      "name": "Proposal Generation",
+      "dept": "Sales",
+      "desc": "AI-powered proposal generation with RFP analysis, personalized content, pricing optimization, and competitive positioning. Analyzes RFPs, generates executive summaries, builds solution pricing, selects references, and assembles proposal packages."
+    },
+    {
+      "name": "Sales Qualification",
+      "dept": "Sales Operations",
+      "desc": "ICP scoring, BANT analysis, personalized outreach, AE routing, and SLA tracking for inbound leads. Scores inbound leads against an Ideal Customer Profile and performs BANT analysis."
+    },
+    {
+      "name": "Win/Loss Analysis",
+      "dept": "Sales Operations",
+      "desc": "AI-powered win/loss analysis with pattern recognition, competitive insights, revenue recovery modeling, and board-ready presentations. Analyzes closed opportunities to surface win-rate trends and root-cause loss patterns."
+    },
+    {
+      "name": "Revenue Forecast",
+      "dept": "Finance",
+      "desc": "Quarterly forecasting, scenario analysis, commit vs best-case modeling, and forecast accuracy tracking. Generates quarterly revenue forecasts using weighted pipeline analysis and runs scenario modeling."
+    },
+    {
+      "name": "Stakeholder Intelligence",
+      "dept": "Account Management",
+      "desc": "Maps org charts, analyzes buying committees, and scores relationship strength for enterprise accounts. Identifies engagement gaps and provides actionable recommendations for stakeholder engagement and champion development."
+    },
+    {
+      "name": "Deal Health Score",
+      "dept": "Sales Operations",
+      "desc": "Calculates composite deal health scores (0-100) based on engagement metrics, activity frequency, stakeholder sentiment, and stage progression velocity. Provides trend analysis, benchmark comparisons, and proactive health alerts."
+    },
+    {
+      "name": "Next Best Action",
+      "dept": "Sales",
+      "desc": "Recommends prioritized next-best actions for each deal based on stage, risk factors, engagement history, and rep profiles. Generates sequenced action plans and forecasts expected impact."
+    },
+    {
+      "name": "Stalled Deal Detection",
+      "dept": "Sales Operations",
+      "desc": "Detects stalled deals by comparing stage duration against configurable thresholds, performs root cause analysis, generates intervention plans with day-by-day actions, and provides stall prevention recommendations."
+    }
+  ]
+}

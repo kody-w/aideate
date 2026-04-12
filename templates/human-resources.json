@@ -1,0 +1,32 @@
+{
+  "industry": "Human Resources",
+  "source": "AIBAST RAR Agent Library — human_resources_stacks + general_stacks",
+  "departments": ["Talent Acquisition", "Employee Relations", "Benefits & Compensation", "Learning & Development", "HR Operations", "Compliance", "Payroll"],
+  "ideas": [
+    {
+      "name": "Ask HR Assistant",
+      "dept": "HR Operations",
+      "desc": "AI-powered HR assistant for time-off requests, benefits inquiries, parental leave, and policy lookups. Answers employee questions by pulling from the latest policy documents and employee handbooks."
+    },
+    {
+      "name": "Email Drafting",
+      "dept": "HR Operations",
+      "desc": "AI-powered email drafting for outreach, follow-ups, proposals, and template management with personalization. Generates professional HR communications for offer letters, policy updates, and employee notifications."
+    },
+    {
+      "name": "Triage Bot",
+      "dept": "Employee Relations",
+      "desc": "Inquiry classification, routing, priority assessment, and handoff summary generation. Routes employee inquiries to the right HR team (benefits, payroll, compliance, employee relations) with context."
+    },
+    {
+      "name": "Cross-Selling Opportunities",
+      "dept": "Benefits & Compensation",
+      "desc": "Identifies cross-selling opportunities via product affinity analysis, customer ownership mapping, and revenue impact projections. In HR context: identifies benefits enrollment gaps and recommends relevant programs."
+    },
+    {
+      "name": "Customer 360 (Employee View)",
+      "dept": "Employee Relations",
+      "desc": "Unified customer profiles merging CRM, support, and billing data with health scores and next-best-action recommendations. Applied to HR: unified employee profiles combining performance, engagement, and service history."
+    }
+  ]
+}

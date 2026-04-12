@@ -1,0 +1,32 @@
+{
+  "industry": "Software & Digital Products",
+  "source": "AIBAST RAR Agent Library — software_dp_stacks",
+  "departments": ["Product", "Engineering", "Customer Success", "Sales", "Marketing", "Support", "Analytics"],
+  "ideas": [
+    {
+      "name": "Competitive Intelligence",
+      "dept": "Product",
+      "desc": "AI-powered competitive intelligence for SaaS market landscape analysis, feature comparisons, pricing analysis, and threat assessments. Monitors competitor releases, G2/Gartner reviews, and job postings for strategic signals."
+    },
+    {
+      "name": "Customer Onboarding",
+      "dept": "Customer Success",
+      "desc": "Tracks SaaS customer onboarding status, milestone completion, feature adoption metrics, and risk flags. Guides new customers through setup, data import, training modules, and time-to-value milestones."
+    },
+    {
+      "name": "License Renewal & Expansion",
+      "dept": "Sales",
+      "desc": "Manages SaaS license renewal pipelines, expansion opportunities, churn risk analysis, and revenue impact projections. Monitors usage patterns and contract timelines to predict renewal risk and draft proposals."
+    },
+    {
+      "name": "Product Feedback Synthesizer",
+      "dept": "Product",
+      "desc": "Aggregates customer feedback, feature requests, sentiment analysis, and roadmap impact assessments for product teams. Clusters themes from support tickets, NPS surveys, app reviews, and sales calls."
+    },
+    {
+      "name": "Support Ticket Resolution",
+      "dept": "Support",
+      "desc": "Intelligent ticket triage, knowledge base resolution search, escalation routing, and SLA compliance dashboards. Auto-resolves common tickets and escalates complex issues with full diagnostic context."
+    }
+  ]
+}

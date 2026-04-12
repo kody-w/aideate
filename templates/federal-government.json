@@ -1,0 +1,32 @@
+{
+  "industry": "Federal Government",
+  "source": "AIBAST RAR Agent Library — federal_government_stacks",
+  "departments": ["Mission Programs", "Budget & Finance", "IT & Cyber", "Acquisitions", "HR & Workforce", "Legal", "Communications"],
+  "ideas": [
+    {
+      "name": "Mission Reporting Assistant",
+      "dept": "Mission Programs",
+      "desc": "Generates mission summaries, KPI dashboards, stakeholder briefs, and trend analyses for federal programs. Produces OMB-ready reports with FISMA compliance, phishing click rates, CSAT, and workforce fill rates across quarterly trends."
+    },
+    {
+      "name": "Acquisition Support",
+      "dept": "Acquisitions",
+      "desc": "Federal acquisition lifecycle support with FAR/DFAR compliance, vendor evaluation, and procurement timeline management. Scores vendor proposals against weighted criteria (technical 35%, past performance 25%, cost 20%, management 10%, small business 10%)."
+    },
+    {
+      "name": "Federal Grants Oversight",
+      "dept": "Budget & Finance",
+      "desc": "Federal grants monitoring with dashboards, compliance tracking, reporting status, and audit preparation. Tracks 2 CFR 200 compliance, Single Audit Act requirements, SF-425/SF-PPR reporting schedules, and audit findings by severity."
+    },
+    {
+      "name": "Regulatory Compliance (FISMA/FedRAMP)",
+      "dept": "IT & Cyber",
+      "desc": "Federal regulatory compliance management with FISMA, FedRAMP, and NIST gap analysis, remediation planning, and audit readiness. Tracks control implementation rates, identifies compliance gaps, and prepares for OIG and GAO examinations."
+    },
+    {
+      "name": "Workforce Clearance & Onboarding",
+      "dept": "HR & Workforce",
+      "desc": "Federal workforce clearance tracking, onboarding checklists, background check monitoring, and access provisioning. Tracks investigation timelines across T1-T5 tiers and maps network/physical/system access by clearance level."
+    }
+  ]
+}

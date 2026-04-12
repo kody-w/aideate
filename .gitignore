@@ -1,0 +1,5 @@
+# Customer workshop projects — contain PII and customer-specific data
+projects/
+
+# Obsidian vault — local notes and knowledge base
+vault/

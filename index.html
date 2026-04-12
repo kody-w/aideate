@@ -741,16 +741,43 @@ function connectSession(fromInput) {
   openChannel(sid);
 }
 
+let pollTimer = null;
+let lastPollHash = '';
+
 function openChannel(sid) {
   if (channel) { try { channel.close(); } catch(e) {} }
+  stopPolling();
   try {
     channel = new BroadcastChannel('aideate-workshop-' + sid);
     channel.onmessage = handleMessage;
     channel.postMessage({ type: 'request_state' });
   } catch (e) {
-    // file:// or unsupported browser — presenter still works for arrow key nav
-    console.warn('BroadcastChannel unavailable:', e.message);
+    // file:// or unsupported browser — fall back to localStorage polling
+    console.warn('BroadcastChannel unavailable, using localStorage polling fallback');
+    startPolling();
   }
+}
+
+function startPolling() {
+  stopPolling();
+  lastPollHash = '';
+  pollTimer = setInterval(pollLocalStorage, 500);
+  pollLocalStorage(); // immediate first check
+}
+
+function stopPolling() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+function pollLocalStorage() {
+  try {
+    const raw = localStorage.getItem('aideate_autosave');
+    if (!raw || raw === lastPollHash) return;
+    lastPollHash = raw;
+    const data = JSON.parse(raw);
+    if (!data.sessionId || data.sessionId !== state.sessionId) return;
+    handleMessage({ data: { type: 'full_state', state: data } });
+  } catch (e) { /* ignore parse errors */ }
 }
 
 // ══════════════════════════════════════════════

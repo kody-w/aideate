@@ -13,7 +13,7 @@ AIdeate is a local-first, privacy-safe workshop tool for identifying and priorit
 ./start.sh 9000     # Custom port
 ```
 
-HTTP is required (not `file://`) because BroadcastChannel and iframes need same-origin context.
+HTTP is recommended. On `file://`, BroadcastChannel is unavailable but the presenter automatically falls back to localStorage polling for sync.
 
 ## Testing
 

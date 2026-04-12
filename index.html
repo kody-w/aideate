@@ -381,13 +381,13 @@
     <div class="tag" style="background:rgba(0,120,212,.3); color:#6cb4ff;">Microsoft AI Acceleration</div>
     <h1 id="welcomeTitle">Welcome to Your<br>AI Workshop</h1>
     <p class="subtitle" id="welcomeCompany" style="margin: 0 auto; font-size: 1.1rem; opacity: .7;"></p>
-    <p class="subtitle" style="margin: 12px auto 0;">
+    <p class="subtitle" style="margin: 12px auto 0;" id="welcomeDurationText">
       Over the next 90 minutes, we'll identify, prioritize, and build the business case
       for AI use cases specific to your organization.
     </p>
     <div class="stat-row" style="justify-content:center;">
       <div class="stat"><div class="num">4</div><div class="label">Phases</div></div>
-      <div class="stat"><div class="num">~90</div><div class="label">Minutes</div></div>
+      <div class="stat"><div class="num" id="welcomeDurationStat">~90</div><div class="label">Minutes</div></div>
       <div class="stat"><div class="num">∞</div><div class="label">Ideas Welcome</div></div>
     </div>
   </div>
@@ -587,6 +587,7 @@ let state = {
   sessionId: '',
   workshopName: '',
   companyName: '',
+  workshopDuration: 90,
   phase: 'ideate',
   participants: 0,
   roster: [],
@@ -795,6 +796,7 @@ function handleMessage(e) {
     case 'set_workshop_info':
       if (msg.workshopName !== undefined) state.workshopName = msg.workshopName;
       if (msg.companyName !== undefined) state.companyName = msg.companyName;
+      if (msg.workshopDuration !== undefined) state.workshopDuration = msg.workshopDuration;
       renderWelcomeSlide();
       renderTopBarLabels();
       saveState();
@@ -966,6 +968,10 @@ function renderWelcomeSlide() {
     title.innerHTML = 'Welcome to Your<br>AI Workshop';
   }
   company.textContent = state.companyName || '';
+  const dur = state.workshopDuration || 90;
+  document.getElementById('welcomeDurationText').textContent =
+    'Over the next ' + dur + ' minutes, we\u2019ll identify, prioritize, and build the business case for AI use cases specific to your organization.';
+  document.getElementById('welcomeDurationStat').textContent = '~' + dur;
 }
 
 function renderPreparedSlide() {

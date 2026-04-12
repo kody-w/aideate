@@ -133,9 +133,17 @@ button {
     <label>Workshop</label>
     <input type="text" id="workshopName" placeholder="Workshop name" style="flex:1;" oninput="onWorkshopInfoChange()">
   </div>
-  <div class="row" style="margin-bottom:0;">
+  <div class="row">
     <label>Company</label>
     <input type="text" id="companyName" placeholder="Company name" style="flex:1;" oninput="onWorkshopInfoChange()">
+  </div>
+  <div class="row" style="margin-bottom:0;">
+    <label>Duration</label>
+    <select id="workshopDuration" onchange="onWorkshopInfoChange()" style="flex:1;">
+      <option value="60">60 minutes</option>
+      <option value="75">75 minutes</option>
+      <option value="90" selected>90 minutes</option>
+    </select>
   </div>
 </div>
 
@@ -295,6 +303,7 @@ let state = {
   sessionId: generateSessionId(),
   workshopName: '',
   companyName: '',
+  workshopDuration: 90,
   phase: 'ideate',
   participants: [],
   ideas: [],
@@ -329,6 +338,7 @@ function restoreAutosave() {
     state.sessionId = data.sessionId;
     state.workshopName = data.workshopName || '';
     state.companyName = data.companyName || '';
+    state.workshopDuration = data.workshopDuration || 90;
     state.participants = data.participants || [];
     state.ideas = data.ideas || [];
     state.phase = data.phase || 'ideate';
@@ -401,7 +411,8 @@ function updateSessionBadge() {
 function onWorkshopInfoChange() {
   state.workshopName = document.getElementById('workshopName').value.trim();
   state.companyName = document.getElementById('companyName').value.trim();
-  send({ type: 'set_workshop_info', workshopName: state.workshopName, companyName: state.companyName });
+  state.workshopDuration = parseInt(document.getElementById('workshopDuration').value) || 90;
+  send({ type: 'set_workshop_info', workshopName: state.workshopName, companyName: state.companyName, workshopDuration: state.workshopDuration });
   autosave();
 }
 
@@ -412,6 +423,7 @@ function exportWorkshop() {
     sessionId: state.sessionId,
     workshopName: state.workshopName,
     companyName: state.companyName,
+    workshopDuration: state.workshopDuration,
     participants: state.participants,
     ideas: state.ideas,
     phase: state.phase,
@@ -444,6 +456,7 @@ function importWorkshop() {
         if (data.version !== '1.0') { alert('Unsupported version'); return; }
         state.workshopName = data.workshopName || '';
         state.companyName = data.companyName || '';
+        state.workshopDuration = data.workshopDuration || 90;
         state.participants = data.participants || [];
         state.ideas = data.ideas || [];
         state.phase = data.phase || 'ideate';
@@ -676,6 +689,7 @@ function renderIdeaList() {
 function renderAll() {
   document.getElementById('workshopName').value = state.workshopName;
   document.getElementById('companyName').value = state.companyName;
+  document.getElementById('workshopDuration').value = state.workshopDuration || 90;
   document.getElementById('currentPhase').textContent = state.phase.toUpperCase();
   // Sync phase buttons
   document.querySelectorAll('.phase-btns button').forEach(b => {

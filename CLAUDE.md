@@ -41,7 +41,7 @@ A single centralized `state` object in each HTML file holds all workshop data. K
 
 ### PWA / Offline
 
-- `sw.js` — Service worker with stale-while-revalidate for HTML, cache-first for assets. Cache version: `aideate-v2`.
+- `sw.js` — Service worker with stale-while-revalidate for HTML, cache-first for assets. Cache version: `aideate-v3`.
 - `manifest.json` — PWA manifest (Microsoft Fluent theme color `#0078d4`, `minimal-ui` display).
 
 ### AI Integration (optional)

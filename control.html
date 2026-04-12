@@ -320,6 +320,7 @@ button {
   <div class="log" id="log"></div>
 </div>
 
+<script src="templates.js"></script>
 <script>
 // ═══ HELPERS ═══
 function generateSessionId() {
@@ -643,8 +644,13 @@ function loadTemplate() {
   const label = sel.options[sel.selectedIndex].text;
   sel.value = '';
 
-  fetch(filePath)
-    .then(r => { if (!r.ok) throw new Error('Could not load template'); return r.json(); })
+  // Try inline bundle first (works on file://), fall back to fetch
+  const bundled = (typeof TEMPLATES !== 'undefined') && TEMPLATES[filePath];
+  const promise = bundled
+    ? Promise.resolve(bundled)
+    : fetch(filePath).then(r => { if (!r.ok) throw new Error('Could not load template'); return r.json(); });
+
+  promise
     .then(template => {
       if (state.ideas.length > 0 && !confirm('This will add ' + template.ideas.length + ' starter ideas for ' + label + ' to your existing ideas. Continue?')) return;
 

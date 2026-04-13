@@ -1,5 +1,5 @@
 // AIdeate Service Worker — offline-first PWA support
-const CACHE_VERSION = 'aideate-v4';
+const CACHE_VERSION = 'aideate-v5';
 const ASSETS = [
   './',
   './index.html',

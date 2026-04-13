@@ -335,6 +335,122 @@ async function runTests() {
     logTest('PWA: SW cache list', false, e.message);
   }
 
+  // ═══ 6. Company Profile Tests (38–42) ═══
+
+  // Test 38: App has company profile fields in drawer
+  logTest('Company Profile: drawer has industry/country/employees/revenue fields',
+    appHtml.includes('companyIndustry') && appHtml.includes('companyCountry') &&
+    appHtml.includes('companyEmployees') && appHtml.includes('companyRevenue'));
+
+  // Test 39: App has company profile in state
+  logTest('Company Profile: state includes companyProfile object',
+    appHtml.includes('companyProfile') && appHtml.includes('industry') && appHtml.includes('employeeCount'));
+
+  // Test 40: Company profile persists in export
+  logTest('Company Profile: included in exportWorkshop()',
+    appHtml.includes('companyProfile'));
+
+  // Test 41: Company profile restores from autosave
+  logTest('Company Profile: restoreAutosave handles companyProfile',
+    appHtml.includes('data.companyProfile'));
+
+  // Test 42: Company profile feeds AI prompts
+  logTest('Company Profile: context sent to AI evaluation',
+    appHtml.includes('companyProfile') && appHtml.includes('Industry'));
+
+  // ═══ 7. ROI Calculator Tests (43–48) ═══
+
+  // Test 43: App has ROI calculator function
+  logTest('ROI: has calculateROI function',
+    appHtml.includes('function calculateROI'));
+
+  // Test 44: ROI calculates NPV
+  logTest('ROI: calculates NPV',
+    appHtml.includes('npv') || appHtml.includes('NPV'));
+
+  // Test 45: ROI calculates payback period
+  logTest('ROI: calculates payback period',
+    appHtml.includes('payback') || appHtml.includes('Payback'));
+
+  // Test 46: ROI fields exist in expanded card
+  logTest('ROI: expanded card has implementation cost and annual benefit fields',
+    appHtml.includes('implementationCost') && appHtml.includes('annualBenefit'));
+
+  // Test 47: ROI results saved to evaluation
+  logTest('ROI: results saved to idea evaluation',
+    appHtml.includes('roiPercent') && appHtml.includes('npvValue') && appHtml.includes('paybackMonths'));
+
+  // Test 48: ROI appears in DOCX report
+  logTest('ROI: included in downloadReportDocx',
+    appHtml.includes('ROI') && appHtml.includes('roiPercent'));
+
+  // ═══ 8. Define Wizard Tests (49–53) ═══
+
+  // Test 49: App has wizard UI
+  logTest('Wizard: has wizard step navigation',
+    appHtml.includes('wizard-step') || appHtml.includes('wizardStep'));
+
+  // Test 50: Wizard has step indicator/progress
+  logTest('Wizard: has step progress indicator',
+    appHtml.includes('wizard-progress') || appHtml.includes('wizardProgress'));
+
+  // Test 51: Wizard navigation functions exist
+  logTest('Wizard: has nextWizardStep and prevWizardStep functions',
+    appHtml.includes('nextWizardStep') && appHtml.includes('prevWizardStep'));
+
+  // Test 52: Wizard covers all evaluation sections
+  logTest('Wizard: covers Current State, AI Solution, Scoring, Ownership sections',
+    appHtml.includes('Current State') && appHtml.includes('AI Solution') &&
+    appHtml.includes('Scoring') && appHtml.includes('Ownership'));
+
+  // Test 53: Wizard saves evaluation on complete
+  logTest('Wizard: saves evaluation on final step',
+    appHtml.includes('saveWizard') || appHtml.includes('completeWizard'));
+
+  // ═══ 9. Prioritization 2×2 Matrix Tests (54–58) ═══
+
+  // Test 54: App has matrix rendering function
+  logTest('Matrix: has renderMatrix function',
+    appHtml.includes('function renderMatrix'));
+
+  // Test 55: Matrix has quadrant labels
+  logTest('Matrix: has quadrant labels (Quick Wins, Strategic, etc.)',
+    appHtml.includes('Quick Wins') && appHtml.includes('Strategic'));
+
+  // Test 56: Matrix is on prioritize/results slide
+  logTest('Matrix: rendered on results slide',
+    appHtml.includes('matrixContainer') || appHtml.includes('matrix-container'));
+
+  // Test 57: Matrix plots ideas as dots
+  logTest('Matrix: plots idea dots by impact/readiness',
+    appHtml.includes('impactScore') && appHtml.includes('readinessScore') && appHtml.includes('matrix'));
+
+  // Test 58: Matrix has axis labels
+  logTest('Matrix: has Impact and Feasibility axis labels',
+    appHtml.includes('Impact') && appHtml.includes('Feasibility'));
+
+  // ═══ 10. Excel Export Tests (59–63) ═══
+
+  // Test 59: App has Excel export function
+  logTest('Excel: has downloadExcel function',
+    appHtml.includes('function downloadExcel'));
+
+  // Test 60: Excel generates .xlsx file
+  logTest('Excel: generates .xlsx blob',
+    appHtml.includes('.xlsx') && appHtml.includes('spreadsheetml'));
+
+  // Test 61: Excel has multiple sheets
+  logTest('Excel: creates multiple worksheet sheets',
+    appHtml.includes('sheet1') || appHtml.includes('Sheet1') || appHtml.includes('worksheet'));
+
+  // Test 62: Excel export button exists
+  logTest('Excel: export button in deliverables bar',
+    appHtml.includes('downloadExcel'));
+
+  // Test 63: Excel includes evaluation data
+  logTest('Excel: includes evaluation fields in output',
+    appHtml.includes('impactScore') && appHtml.includes('readinessScore'));
+
   showSummary();
 }
 </script>

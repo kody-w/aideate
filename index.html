@@ -503,6 +503,32 @@
     border-radius: 4px; font-weight: 700;
   }
 
+  /* 2x2 Prioritization Matrix */
+  .matrix-box {
+    position: relative; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; width: 100%; max-width: 700px; margin: 0 auto;
+    aspect-ratio: 16/10; overflow: hidden;
+  }
+  .matrix-axis-label {
+    position: absolute; font-size: .65rem; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .5px; font-weight: 600;
+  }
+  .matrix-quadrant-label {
+    position: absolute; font-size: .6rem; font-weight: 700; opacity: .35;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .matrix-dot {
+    position: absolute; width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .6rem; font-weight: 800; border: 2px solid rgba(0,0,0,.3);
+    transform: translate(-50%, -50%); transition: all .3s;
+    cursor: default; z-index: 1;
+  }
+  .matrix-dot:hover { transform: translate(-50%, -50%) scale(1.3); z-index: 2; }
+  .matrix-legend { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+  .matrix-legend-item { display: flex; align-items: center; gap: 4px; font-size: .7rem; }
+  .matrix-legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
   .complexity-badge { display: inline-block; padding: 3px 12px; border-radius: 10px; font-size: .75rem; font-weight: 700; text-transform: uppercase; }
   .complexity-badge.low { background: rgba(74,222,128,.15); color: #4ade80; }
   .complexity-badge.medium { background: rgba(251,191,36,.15); color: #fbbf24; }
@@ -744,6 +770,53 @@
     font-size: .65rem; padding: 3px 5px; transition: transform .2s;
   }
   .drawer .idea-row .eval-toggle.open { transform: rotate(90deg); }
+
+  /* Define Wizard overlay */
+  .wizard-overlay {
+    position: fixed; inset: 0; z-index: 800;
+    background: rgba(10,15,30,.95); backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; animation: fadeIn .3s ease;
+  }
+  .wizard-card {
+    background: linear-gradient(135deg, var(--card), rgba(22,33,62,.98));
+    border: 2px solid var(--border); border-radius: 20px;
+    padding: 32px 40px; max-width: 700px; width: 100%; max-height: 90vh;
+    overflow-y: auto; animation: cardIn .4s ease; position: relative;
+  }
+  .wizard-progress { display: flex; gap: 4px; margin-bottom: 24px; }
+  .wizard-progress .wizStep {
+    flex: 1; height: 4px; border-radius: 2px; background: var(--border); transition: background .3s;
+  }
+  .wizard-progress .wizStep.done { background: var(--ms-green); }
+  .wizard-progress .wizStep.active { background: var(--ms-blue); }
+  .wizard-step { display: none; }
+  .wizard-step.active { display: block; }
+  .wizard-step h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; }
+  .wizard-step .wiz-field { margin-bottom: 12px; }
+  .wizard-step .wiz-field label {
+    font-size: .7rem; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .5px; display: block; margin-bottom: 4px;
+  }
+  .wizard-step .wiz-field input,
+  .wizard-step .wiz-field textarea,
+  .wizard-step .wiz-field select {
+    width: 100%; background: var(--dark); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); padding: 10px 14px;
+    font-size: .88rem; font-family: inherit;
+  }
+  .wizard-step .wiz-field textarea { resize: vertical; min-height: 60px; }
+  .wizard-step .wiz-field input:focus, .wizard-step .wiz-field textarea:focus,
+  .wizard-step .wiz-field select:focus { border-color: var(--ms-blue); outline: none; }
+  .wizard-nav { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .wizard-nav button {
+    padding: 10px 24px; border: none; border-radius: 8px; font-weight: 700;
+    font-size: .85rem; cursor: pointer; transition: all .2s;
+  }
+  .wizard-nav .wiz-prev { background: var(--border); color: var(--text); }
+  .wizard-nav .wiz-next { background: linear-gradient(135deg, var(--ms-blue), var(--ms-purple)); color: #fff; }
+  .wizard-nav .wiz-next:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,120,212,.4); }
+  .wizard-counter { font-size: .75rem; color: var(--muted); margin-right: auto; align-self: center; }
 
   /* AI paste area in drawer */
   .drawer .ai-paste-area {
@@ -1038,6 +1111,7 @@
   </div>
   <div class="priority-container" id="priorityContainer">
     <div class="podium" id="podium"></div>
+    <div id="matrixContainer" style="margin-bottom:24px;"></div>
     <table class="results-table" id="resultsTable">
       <thead><tr><th>#</th><th>Challenge</th><th>Department</th><th>Votes</th><th>%</th><th>Status</th></tr></thead>
       <tbody id="resultsBody"></tbody>
@@ -1045,7 +1119,8 @@
   </div>
   <div class="deliverables-bar" id="deliverablesBar">
     <button class="deliverable-btn" onclick="downloadReportDocx()">📄 Download Word (.docx)</button>
-    <button class="deliverable-btn" onclick="generateReport()">📊 View Report / Save PDF</button>
+    <button class="deliverable-btn" onclick="downloadExcel()">📊 Download Excel (.xlsx)</button>
+    <button class="deliverable-btn" onclick="generateReport()">🖨️ View Report / Save PDF</button>
     <button class="deliverable-btn secondary" onclick="exportWorkshop()">💾 Export JSON</button>
   </div>
   <div class="phase-footer">
@@ -1080,6 +1155,24 @@
     <div class="d-row"><label>Duration</label><select id="workshopDuration" onchange="onWorkshopInfoChange()" style="flex:1;">
       <option value="60">60 min</option><option value="75">75 min</option><option value="90" selected>90 min</option>
     </select></div>
+  </div>
+
+  <!-- COMPANY PROFILE -->
+  <div class="drawer-section" data-context="slide-1,slide-2,slide-3,slide-8">
+    <h3>🏢 Company Profile</h3>
+    <div class="d-row"><label>Industry</label><select id="companyIndustry" style="flex:1;" onchange="onCompanyProfileChange()">
+      <option value="">Select...</option>
+      <option value="Healthcare">Healthcare</option><option value="Financial Services">Financial Services</option>
+      <option value="Manufacturing">Manufacturing</option><option value="Retail & CPG">Retail & CPG</option>
+      <option value="Energy & Utilities">Energy & Utilities</option><option value="Technology">Technology</option>
+      <option value="Professional Services">Professional Services</option><option value="Government">Government</option>
+      <option value="Education">Education</option><option value="Media & Entertainment">Media & Entertainment</option>
+      <option value="Transportation & Logistics">Transportation & Logistics</option><option value="Other">Other</option>
+    </select></div>
+    <div class="d-row"><label>Country</label><input type="text" id="companyCountry" placeholder="Country/Region" style="flex:1;" oninput="onCompanyProfileChange()"></div>
+    <div class="d-row"><label>Employees</label><input type="text" id="companyEmployees" placeholder="e.g. 5,000" style="flex:1;" oninput="onCompanyProfileChange()"></div>
+    <div class="d-row"><label>Revenue</label><input type="text" id="companyRevenue" placeholder="e.g. $500M" style="flex:1;" oninput="onCompanyProfileChange()"></div>
+    <div style="margin-top:4px;"><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:2px;">Key Business Goals</label><textarea id="companyGoals" placeholder="Strategic priorities and goals for this year" rows="2" style="width:100%;" oninput="onCompanyProfileChange()"></textarea></div>
   </div>
 
   <!-- PHASE CONTROL -->
@@ -1218,7 +1311,8 @@
     </div>
     <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
       <button class="btn-orange" onclick="downloadReportDocx()">📄 Word</button>
-      <button class="btn-orange" onclick="generateReport()">📊 PDF Report</button>
+      <button class="btn-orange" onclick="downloadExcel()">📊 Excel</button>
+      <button class="btn-orange" onclick="generateReport()">🖨️ PDF</button>
     </div>
     <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
       <button class="btn-sm" style="background:var(--border);color:var(--muted);" onclick="clearAutosave()">🗑️ Clear Cache</button>
@@ -1291,6 +1385,7 @@ let state = {
     { label: 'Demo 4', url: '', visible: false }
   ],
   departments: ['Sales', 'Operations', 'HR', 'IT', 'Finance', 'Marketing', 'Customer Service', 'Engineering', 'Legal', 'Product'],
+  companyProfile: { industry: '', country: '', employeeCount: '', annualRevenue: '', businessGoals: '' },
   createdAt: new Date().toISOString()
 };
 
@@ -1322,6 +1417,7 @@ function restoreAutosave() {
     state.departments = data.departments || state.departments;
     state.createdAt = data.createdAt || state.createdAt;
     state.evalFocusId = data.evalFocusId || null;
+    state.companyProfile = data.companyProfile || { industry: '', country: '', employeeCount: '', annualRevenue: '', businessGoals: '' };
     return true;
   } catch { return false; }
 }
@@ -1492,6 +1588,15 @@ function toggleCollapsible(header) {
 // ══════════════════════════════════════════════
 // WORKSHOP SETUP
 // ══════════════════════════════════════════════
+function onCompanyProfileChange() {
+  state.companyProfile.industry = document.getElementById('companyIndustry').value;
+  state.companyProfile.country = document.getElementById('companyCountry').value.trim();
+  state.companyProfile.employeeCount = document.getElementById('companyEmployees').value.trim();
+  state.companyProfile.annualRevenue = document.getElementById('companyRevenue').value.trim();
+  state.companyProfile.businessGoals = document.getElementById('companyGoals').value.trim();
+  autosave();
+}
+
 function onWorkshopInfoChange() {
   state.workshopName = document.getElementById('workshopName').value.trim();
   state.companyName = document.getElementById('companyName').value.trim();
@@ -1861,6 +1966,218 @@ function saveIdeaEvaluation(ideaId) {
   log('Saved evaluation: ' + idea.name);
 }
 
+// ══════════════════════════════════════════════
+// DEFINE WIZARD (10-step guided evaluation)
+// ══════════════════════════════════════════════
+let wizardIdeaId = null;
+let wizardCurrentStep = 0;
+const WIZARD_STEPS = [
+  { title: '1. Problem Statement', fields: [
+    { key: 'name', label: 'Challenge Name', type: 'text', placeholder: 'Short name for this business challenge', readonly: true },
+    { key: 'desc', label: 'Description', type: 'textarea', placeholder: 'Describe the business problem in detail' }
+  ]},
+  { title: '2. Current Process', fields: [
+    { key: 'currentProcess', label: 'Current Workflow', type: 'textarea', placeholder: 'Step-by-step: how is this done today?' },
+    { key: 'systemsTools', label: 'Systems & Tools', type: 'text', placeholder: 'What apps, databases, platforms are used?' }
+  ]},
+  { title: '3. People & Frequency', fields: [
+    { key: 'peopleInvolved', label: 'People Involved', type: 'number', placeholder: 'How many people do this task?' },
+    { key: 'processFrequency', label: 'Frequency (tasks/week)', type: 'number', placeholder: 'How many times per week?' },
+    { key: 'timePerOccurrence', label: 'Time Per Task (minutes)', type: 'number', placeholder: 'Minutes spent per task' }
+  ]},
+  { title: '4. Pain Points', fields: [
+    { key: 'painPoints', label: 'Pain Points & Bottlenecks', type: 'textarea', placeholder: 'What breaks, slows down, or causes errors? What frustrates people?' }
+  ]},
+  { title: '5. AI Solution Design', fields: [
+    { key: 'idealSolution', label: 'Ideal AI Solution', type: 'textarea', placeholder: 'How could AI address this challenge? What would the ideal solution look like?' },
+    { key: 'dataSources', label: 'Data Sources Required', type: 'textarea', placeholder: 'What data, APIs, or systems would the AI need access to?' }
+  ]},
+  { title: '6. Business Impact', fields: [
+    { key: 'businessImpact', label: 'Business Impact', type: 'textarea', placeholder: 'Revenue growth, cost reduction, quality improvement, risk mitigation?' },
+    { key: 'expectedBenefits', label: 'Expected Benefits', type: 'textarea', placeholder: 'Concrete, measurable benefits (list 2-4 bullets)' },
+    { key: 'strategicAlignment', label: 'Strategic Alignment', type: 'textarea', placeholder: 'How does this align with business priorities and goals?' }
+  ]},
+  { title: '7. Scoring', fields: [
+    { key: 'impactScore', label: 'Impact Score (1-10)', type: 'range', min: 1, max: 10 },
+    { key: 'readinessScore', label: 'Readiness Score (1-10)', type: 'range', min: 1, max: 10 },
+    { key: 'complexity', label: 'Complexity', type: 'select', options: [{v:'',l:'Select...'},{v:'low',l:'Low'},{v:'medium',l:'Medium'},{v:'high',l:'High'}] }
+  ]},
+  { title: '8. Timeline & Readiness', fields: [
+    { key: 'implementationTimeline', label: 'Implementation Timeline', type: 'select', options: [{v:'',l:'Select...'},{v:'quick-win',l:'Quick Win (1-2 months)'},{v:'standard',l:'Standard (3-6 months)'},{v:'strategic',l:'Strategic (6+ months)'}] },
+    { key: 'dataReadiness', label: 'Data Readiness', type: 'select', options: [{v:'',l:'Select...'},{v:'green',l:'Green — Data ready'},{v:'amber',l:'Amber — Some gaps'},{v:'red',l:'Red — Significant work needed'}] }
+  ]},
+  { title: '9. Ownership & Risk', fields: [
+    { key: 'stakeholders', label: 'Stakeholders', type: 'text', placeholder: 'Who benefits? Who needs to be involved?' },
+    { key: 'sponsorName', label: 'Executive Sponsor', type: 'text', placeholder: 'Name and title of sponsor' },
+    { key: 'successCriteria', label: 'Success Criteria', type: 'textarea', placeholder: 'How will we measure success? List specific KPIs.' },
+    { key: 'risks', label: 'Risks & Blockers', type: 'textarea', placeholder: 'Data quality issues, compliance, dependencies, mitigation strategies' }
+  ]},
+  { title: '10. Summary & ROI', fields: [
+    { key: 'implementationCost', label: 'Implementation Cost ($)', type: 'number', placeholder: 'Total estimated cost' },
+    { key: 'annualBenefit', label: 'Annual Benefit ($)', type: 'number', placeholder: 'Yearly savings or revenue impact' },
+    { key: '_summary', label: '', type: 'summary' }
+  ]}
+];
+
+function openWizard(ideaId) {
+  wizardIdeaId = ideaId;
+  wizardCurrentStep = 0;
+  var idea = state.ideas.find(function(i) { return i.id === ideaId; });
+  if (!idea) return;
+  var overlay = document.createElement('div');
+  overlay.className = 'wizard-overlay';
+  overlay.id = 'wizardOverlay';
+  overlay.innerHTML =
+    '<div class="wizard-card">' +
+      '<div class="ex-close" onclick="closeWizard()">✕</div>' +
+      '<div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Define Wizard</div>' +
+      '<div style="font-size:1.4rem;font-weight:800;margin-bottom:16px;">' + escHtml(idea.name) + '</div>' +
+      '<div class="wizard-progress" id="wizardProgress"></div>' +
+      '<div id="wizardStepContainer"></div>' +
+      '<div class="wizard-nav">' +
+        '<span class="wizard-counter" id="wizardCounter"></span>' +
+        '<button class="wiz-prev" id="wizPrev" onclick="prevWizardStep()">Back</button>' +
+        '<button class="wiz-next" id="wizNext" onclick="nextWizardStep()">Next</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  renderWizardStep();
+}
+
+function closeWizard() {
+  var overlay = document.getElementById('wizardOverlay');
+  if (overlay) overlay.remove();
+  wizardIdeaId = null;
+}
+
+function renderWizardStep() {
+  var idea = state.ideas.find(function(i) { return i.id === wizardIdeaId; });
+  if (!idea) return;
+  var ev = idea.evaluation || {};
+  var step = WIZARD_STEPS[wizardCurrentStep];
+
+  // Progress bar
+  var prog = document.getElementById('wizardProgress');
+  prog.innerHTML = WIZARD_STEPS.map(function(_, idx) {
+    var cls = idx < wizardCurrentStep ? 'wizStep done' : idx === wizardCurrentStep ? 'wizStep active' : 'wizStep';
+    return '<div class="' + cls + '"></div>';
+  }).join('');
+
+  // Step content
+  var container = document.getElementById('wizardStepContainer');
+  var html = '<div class="wizard-step active"><h3>' + step.title + '</h3>';
+  step.fields.forEach(function(f) {
+    if (f.type === 'summary') {
+      // Summary view
+      html += '<div style="background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:8px;">';
+      html += '<div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Review</div>';
+      var sumFields = ['peopleInvolved','processFrequency','timePerOccurrence','painPoints','idealSolution','impactScore','readinessScore','complexity'];
+      sumFields.forEach(function(k) {
+        var v = ev[k];
+        if (v) html += '<div style="font-size:.78rem;margin-bottom:4px;"><strong style="color:var(--muted);">' + k.replace(/([A-Z])/g,' $1') + ':</strong> ' + escHtml(String(v)) + '</div>';
+      });
+      html += '<div id="wiz-roiResults-' + wizardIdeaId + '" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;"></div>';
+      html += '</div>';
+      return;
+    }
+    var val = f.key === 'name' ? idea.name : f.key === 'desc' ? idea.desc : (ev[f.key] || '');
+    html += '<div class="wiz-field"><label>' + f.label + '</label>';
+    if (f.type === 'textarea') {
+      html += '<textarea id="wiz-' + f.key + '" placeholder="' + (f.placeholder||'') + '"' + (f.readonly?' readonly':'') + '>' + escHtml(val || '') + '</textarea>';
+    } else if (f.type === 'select') {
+      html += '<select id="wiz-' + f.key + '">' + f.options.map(function(o) { return '<option value="' + o.v + '"' + (val==o.v?' selected':'') + '>' + o.l + '</option>'; }).join('') + '</select>';
+    } else if (f.type === 'range') {
+      var rv = val || 5;
+      html += '<div style="display:flex;align-items:center;gap:10px;"><input type="range" id="wiz-' + f.key + '" min="' + (f.min||1) + '" max="' + (f.max||10) + '" value="' + rv + '" oninput="this.nextElementSibling.textContent=this.value" style="flex:1;accent-color:var(--ms-blue);"><span style="font-weight:700;font-size:1.1rem;min-width:24px;text-align:center;">' + rv + '</span><span style="font-size:.7rem;color:var(--muted);">/10</span></div>';
+    } else {
+      html += '<input type="' + (f.type||'text') + '" id="wiz-' + f.key + '" placeholder="' + (f.placeholder||'') + '" value="' + escAttr(val || '') + '"' + (f.readonly?' readonly':'') + '>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+
+  // Nav state
+  document.getElementById('wizPrev').style.display = wizardCurrentStep === 0 ? 'none' : '';
+  document.getElementById('wizNext').textContent = wizardCurrentStep === WIZARD_STEPS.length - 1 ? 'Complete' : 'Next';
+  document.getElementById('wizardCounter').textContent = 'Step ' + (wizardCurrentStep + 1) + ' of ' + WIZARD_STEPS.length;
+
+  // If on summary step, calc ROI
+  if (wizardCurrentStep === WIZARD_STEPS.length - 1) {
+    setTimeout(function() { calculateROI(wizardIdeaId, 'wiz'); }, 50);
+  }
+}
+
+function saveWizardStepData() {
+  var idea = state.ideas.find(function(i) { return i.id === wizardIdeaId; });
+  if (!idea) return;
+  if (!idea.evaluation) idea.evaluation = {};
+  var step = WIZARD_STEPS[wizardCurrentStep];
+  step.fields.forEach(function(f) {
+    if (f.key.startsWith('_') || f.readonly) return;
+    if (f.key === 'name') { idea.name = document.getElementById('wiz-name')?.value || idea.name; return; }
+    if (f.key === 'desc') { idea.desc = document.getElementById('wiz-desc')?.value || idea.desc; return; }
+    var el = document.getElementById('wiz-' + f.key);
+    if (!el) return;
+    if (f.type === 'range' || f.type === 'number') {
+      idea.evaluation[f.key] = el.value;
+    } else {
+      idea.evaluation[f.key] = el.value;
+    }
+  });
+  idea.evaluation.evaluatedAt = new Date().toISOString();
+  autosave();
+}
+
+function nextWizardStep() {
+  saveWizardStepData();
+  if (wizardCurrentStep >= WIZARD_STEPS.length - 1) {
+    completeWizard();
+    return;
+  }
+  wizardCurrentStep++;
+  renderWizardStep();
+}
+
+function prevWizardStep() {
+  saveWizardStepData();
+  if (wizardCurrentStep > 0) {
+    wizardCurrentStep--;
+    renderWizardStep();
+  }
+}
+
+function completeWizard() {
+  saveWizardStepData();
+  var idea = state.ideas.find(function(i) { return i.id === wizardIdeaId; });
+  if (idea && idea.evaluation) {
+    // Calculate and store ROI
+    var ev = idea.evaluation;
+    var ic = parseFloat(ev.implementationCost) || 0;
+    var ab = parseFloat(ev.annualBenefit) || 0;
+    if (ic > 0 && ab > 0) {
+      var h = parseInt(ev.timeHorizon) || 3, dr = (parseFloat(ev.discountRate) || 10) / 100;
+      var npv = -ic; for (var y = 1; y <= h; y++) npv += ab / Math.pow(1 + dr, y);
+      ev.roiPercent = (((ab * h - ic) / ic) * 100).toFixed(1);
+      ev.npvValue = npv.toFixed(0);
+      ev.paybackMonths = (ic / (ab / 12)).toFixed(1);
+    }
+    // Calculate time savings
+    var ppl = parseFloat(ev.peopleInvolved) || 0;
+    var freq = parseFloat(ev.processFrequency) || 0;
+    var mins = parseFloat(ev.timePerOccurrence) || 0;
+    var hrs = ppl * freq * (mins / 60);
+    if (hrs > 0) ev.estimatedTimeSavings = hrs.toFixed(1) + ' hrs/week';
+  }
+  closeWizard();
+  renderPanelIdeaList();
+  renderEvaluation();
+  renderPriority();
+  renderIdeas();
+  autosave();
+  log('Wizard complete: ' + (idea?.name || ''));
+}
+
 function focusEvalIdea(ideaId) {
   state.evalFocusId = ideaId;
   renderPanelIdeaList();
@@ -1936,8 +2253,14 @@ async function aiEvaluateIdea(ideaId) {
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> ...'; }
   if (status) status.textContent = 'Calling AI...';
 
+  const cp = state.companyProfile || {};
   const context = [
     state.companyName ? 'Company: ' + state.companyName : '',
+    cp.industry ? 'Industry: ' + cp.industry : '',
+    cp.country ? 'Country: ' + cp.country : '',
+    cp.employeeCount ? 'Employees: ' + cp.employeeCount : '',
+    cp.annualRevenue ? 'Annual Revenue: ' + cp.annualRevenue : '',
+    cp.businessGoals ? 'Business Goals: ' + cp.businessGoals : '',
     state.workshopName ? 'Workshop: ' + state.workshopName : '',
     state.participants.length ? 'Participants: ' + state.participants.map(p => p.name + (p.title ? ' (' + p.title + ')' : '')).join(', ') : ''
   ].filter(Boolean).join('\n');
@@ -2085,7 +2408,7 @@ function generateReport() {
     const medal = i === 0 ? '&#x1F947;' : i === 1 ? '&#x1F948;' : i === 2 ? '&#x1F949;' : '#' + (i+1);
     const tlLabels = {'quick-win':'Quick Win (1-2 months)','standard':'Standard (3-6 months)','strategic':'Strategic (6+ months)'};
     const drLabels = {'green':'Green — Ready','amber':'Amber — Some gaps','red':'Red — Significant work needed'};
-    const fields = [{label:'People Involved',val:ev.peopleInvolved},{label:'Process Frequency',val:ev.processFrequency},{label:'Time Per Occurrence',val:ev.timePerOccurrence},{label:'Systems & Tools',val:ev.systemsTools},{label:'Current Process',val:ev.currentProcess},{label:'Pain Points',val:ev.painPoints},{label:'Ideal AI Solution',val:ev.idealSolution},{label:'Data Sources',val:ev.dataSources},{label:'Time Savings',val:ev.estimatedTimeSavings},{label:'Business Impact',val:ev.businessImpact},{label:'Expected Benefits',val:ev.expectedBenefits},{label:'Strategic Alignment',val:ev.strategicAlignment},{label:'Success Criteria',val:ev.successCriteria},{label:'Stakeholders',val:ev.stakeholders},{label:'Executive Sponsor',val:ev.sponsorName},{label:'Implementation Timeline',val:tlLabels[ev.implementationTimeline]||ev.implementationTimeline},{label:'Data Readiness',val:drLabels[ev.dataReadiness]||ev.dataReadiness},{label:'Risks & Blockers',val:ev.risks}];
+    const fields = [{label:'People Involved',val:ev.peopleInvolved},{label:'Process Frequency',val:ev.processFrequency},{label:'Time Per Occurrence',val:ev.timePerOccurrence},{label:'Systems & Tools',val:ev.systemsTools},{label:'Current Process',val:ev.currentProcess},{label:'Pain Points',val:ev.painPoints},{label:'Ideal AI Solution',val:ev.idealSolution},{label:'Data Sources',val:ev.dataSources},{label:'Time Savings',val:ev.estimatedTimeSavings},{label:'Business Impact',val:ev.businessImpact},{label:'Expected Benefits',val:ev.expectedBenefits},{label:'Strategic Alignment',val:ev.strategicAlignment},{label:'Success Criteria',val:ev.successCriteria},{label:'Stakeholders',val:ev.stakeholders},{label:'Executive Sponsor',val:ev.sponsorName},{label:'Implementation Timeline',val:tlLabels[ev.implementationTimeline]||ev.implementationTimeline},{label:'Data Readiness',val:drLabels[ev.dataReadiness]||ev.dataReadiness},{label:'Risks & Blockers',val:ev.risks},{label:'ROI',val:ev.roiPercent?ev.roiPercent+'%':''},{label:'NPV',val:ev.npvValue?'$'+Number(ev.npvValue).toLocaleString():''},{label:'Payback Period',val:ev.paybackMonths?ev.paybackMonths+' months':''}];
     const fieldsHtml = idea.evaluation ? fields.map(f => f.val ? '<div style="margin-bottom:12px;"><div style="font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">'+f.label+'</div><div style="font-size:.85rem;line-height:1.5;">'+esc(f.val)+'</div></div>' : '').join('') : '<p style="color:#94a3b8;font-style:italic;">Not yet evaluated</p>';
     return '<div style="background:#16213e;border:2px solid #2a3a5c;border-radius:12px;padding:24px;margin-bottom:20px;page-break-inside:avoid;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;"><span style="font-size:1.4rem;">'+medal+'</span><div style="flex:1;"><div style="font-size:1.2rem;font-weight:800;">'+esc(idea.name)+'</div><div style="font-size:.8rem;color:#94a3b8;">'+esc(idea.dept)+' &middot; '+idea.votes+' votes</div></div>'+(idea.evaluation?'<div style="display:flex;gap:12px;"><div style="text-align:center;"><div style="font-size:.6rem;color:#94a3b8;text-transform:uppercase;">Impact</div><div style="font-size:1.4rem;font-weight:800;color:'+scoreColor(ev.impactScore||0)+';">'+(ev.impactScore||'-')+'</div></div><div style="text-align:center;"><div style="font-size:.6rem;color:#94a3b8;text-transform:uppercase;">Readiness</div><div style="font-size:1.4rem;font-weight:800;color:'+scoreColor(ev.readinessScore||0)+';">'+(ev.readinessScore||'-')+'</div></div><div style="text-align:center;"><div style="font-size:.6rem;color:#94a3b8;text-transform:uppercase;">Complexity</div><div style="margin-top:4px;">'+complexityLabel(ev.complexity)+'</div></div></div>':'')+'</div>'+(idea.desc?'<p style="color:#e2e8f0;margin-bottom:16px;font-size:.9rem;line-height:1.5;">'+esc(idea.desc)+'</p>':'')+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;">'+fieldsHtml+'</div></div>';
   }).join('');
@@ -2229,6 +2552,7 @@ function downloadReportDocx() {
     if (ev.impactScore) body += p('Impact Score: ' + ev.impactScore + '/10  |  Readiness Score: ' + (ev.readinessScore||'-') + '/10  |  Complexity: ' + (ev.complexity ? ev.complexity.charAt(0).toUpperCase()+ev.complexity.slice(1) : 'N/A'));
     if (ev.implementationTimeline) body += p('Implementation Timeline: ' + (tlMap[ev.implementationTimeline] || ev.implementationTimeline));
     if (ev.dataReadiness) body += p('Data Readiness: ' + (drMap[ev.dataReadiness] || ev.dataReadiness));
+    if (ev.roiPercent) body += p('ROI: ' + ev.roiPercent + '%  |  NPV: $' + Number(ev.npvValue||0).toLocaleString() + '  |  Payback: ' + ev.paybackMonths + ' months');
     body += p('');
   });
 
@@ -2265,6 +2589,167 @@ function downloadReportDocx() {
   log('Downloaded Word report');
 }
 
+function downloadExcel() {
+  var te = new TextEncoder();
+  var sorted = [...state.ideas].sort(function(a,b) { return (b.votes||0) - (a.votes||0); });
+  var totalVotes = sorted.reduce(function(s,i) { return s + (i.votes||0); }, 0);
+  var date = new Date().toISOString().split('T')[0];
+  var esc = function(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+
+  function makeSheet(name, headers, rows) {
+    var xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+      '<sheetData>';
+    // Header row
+    xml += '<row r="1">';
+    headers.forEach(function(h, c) {
+      xml += '<c r="' + colLetter(c) + '1" t="inlineStr"><is><t>' + esc(h) + '</t></is></c>';
+    });
+    xml += '</row>';
+    // Data rows
+    rows.forEach(function(row, r) {
+      xml += '<row r="' + (r+2) + '">';
+      row.forEach(function(val, c) {
+        var ref = colLetter(c) + (r+2);
+        if (typeof val === 'number' && !isNaN(val)) {
+          xml += '<c r="' + ref + '"><v>' + val + '</v></c>';
+        } else {
+          xml += '<c r="' + ref + '" t="inlineStr"><is><t>' + esc(String(val||'')) + '</t></is></c>';
+        }
+      });
+      xml += '</row>';
+    });
+    xml += '</sheetData></worksheet>';
+    return xml;
+  }
+
+  function colLetter(i) { return String.fromCharCode(65 + (i % 26)); }
+
+  // Sheet 1: Summary
+  var summaryHeaders = ['Workshop', 'Company', 'Date', 'Participants', 'Total Ideas', 'Evaluated', 'Total Votes'];
+  var cp = state.companyProfile || {};
+  var summaryRows = [[
+    state.workshopName||'', state.companyName||'', date, state.participants.length,
+    state.ideas.length, sorted.filter(function(i){return !!i.evaluation;}).length, totalVotes
+  ]];
+  if (cp.industry || cp.country || cp.employeeCount) {
+    summaryHeaders.push('Industry', 'Country', 'Employees', 'Revenue');
+    summaryRows[0].push(cp.industry||'', cp.country||'', cp.employeeCount||'', cp.annualRevenue||'');
+  }
+
+  // Sheet 2: Challenges (all ideas ranked)
+  var ideasHeaders = ['Rank', 'Challenge', 'Department', 'Description', 'Submitter', 'Votes', 'Vote %', 'Impact', 'Readiness', 'Complexity', 'Timeline', 'Data Readiness', 'Time Savings', 'ROI %', 'Status'];
+  var tlMap = {'quick-win':'Quick Win','standard':'Standard','strategic':'Strategic'};
+  var drMap = {'green':'Green','amber':'Amber','red':'Red'};
+  var ideasRows = sorted.map(function(idea, i) {
+    var ev = idea.evaluation || {};
+    return [
+      i+1, idea.name, idea.dept, idea.desc||'', idea.submitter||'',
+      idea.votes||0, totalVotes>0 ? Math.round((idea.votes||0)/totalVotes*100) : 0,
+      ev.impactScore||'', ev.readinessScore||'', ev.complexity||'',
+      tlMap[ev.implementationTimeline]||ev.implementationTimeline||'',
+      drMap[ev.dataReadiness]||ev.dataReadiness||'',
+      ev.estimatedTimeSavings||'', ev.roiPercent ? ev.roiPercent + '%' : '',
+      idea.evaluation ? 'Evaluated' : 'Pending'
+    ];
+  });
+
+  // Sheet 3: Evaluations (detailed)
+  var evalHeaders = ['Challenge', 'People Involved', 'Frequency', 'Time/Task', 'Systems & Tools', 'Current Process',
+    'Pain Points', 'Ideal AI Solution', 'Data Sources', 'Time Savings', 'Business Impact', 'Expected Benefits',
+    'Strategic Alignment', 'Stakeholders', 'Executive Sponsor', 'Success Criteria', 'Risks',
+    'Impact Score', 'Readiness Score', 'Complexity', 'Timeline', 'Data Readiness',
+    'Impl. Cost', 'Annual Benefit', 'ROI %', 'NPV', 'Payback (months)'];
+  var evalRows = sorted.filter(function(i){return !!i.evaluation;}).map(function(idea) {
+    var ev = idea.evaluation;
+    return [
+      idea.name, ev.peopleInvolved||'', ev.processFrequency||'', ev.timePerOccurrence||'',
+      ev.systemsTools||'', ev.currentProcess||'', ev.painPoints||'', ev.idealSolution||'',
+      ev.dataSources||'', ev.estimatedTimeSavings||'', ev.businessImpact||'', ev.expectedBenefits||'',
+      ev.strategicAlignment||'', ev.stakeholders||'', ev.sponsorName||'', ev.successCriteria||'', ev.risks||'',
+      ev.impactScore||'', ev.readinessScore||'', ev.complexity||'',
+      tlMap[ev.implementationTimeline]||ev.implementationTimeline||'', drMap[ev.dataReadiness]||ev.dataReadiness||'',
+      ev.implementationCost||'', ev.annualBenefit||'', ev.roiPercent||'', ev.npvValue||'', ev.paybackMonths||''
+    ];
+  });
+
+  // Sheet 4: Participants
+  var partHeaders = ['Name', 'Title', 'Initials'];
+  var partRows = state.participants.map(function(p) { return [p.name, p.title||'', p.initials||'']; });
+
+  // Sheet 5: Votes
+  var voteHeaders = ['Challenge', 'Department', 'Voter', 'Vote #'];
+  var voteRows = [];
+  sorted.forEach(function(idea) {
+    (idea.voters||[]).forEach(function(v, vi) {
+      voteRows.push([idea.name, idea.dept, v, vi+1]);
+    });
+  });
+
+  var sheet1 = makeSheet('Summary', summaryHeaders, summaryRows);
+  var sheet2 = makeSheet('Challenges', ideasHeaders, ideasRows);
+  var sheet3 = makeSheet('Evaluations', evalHeaders, evalRows);
+  var sheet4 = makeSheet('Participants', partHeaders, partRows);
+  var sheet5 = makeSheet('Votes', voteHeaders, voteRows);
+
+  var contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+    '<Default Extension="xml" ContentType="application/xml"/>' +
+    '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+    '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+    '<Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+    '<Override PartName="/xl/worksheets/sheet3.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+    '<Override PartName="/xl/worksheets/sheet4.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+    '<Override PartName="/xl/worksheets/sheet5.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+    '</Types>';
+
+  var rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+    '</Relationships>';
+
+  var wbRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>' +
+    '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>' +
+    '<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet3.xml"/>' +
+    '<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet4.xml"/>' +
+    '<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet5.xml"/>' +
+    '</Relationships>';
+
+  var workbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+    '<sheets>' +
+    '<sheet name="Summary" sheetId="1" r:id="rId1"/>' +
+    '<sheet name="Challenges" sheetId="2" r:id="rId2"/>' +
+    '<sheet name="Evaluations" sheetId="3" r:id="rId3"/>' +
+    '<sheet name="Participants" sheetId="4" r:id="rId4"/>' +
+    '<sheet name="Votes" sheetId="5" r:id="rId5"/>' +
+    '</sheets></workbook>';
+
+  var zipData = buildZip([
+    { name: '[Content_Types].xml', data: te.encode(contentTypes) },
+    { name: '_rels/.rels', data: te.encode(rels) },
+    { name: 'xl/_rels/workbook.xml.rels', data: te.encode(wbRels) },
+    { name: 'xl/workbook.xml', data: te.encode(workbook) },
+    { name: 'xl/worksheets/sheet1.xml', data: te.encode(sheet1) },
+    { name: 'xl/worksheets/sheet2.xml', data: te.encode(sheet2) },
+    { name: 'xl/worksheets/sheet3.xml', data: te.encode(sheet3) },
+    { name: 'xl/worksheets/sheet4.xml', data: te.encode(sheet4) },
+    { name: 'xl/worksheets/sheet5.xml', data: te.encode(sheet5) }
+  ]);
+
+  var blob = new Blob([zipData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = (state.workshopName || 'AIdeate_Report').replace(/[^a-zA-Z0-9 _-]/g, '') + '.xlsx';
+  a.click();
+  URL.revokeObjectURL(url);
+  log('Downloaded Excel report');
+}
+
 // ══════════════════════════════════════════════
 // IMPORT / EXPORT / ZIP
 // ══════════════════════════════════════════════
@@ -2273,7 +2758,8 @@ function exportWorkshop() {
     version: '1.0', sessionId: state.sessionId, workshopName: state.workshopName, companyName: state.companyName,
     workshopDuration: state.workshopDuration, participants: state.participants, ideas: state.ideas,
     phase: state.phase, timerSeconds: state.timerSeconds, demoSlides: state.demoSlides,
-    departments: state.departments, createdAt: state.createdAt || new Date().toISOString(), exportedAt: new Date().toISOString()
+    departments: state.departments, companyProfile: state.companyProfile,
+    createdAt: state.createdAt || new Date().toISOString(), exportedAt: new Date().toISOString()
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -2306,6 +2792,7 @@ function handleImportFile(event) {
       state.timerSeconds = data.timerSeconds || 300;
       state.demoSlides = data.demoSlides || state.demoSlides;
       state.departments = data.departments || state.departments;
+      state.companyProfile = data.companyProfile || state.companyProfile;
       state.createdAt = data.createdAt || state.createdAt;
       state.evalFocusId = data.evalFocusId || null;
       state.sessionId = data.sessionId || generateSessionId();
@@ -2478,6 +2965,52 @@ function calcTimeSavings(ideaId, pfx) {
   if (el) el.value = hrs > 0 ? hrs.toFixed(1) + ' hrs/week' : '';
 }
 
+function calculateROI(ideaId, pfx) {
+  var costEl = document.getElementById(pfx + '-implCost-' + ideaId);
+  var benEl = document.getElementById(pfx + '-annualBen-' + ideaId);
+  var horizonEl = document.getElementById(pfx + '-horizon-' + ideaId);
+  var discountEl = document.getElementById(pfx + '-discount-' + ideaId);
+  var riskEl = document.getElementById(pfx + '-riskFactor-' + ideaId);
+  var resultsEl = document.getElementById(pfx + '-roiResults-' + ideaId);
+  if (!costEl || !benEl || !resultsEl) return;
+
+  var cost = parseFloat(costEl.value) || 0;
+  var annualBenefit = parseFloat(benEl.value) || 0;
+  var horizon = parseInt(horizonEl?.value) || 3;
+  var discountRate = (parseFloat(discountEl?.value) || 10) / 100;
+  var riskFactor = (parseFloat(riskEl?.value) || 20) / 100;
+
+  if (cost <= 0 || annualBenefit <= 0) {
+    resultsEl.innerHTML = '<span style="font-size:.75rem;color:var(--muted);">Enter cost and benefit to see ROI calculations</span>';
+    return;
+  }
+
+  // NPV = sum of discounted cash flows - initial cost
+  var npv = -cost;
+  for (var y = 1; y <= horizon; y++) {
+    npv += annualBenefit / Math.pow(1 + discountRate, y);
+  }
+
+  // Simple ROI %
+  var totalBenefit = annualBenefit * horizon;
+  var roiPercent = ((totalBenefit - cost) / cost) * 100;
+
+  // Payback period in months
+  var paybackMonths = cost / (annualBenefit / 12);
+
+  // Risk-adjusted ROI
+  var riskAdjustedBenefit = annualBenefit * (1 - riskFactor);
+  var riskAdjustedROI = ((riskAdjustedBenefit * horizon - cost) / cost) * 100;
+
+  function fmt(n) { return n >= 1000000 ? '$' + (n/1000000).toFixed(1) + 'M' : n >= 1000 ? '$' + (n/1000).toFixed(0) + 'K' : '$' + n.toFixed(0); }
+
+  resultsEl.innerHTML =
+    '<div style="background:rgba(16,124,16,.12);border:1px solid rgba(16,124,16,.3);border-radius:8px;padding:10px 14px;text-align:center;min-width:100px;"><div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;">ROI</div><div style="font-size:1.3rem;font-weight:800;color:#4ade80;">' + roiPercent.toFixed(0) + '%</div></div>' +
+    '<div style="background:rgba(0,120,212,.12);border:1px solid rgba(0,120,212,.3);border-radius:8px;padding:10px 14px;text-align:center;min-width:100px;"><div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;">NPV</div><div style="font-size:1.3rem;font-weight:800;color:#60a5fa;">' + fmt(npv) + '</div></div>' +
+    '<div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:10px 14px;text-align:center;min-width:100px;"><div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;">Payback</div><div style="font-size:1.3rem;font-weight:800;color:#fbbf24;">' + (paybackMonths <= 12 ? paybackMonths.toFixed(1) + ' mo' : (paybackMonths/12).toFixed(1) + ' yr') + '</div></div>' +
+    '<div style="background:rgba(116,39,116,.12);border:1px solid rgba(116,39,116,.3);border-radius:8px;padding:10px 14px;text-align:center;min-width:100px;"><div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;">Risk-Adj ROI</div><div style="font-size:1.3rem;font-weight:800;color:#c490c4;">' + riskAdjustedROI.toFixed(0) + '%</div></div>';
+}
+
 function expandIdeaCard(ideaId) {
   const idea = state.ideas.find(i => i.id === ideaId);
   if (!idea) return;
@@ -2517,6 +3050,13 @@ function expandIdeaCard(ideaId) {
         '<div class="ef"><label>⚙️ Complexity</label><select id="ex-complexity-'+idea.id+'"><option value="">Select...</option><option value="low"'+(ev.complexity==='low'?' selected':'')+'>Low</option><option value="medium"'+(ev.complexity==='medium'?' selected':'')+'>Medium</option><option value="high"'+(ev.complexity==='high'?' selected':'')+'>High</option></select></div>' +
         '<div class="ef"><label>🗓️ Implementation Timeline</label><select id="ex-timeline-'+idea.id+'"><option value="">Select...</option><option value="quick-win"'+(ev.implementationTimeline==='quick-win'?' selected':'')+'>Quick Win (1-2 months)</option><option value="standard"'+(ev.implementationTimeline==='standard'?' selected':'')+'>Standard (3-6 months)</option><option value="strategic"'+(ev.implementationTimeline==='strategic'?' selected':'')+'>Strategic (6+ months)</option></select></div>' +
         '<div class="ef"><label>🟢 Data Readiness</label><select id="ex-dataReady-'+idea.id+'"><option value="">Select...</option><option value="green"'+(ev.dataReadiness==='green'?' selected':'')+'>Green — Data ready</option><option value="amber"'+(ev.dataReadiness==='amber'?' selected':'')+'>Amber — Some gaps</option><option value="red"'+(ev.dataReadiness==='red'?' selected':'')+'>Red — Significant work needed</option></select></div>' +
+        '<div class="ex-section">ROI Calculator</div>' +
+        '<div class="ef"><label>💰 Implementation Cost ($)</label><input type="number" min="0" id="ex-implCost-'+idea.id+'" placeholder="Total cost to implement" value="'+escAttr(ev.implementationCost||'')+'" oninput="calculateROI('+idea.id+',\'ex\')"></div>' +
+        '<div class="ef"><label>💵 Annual Benefit ($)</label><input type="number" min="0" id="ex-annualBen-'+idea.id+'" placeholder="Yearly savings/revenue" value="'+escAttr(ev.annualBenefit||'')+'" oninput="calculateROI('+idea.id+',\'ex\')"></div>' +
+        '<div class="ef"><label>📅 Time Horizon (years)</label><input type="number" min="1" max="10" id="ex-horizon-'+idea.id+'" placeholder="3" value="'+(ev.timeHorizon||3)+'" oninput="calculateROI('+idea.id+',\'ex\')"></div>' +
+        '<div class="ef"><label>📉 Discount Rate (%)</label><input type="number" min="0" max="50" step="0.5" id="ex-discount-'+idea.id+'" placeholder="10" value="'+(ev.discountRate||10)+'" oninput="calculateROI('+idea.id+',\'ex\')"></div>' +
+        '<div class="ef"><label>⚠️ Risk Factor (%)</label><input type="number" min="0" max="100" step="5" id="ex-riskFactor-'+idea.id+'" placeholder="20" value="'+(ev.riskFactor||20)+'" oninput="calculateROI('+idea.id+',\'ex\')"></div>' +
+        '<div class="ef" style="grid-column:1/-1;"><div id="ex-roiResults-'+idea.id+'" style="display:flex;gap:16px;flex-wrap:wrap;"></div></div>' +
         '<div class="ex-section">Ownership &amp; Risk</div>' +
         '<div class="ef"><label>👤 Stakeholders</label><input id="ex-stakeholders-'+idea.id+'" placeholder="Sponsors, beneficiaries" value="'+escAttr(ev.stakeholders||'')+'"></div>' +
         '<div class="ef"><label>🏢 Executive Sponsor</label><input id="ex-sponsor-'+idea.id+'" placeholder="Sponsor name and title" value="'+escAttr(ev.sponsorName||'')+'"></div>' +
@@ -2531,6 +3071,7 @@ function expandIdeaCard(ideaId) {
     '</div>';
   grid.appendChild(overlay);
   calcTimeSavings(idea.id, 'ex');
+  calculateROI(idea.id, 'ex');
 }
 
 function saveExpandedCard(ideaId) {
@@ -2560,8 +3101,26 @@ function saveExpandedCard(ideaId) {
     sponsorName: g('sponsor'),
     successCriteria: g('kpis'),
     risks: g('risks'),
+    implementationCost: g('implCost'),
+    annualBenefit: g('annualBen'),
+    timeHorizon: parseInt(g('horizon')) || 3,
+    discountRate: parseFloat(g('discount')) || 10,
+    riskFactor: parseFloat(g('riskFactor')) || 20,
+    roiPercent: '',
+    npvValue: '',
+    paybackMonths: '',
     evaluatedAt: new Date().toISOString()
   };
+  // Calculate and store ROI values
+  var ic = parseFloat(idea.evaluation.implementationCost) || 0;
+  var ab = parseFloat(idea.evaluation.annualBenefit) || 0;
+  if (ic > 0 && ab > 0) {
+    var h = idea.evaluation.timeHorizon, dr = idea.evaluation.discountRate / 100, rf = idea.evaluation.riskFactor / 100;
+    var npv = -ic; for (var y = 1; y <= h; y++) npv += ab / Math.pow(1 + dr, y);
+    idea.evaluation.roiPercent = (((ab * h - ic) / ic) * 100).toFixed(1);
+    idea.evaluation.npvValue = npv.toFixed(0);
+    idea.evaluation.paybackMonths = (ic / (ab / 12)).toFixed(1);
+  }
   autosave();
   renderIdeas(); // updates status badges
   const msg = document.getElementById('exSavedMsg');
@@ -2718,6 +3277,46 @@ function removeVoteChip(ideaId, voter) {
   }
 }
 
+function renderMatrix() {
+  var container = document.getElementById('matrixContainer');
+  if (!container) return;
+  var evaluated = state.ideas.filter(function(i) { return i.evaluation && (i.evaluation.impactScore || i.evaluation.readinessScore); });
+  if (evaluated.length < 2) {
+    container.innerHTML = '';
+    return;
+  }
+  var colors = ['#3b82f6','#8b5cf6','#22c55e','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#14b8a6'];
+  var sorted = [...evaluated].sort(function(a,b) { return (b.votes||0) - (a.votes||0); });
+
+  var dots = sorted.map(function(idea, i) {
+    var ev = idea.evaluation;
+    var x = ((ev.readinessScore || 5) - 1) / 9 * 80 + 10; // 10-90% range
+    var y = 90 - ((ev.impactScore || 5) - 1) / 9 * 80; // inverted Y
+    return '<div class="matrix-dot" style="left:' + x + '%;top:' + y + '%;background:' + colors[i % colors.length] + ';" title="' + escAttr(idea.name) + ' (Impact: ' + (ev.impactScore||5) + ', Feasibility: ' + (ev.readinessScore||5) + ')">' + (i + 1) + '</div>';
+  }).join('');
+
+  var legend = sorted.map(function(idea, i) {
+    return '<div class="matrix-legend-item"><div class="matrix-legend-dot" style="background:' + colors[i % colors.length] + ';"></div>' + escHtml(idea.name) + '</div>';
+  }).join('');
+
+  container.innerHTML =
+    '<div style="text-align:center;margin-bottom:8px;"><span style="font-size:.85rem;font-weight:700;color:var(--text);">Impact vs. Feasibility Matrix</span></div>' +
+    '<div class="matrix-box">' +
+      '<div class="matrix-axis-label" style="left:50%;top:4px;transform:translateX(-50%);">HIGH IMPACT</div>' +
+      '<div class="matrix-axis-label" style="left:50%;bottom:4px;transform:translateX(-50%);">LOW IMPACT</div>' +
+      '<div class="matrix-axis-label" style="left:4px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:center;">LOW FEASIBILITY</div>' +
+      '<div class="matrix-axis-label" style="right:4px;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:center;">HIGH FEASIBILITY</div>' +
+      '<div style="position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed var(--border);"></div>' +
+      '<div style="position:absolute;top:50%;left:0;right:0;border-top:1px dashed var(--border);"></div>' +
+      '<div class="matrix-quadrant-label" style="top:8px;right:12px;color:#4ade80;">QUICK WINS</div>' +
+      '<div class="matrix-quadrant-label" style="top:8px;left:12px;color:#fbbf24;">STRATEGIC BETS</div>' +
+      '<div class="matrix-quadrant-label" style="bottom:8px;right:12px;color:var(--muted);">FILL-INS</div>' +
+      '<div class="matrix-quadrant-label" style="bottom:8px;left:12px;color:#f87171;">DEPRIORITIZE</div>' +
+      dots +
+    '</div>' +
+    '<div class="matrix-legend">' + legend + '</div>';
+}
+
 function renderPriority() {
   const sorted = [...state.ideas].sort((a, b) => (b.votes || 0) - (a.votes || 0));
   const totalVotes = sorted.reduce((s, i) => s + (i.votes || 0), 0);
@@ -2735,6 +3334,7 @@ function renderPriority() {
     '<tr><td style="font-size:1.1rem;width:40px;">'+(i<3?medals[i]:i+1)+'</td><td>'+escHtml(idea.name)+'</td><td><span class="dept '+getDeptClass(idea.dept)+'" style="font-size:.7rem;padding:3px 10px;border-radius:8px;">'+escHtml(idea.dept)+'</span></td><td style="font-weight:700;font-size:1.1rem;">'+(idea.votes||0)+'</td><td>'+(totalVotes>0?Math.round((idea.votes||0)/totalVotes*100):0)+'%</td><td><span class="eval-status-badge '+(idea.evaluation?'done':'pending')+'">'+(idea.evaluation?'✓ Evaluated':'Pending')+'</span></td></tr>'
   ).join('');
   document.getElementById('totalIdeas').textContent = state.ideas.length + ' ideas — ' + totalVotes + ' total votes';
+  renderMatrix();
 }
 
 function renderEvaluation() {
@@ -2862,7 +3462,7 @@ function renderPanelIdeaList() {
     const isOpen = expandedEvalIds.has(i.id);
     const badge = hasEval ? '<span class="eval-badge">Evaluated</span>' : '<span class="eval-pending-badge">Pending</span>';
     const focusBadge = state.evalFocusId === i.id ? ' <span style="font-size:.55rem;color:var(--ms-blue);">● On Screen</span>' : '';
-    return '<div class="idea-row" style="flex-wrap:wrap;"><button class="eval-toggle'+(isOpen?' open':'')+'" onclick="toggleEvalForm('+i.id+')">▶</button><span class="idea-name">'+escHtml(i.name)+'</span>'+badge+focusBadge+'<span class="idea-dept">'+escHtml(i.dept)+'</span><div class="vote-controls"><button class="btn-sm btn-red" onclick="removeVote('+i.id+')">−</button><span class="vote-num">'+i.votes+'</span><button class="btn-sm btn-green" onclick="addVote('+i.id+')">+</button><button class="btn-sm" style="background:var(--border);color:var(--ms-red);margin-left:6px;" onclick="removeIdea('+i.id+')">✕</button></div>'+(isOpen?renderEvalForm(i):'')+'</div>';
+    return '<div class="idea-row" style="flex-wrap:wrap;"><button class="eval-toggle'+(isOpen?' open':'')+'" onclick="toggleEvalForm('+i.id+')">▶</button><span class="idea-name">'+escHtml(i.name)+'</span>'+badge+focusBadge+'<span class="idea-dept">'+escHtml(i.dept)+'</span><div class="vote-controls"><button class="btn-sm btn-purple" onclick="openWizard('+i.id+')" title="Define Wizard">🧙</button><button class="btn-sm btn-red" onclick="removeVote('+i.id+')">−</button><span class="vote-num">'+i.votes+'</span><button class="btn-sm btn-green" onclick="addVote('+i.id+')">+</button><button class="btn-sm" style="background:var(--border);color:var(--ms-red);margin-left:6px;" onclick="removeIdea('+i.id+')">✕</button></div>'+(isOpen?renderEvalForm(i):'')+'</div>';
   }).join('');
   const evalListEl = document.getElementById('evalList');
   if (evalListEl) evalListEl.innerHTML = evalHtml;
@@ -2890,6 +3490,13 @@ function renderAll() {
   document.getElementById('workshopName').value = state.workshopName;
   document.getElementById('companyName').value = state.companyName;
   document.getElementById('workshopDuration').value = state.workshopDuration || 90;
+  // Company profile
+  var cp = state.companyProfile || {};
+  document.getElementById('companyIndustry').value = cp.industry || '';
+  document.getElementById('companyCountry').value = cp.country || '';
+  document.getElementById('companyEmployees').value = cp.employeeCount || '';
+  document.getElementById('companyRevenue').value = cp.annualRevenue || '';
+  document.getElementById('companyGoals').value = cp.businessGoals || '';
   document.getElementById('currentPhase').textContent = state.phase.toUpperCase();
   document.querySelectorAll('.drawer .phase-btns button').forEach(b => {
     b.classList.remove('active-phase');

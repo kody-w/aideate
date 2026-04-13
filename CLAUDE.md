@@ -17,7 +17,7 @@ HTTP is recommended. `file://` also works for basic functionality.
 
 ## Testing
 
-Open `tests.html` in a browser and click "Run All Tests." There are 37 tests covering JSON schema, localStorage persistence, import/export, unified app structure, PII checks, and PWA functionality. There is no CLI test runner — tests run entirely in the browser DOM.
+Open `tests.html` in a browser and click "Run All Tests." There are 63 tests covering JSON schema, localStorage persistence, import/export, unified app structure, PII checks, PWA functionality, company profile, ROI calculator, define wizard, prioritization matrix, and Excel export. There is no CLI test runner — tests run entirely in the browser DOM.
 
 ## Architecture
 
@@ -31,7 +31,7 @@ Open `tests.html` in a browser and click "Run All Tests." There are 37 tests cov
 
 ### State management
 
-A single centralized `state` object holds all workshop data. Key fields: `sessionId`, `workshopName`, `companyName`, `phase` (ideate/vote/evaluate/prioritize), `participants` (array of `{id, name, title, initials}`), `ideas` (with votes/voters/evaluation), `timerSeconds`, `demoSlides`, `departments`. Every mutation autosaves to `localStorage` and directly calls the relevant render functions.
+A single centralized `state` object holds all workshop data. Key fields: `sessionId`, `workshopName`, `companyName`, `companyProfile` (industry/country/employees/revenue/goals), `phase` (ideate/vote/evaluate/prioritize), `participants` (array of `{id, name, title, initials}`), `ideas` (with votes/voters/evaluation including ROI fields), `timerSeconds`, `demoSlides`, `departments`. Every mutation autosaves to `localStorage` and directly calls the relevant render functions.
 
 ### Persistence
 
@@ -40,12 +40,22 @@ A single centralized `state` object holds all workshop data. Key fields: `sessio
 
 ### PWA / Offline
 
-- `sw.js` — Service worker with stale-while-revalidate for HTML, cache-first for assets. Cache version: `aideate-v4`.
+- `sw.js` — Service worker with stale-while-revalidate for HTML, cache-first for assets. Cache version: `aideate-v5`.
 - `manifest.json` — PWA manifest (Microsoft Fluent theme color `#0078d4`, `standalone` display).
 
 ### AI Integration (optional)
 
 GitHub Models API (`models.inference.ai.azure.com`) for formatting raw chat text into structured use cases and AI-powered evaluation of ideas. Requires a user-provided GitHub Personal Access Token stored in localStorage. Triggered by "Format with AI" and "Fill with AI" buttons in the drawer.
+
+### Key Features
+
+- **Company Profile**: Structured intake (industry, country, employees, revenue, business goals) feeds into AI prompts and report context.
+- **ROI Calculator**: Per-idea financial model with NPV, ROI%, payback period, and risk-adjusted ROI. Inputs: implementation cost, annual benefit, discount rate, time horizon, risk factor.
+- **10-Step Define Wizard**: Guided step-by-step evaluation walkthrough (Problem → Process → People → Pain Points → AI Solution → Impact → Scoring → Timeline → Ownership → Summary/ROI). Accessible via the wizard button in the eval drawer section.
+- **Prioritization 2×2 Matrix**: Visual scatter plot of Impact vs. Feasibility on the results slide. Quadrants labeled (Quick Wins, Strategic Bets, Fill-ins, Deprioritize). Auto-renders when 2+ ideas have evaluation scores.
+- **Excel Multi-Sheet Export**: Client-side `.xlsx` generation with 5 sheets (Summary, Challenges, Evaluations, Participants, Votes). Uses the same `buildZip`/`crc32` functions as the DOCX export.
+- **Word (.docx) Export**: Client-side OOXML document with executive summary, ranked challenges table, detailed evaluations, and ROI data.
+- **Time Savings Auto-Calculation**: People × Frequency × Time Per Task = hours/week, computed live in all form contexts.
 
 ## Key Constraints
 

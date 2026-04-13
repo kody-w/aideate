@@ -178,14 +178,26 @@
   .roster-avatar:nth-child(6n+5) { background: #ef4444; }
   .roster-avatar:nth-child(6n)   { background: #06b6d4; }
 
-  /* Ideate grid */
+  /* Ideate grid — fills available space, adapts to idea count */
   .ideate-grid {
-    flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px; padding: 24px 40px; overflow-y: auto; align-content: start;
+    flex: 1; display: grid; gap: 16px; padding: 24px 40px;
+    overflow-y: auto; align-content: start;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
+  /* When JS sets data-cols, use fixed column count to fill the screen */
+  .ideate-grid[data-cols="1"] { grid-template-columns: 1fr; }
+  .ideate-grid[data-cols="2"] { grid-template-columns: 1fr 1fr; }
+  .ideate-grid[data-cols="3"] { grid-template-columns: 1fr 1fr 1fr; }
+  .ideate-grid[data-cols="4"] { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .ideate-grid[data-cols="5"] { grid-template-columns: repeat(5, 1fr); }
+  .ideate-grid[data-cols="6"] { grid-template-columns: repeat(6, 1fr); }
+  /* Stretch rows to fill height when few enough ideas */
+  .ideate-grid.fill-height { align-content: stretch; }
+
   .idea-card {
     background: var(--card); border: 2px solid var(--border); border-radius: 12px;
     padding: 18px; animation: cardIn .4s ease; transition: all .3s;
+    display: flex; flex-direction: column;
   }
   @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(.95); } to { opacity: 1; transform: none; } }
   .idea-card .dept {
@@ -204,7 +216,7 @@
   .dept-Product { background: rgba(45,212,191,.15); color: #2dd4bf; }
   .dept-default { background: rgba(148,163,184,.15); color: #94a3b8; }
   .idea-card .name { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
-  .idea-card .desc { font-size: .82rem; color: var(--muted); line-height: 1.5; }
+  .idea-card .desc { font-size: .82rem; color: var(--muted); line-height: 1.5; flex: 1; }
   .idea-card .submitter { font-size: .7rem; color: var(--muted); margin-top: 8px; opacity: .6; }
 
   .empty-state { grid-column: 1 / -1; text-align: center; padding: 80px 40px; color: var(--muted); }
@@ -298,6 +310,53 @@
   .eval-status-badge { font-size: .65rem; padding: 3px 8px; border-radius: 6px; font-weight: 700; }
   .eval-status-badge.done { background: rgba(16,124,16,.2); color: #4ade80; }
   .eval-status-badge.pending { background: rgba(148,163,184,.15); color: var(--muted); }
+
+  /* Add-idea popup (on ideate slide) */
+  .add-idea-fab {
+    position: absolute; bottom: 64px; right: 32px; z-index: 5;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--ms-blue), var(--ms-purple));
+    border: none; color: #fff; font-size: 1.6rem; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 16px rgba(0,120,212,.4);
+    transition: all .3s; display: flex; align-items: center; justify-content: center;
+  }
+  .add-idea-fab:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(0,120,212,.5); }
+
+  .add-idea-overlay {
+    position: absolute; inset: 0; background: rgba(15,23,42,.85); backdrop-filter: blur(8px);
+    display: none; align-items: flex-start; justify-content: center; padding: 60px 24px 24px;
+    z-index: 10; animation: fadeIn .3s ease; overflow-y: auto;
+  }
+  .add-idea-overlay.open { display: flex; }
+  .add-idea-card {
+    background: var(--card); border: 2px solid var(--border); border-radius: 16px;
+    padding: 32px; max-width: 720px; width: 100%; animation: cardIn .4s ease;
+  }
+  .add-idea-card h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; }
+  .add-idea-card .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .add-idea-card .form-field { display: flex; flex-direction: column; gap: 4px; }
+  .add-idea-card .form-field.full { grid-column: 1 / -1; }
+  .add-idea-card .form-field label { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+  .add-idea-card .form-field input,
+  .add-idea-card .form-field select,
+  .add-idea-card .form-field textarea {
+    background: var(--dark); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); padding: 10px 12px; font-size: .9rem; font-family: inherit;
+    transition: border-color .2s;
+  }
+  .add-idea-card .form-field input:focus,
+  .add-idea-card .form-field select:focus,
+  .add-idea-card .form-field textarea:focus { border-color: var(--ms-blue); outline: none; }
+  .add-idea-card .form-field textarea { resize: vertical; min-height: 60px; }
+  .add-idea-card .form-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .add-idea-card .form-actions button {
+    padding: 10px 24px; border: none; border-radius: 8px; font-weight: 700;
+    font-size: .9rem; cursor: pointer; transition: all .2s;
+  }
+  .add-idea-card .btn-submit { background: linear-gradient(135deg, var(--ms-blue), var(--ms-purple)); color: #fff; }
+  .add-idea-card .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,120,212,.4); }
+  .add-idea-card .btn-cancel { background: var(--border); color: var(--text); }
+  .add-idea-card .btn-cancel:hover { background: rgba(255,255,255,.15); }
 
   /* Footer */
   .phase-footer {
@@ -640,6 +699,23 @@
   </div>
   <div class="ideate-grid" id="ideateGrid">
     <div class="empty-state" id="ideateEmpty"><div class="icon">💡</div><h2>Waiting for ideas...</h2><p>Use cases will appear here as they're added</p></div>
+  </div>
+  <button class="add-idea-fab" onclick="showAddIdeaPopup()" title="Add idea (+)">+</button>
+  <!-- Add-idea popup overlay -->
+  <div class="add-idea-overlay" id="addIdeaOverlay">
+    <div class="add-idea-card">
+      <h2>💡 Add Use Case</h2>
+      <div class="form-grid">
+        <div class="form-field"><label>Use Case Name</label><input type="text" id="popupIdeaName" placeholder="e.g. Sales Call Prep Agent" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitIdeaFromPopup();}"></div>
+        <div class="form-field"><label>Department</label><select id="popupIdeaDept"></select></div>
+        <div class="form-field full"><label>Description</label><textarea id="popupIdeaDesc" placeholder="What does this AI agent do? What problem does it solve?" rows="3"></textarea></div>
+        <div class="form-field"><label>Submitted By</label><input type="text" id="popupIdeaSubmitter" placeholder="Name"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-cancel" onclick="hideAddIdeaPopup()">Cancel</button>
+        <button class="btn-submit" onclick="submitIdeaFromPopup()">Add Idea</button>
+      </div>
+    </div>
   </div>
   <div class="phase-footer">
     <div class="status-dot"></div><span>Live Workshop</span><span id="ideaCount">0 ideas</span>
@@ -1077,7 +1153,15 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); navigateBy(1); }
   if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); navigateBy(-1); }
   if (e.key === 'g' || e.key === 'G') { e.preventDefault(); toggleDrawer(); }
-  if (e.key === 'Escape') { closeDrawer(); }
+  if (e.key === 'Escape') {
+    const addOverlay = document.getElementById('addIdeaOverlay');
+    if (addOverlay && addOverlay.classList.contains('open')) { hideAddIdeaPopup(); return; }
+    closeDrawer();
+  }
+  if (e.key === '+' || e.key === '=') {
+    const active = document.querySelector('.slide.active');
+    if (active && active.id === 'slide-9') { e.preventDefault(); showAddIdeaPopup(); }
+  }
   if (e.key === 'f' || e.key === 'F') {
     if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => {}); }
     else { document.exitFullscreen(); }
@@ -1347,6 +1431,37 @@ function addIdea() {
   document.getElementById('newIdeaName').value = '';
   document.getElementById('newIdeaDesc').value = '';
   document.getElementById('newIdeaSubmitter').value = '';
+  renderPanelIdeaList();
+  renderIdeas();
+  renderPreparedSlide();
+  autosave();
+  log('Added: ' + name);
+}
+
+function showAddIdeaPopup() {
+  const overlay = document.getElementById('addIdeaOverlay');
+  // populate dept select
+  const sel = document.getElementById('popupIdeaDept');
+  sel.innerHTML = state.departments.map(d => '<option value="' + escAttr(d) + '">' + escHtml(d) + '</option>').join('');
+  overlay.classList.add('open');
+  document.getElementById('popupIdeaName').focus();
+}
+
+function hideAddIdeaPopup() {
+  document.getElementById('addIdeaOverlay').classList.remove('open');
+  document.getElementById('popupIdeaName').value = '';
+  document.getElementById('popupIdeaDesc').value = '';
+  document.getElementById('popupIdeaSubmitter').value = '';
+}
+
+function submitIdeaFromPopup() {
+  const name = document.getElementById('popupIdeaName').value.trim();
+  const dept = document.getElementById('popupIdeaDept').value;
+  const desc = document.getElementById('popupIdeaDesc').value.trim();
+  const submitter = document.getElementById('popupIdeaSubmitter').value.trim();
+  if (!name) { document.getElementById('popupIdeaName').focus(); return; }
+  state.ideas.push({ id: Date.now(), name, dept, desc, submitter: submitter || 'Facilitator', votes: 0, voters: [] });
+  hideAddIdeaPopup();
   renderPanelIdeaList();
   renderIdeas();
   renderPreparedSlide();
@@ -1892,15 +2007,54 @@ function renderParticipants() {
 function renderIdeas() {
   const grid = document.getElementById('ideateGrid');
   const empty = document.getElementById('ideateEmpty');
-  if (state.ideas.length === 0) {
+  const n = state.ideas.length;
+  if (n === 0) {
+    grid.removeAttribute('data-cols');
+    grid.classList.remove('fill-height');
+    grid.style.removeProperty('grid-template-rows');
+    grid.style.fontSize = '';
     grid.innerHTML = ''; grid.appendChild(empty); empty.style.display = '';
   } else {
     if (empty) empty.style.display = 'none';
+    // Compute optimal grid: cols x rows that best fills the screen
+    let cols, rows;
+    if (n <= 1)      { cols = 1; rows = 1; }
+    else if (n <= 2) { cols = 2; rows = 1; }
+    else if (n <= 3) { cols = 3; rows = 1; }
+    else if (n <= 4) { cols = 2; rows = 2; }
+    else if (n <= 6) { cols = 3; rows = 2; }
+    else if (n <= 8) { cols = 4; rows = 2; }
+    else if (n <= 9) { cols = 3; rows = 3; }
+    else if (n <= 12) { cols = 4; rows = 3; }
+    else if (n <= 16) { cols = 4; rows = 4; }
+    else if (n <= 20) { cols = 5; rows = 4; }
+    else if (n <= 24) { cols = 6; rows = 4; }
+    else if (n <= 30) { cols = 6; rows = 5; }
+    else              { cols = 6; rows = Math.ceil(n / 6); }
+
+    // Cards fill available height when they all fit without scroll
+    const maxFit = cols * rows;
+    grid.setAttribute('data-cols', cols);
+    if (n <= maxFit && rows <= 5) {
+      grid.classList.add('fill-height');
+      grid.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
+    } else {
+      grid.classList.remove('fill-height');
+      grid.style.removeProperty('grid-template-rows');
+    }
+
+    // Scale text down as density increases
+    let scale = '';
+    if (n > 20) scale = '.82';
+    else if (n > 12) scale = '.88';
+    else if (n > 8) scale = '.92';
+    grid.style.fontSize = scale ? scale + 'em' : '';
+
     grid.innerHTML = state.ideas.map(i =>
       '<div class="idea-card"><div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div><div class="name">'+escHtml(i.name)+'</div><div class="desc">'+escHtml(i.desc)+'</div>'+(i.submitter?'<div class="submitter">Submitted by '+escHtml(i.submitter)+'</div>':'')+'</div>'
     ).join('');
   }
-  document.getElementById('ideaCount').textContent = state.ideas.length + ' idea' + (state.ideas.length !== 1 ? 's' : '');
+  document.getElementById('ideaCount').textContent = n + ' idea' + (n !== 1 ? 's' : '');
 }
 
 function renderVotes() {

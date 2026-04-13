@@ -182,19 +182,74 @@
   .ideate-grid {
     flex: 1; display: flex; flex-wrap: wrap; gap: 16px; padding: 24px 40px;
     overflow-y: auto; align-content: flex-start;
+    perspective: 1200px;
   }
 
+  /* Flip-card wrapper */
   .idea-card {
-    background: var(--card); border: 2px solid var(--border); border-radius: 12px;
-    padding: 18px; animation: cardIn .4s ease; transition: all .3s;
-    display: flex; flex-direction: column;
     flex: 1 1 300px; min-width: 240px; max-width: 100%;
+    position: relative; cursor: pointer;
+    animation: cardIn .4s ease;
   }
-  @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(.95); } to { opacity: 1; transform: none; } }
-  .idea-card .dept {
+  .idea-card-inner {
+    position: relative; width: 100%; height: 100%;
+    transition: transform .5s ease;
+    transform-style: preserve-3d;
+  }
+  .idea-card.flipped .idea-card-inner { transform: rotateY(180deg); }
+
+  .idea-front, .idea-back {
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 12px; border: 2px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  /* Front is in-flow to size the card; back overlays it */
+  .idea-front { position: relative; min-height: 100%; }
+  .idea-back { position: absolute; inset: 0; }
+
+  /* FRONT — big Jeopardy-style name */
+  .idea-front {
+    background: linear-gradient(135deg, var(--card), rgba(22,33,62,.95));
+    align-items: center; justify-content: center; text-align: center;
+    padding: 24px;
+  }
+  .idea-front .dept {
+    position: absolute; top: 14px; left: 14px;
     font-size: .65rem; padding: 3px 10px; border-radius: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .5px; display: inline-block; margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: .5px;
   }
+  .idea-front .name {
+    font-weight: 800; font-size: clamp(1.1rem, 2.2vw, 1.8rem);
+    line-height: 1.2; padding: 0 8px;
+    background: linear-gradient(135deg, #fff, rgba(255,255,255,.8));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .idea-front .flip-hint {
+    position: absolute; bottom: 10px; right: 14px;
+    font-size: .6rem; color: var(--muted); opacity: .4;
+  }
+
+  /* BACK — details */
+  .idea-back {
+    background: var(--card);
+    transform: rotateY(180deg);
+    padding: 20px;
+  }
+  .idea-back .dept {
+    font-size: .65rem; padding: 3px 10px; border-radius: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px; display: inline-block; margin-bottom: 10px;
+  }
+  .idea-back .name { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+  .idea-back .desc { font-size: .88rem; color: var(--muted); line-height: 1.6; flex: 1; }
+  .idea-back .submitter { font-size: .72rem; color: var(--muted); margin-top: 10px; opacity: .6; }
+  .idea-back .flip-hint {
+    position: absolute; bottom: 10px; right: 14px;
+    font-size: .6rem; color: var(--muted); opacity: .4;
+  }
+
+  @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(.95); } to { opacity: 1; transform: none; } }
+
+  /* Dept badge colors (shared front + back) */
   .dept-Sales { background: rgba(96,165,250,.15); color: #60a5fa; }
   .dept-Operations { background: rgba(251,146,60,.15); color: #fb923c; }
   .dept-HR { background: rgba(244,114,182,.15); color: #f472b6; }
@@ -206,9 +261,6 @@
   .dept-Legal { background: rgba(163,163,163,.15); color: #a3a3a3; }
   .dept-Product { background: rgba(45,212,191,.15); color: #2dd4bf; }
   .dept-default { background: rgba(148,163,184,.15); color: #94a3b8; }
-  .idea-card .name { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
-  .idea-card .desc { font-size: .82rem; color: var(--muted); line-height: 1.5; flex: 1; }
-  .idea-card .submitter { font-size: .7rem; color: var(--muted); margin-top: 8px; opacity: .6; }
 
   .empty-state { grid-column: 1 / -1; text-align: center; padding: 80px 40px; color: var(--muted); }
   .empty-state .icon { font-size: 4rem; margin-bottom: 16px; }
@@ -2004,10 +2056,22 @@ function renderIdeas() {
     grid.innerHTML = ''; grid.appendChild(empty); empty.style.display = '';
   } else {
     if (empty) empty.style.display = 'none';
-    // Stretch cards to fill viewport when few enough to fit without scroll
     grid.style.alignContent = n <= 20 ? 'stretch' : 'flex-start';
     grid.innerHTML = state.ideas.map(i =>
-      '<div class="idea-card"><div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div><div class="name">'+escHtml(i.name)+'</div><div class="desc">'+escHtml(i.desc)+'</div>'+(i.submitter?'<div class="submitter">Submitted by '+escHtml(i.submitter)+'</div>':'')+'</div>'
+      '<div class="idea-card" onclick="this.classList.toggle(\'flipped\')">' +
+        '<div class="idea-card-inner">' +
+          '<div class="idea-front"><div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div>' +
+            '<div class="name">'+escHtml(i.name)+'</div>' +
+            '<div class="flip-hint">click to flip</div>' +
+          '</div>' +
+          '<div class="idea-back"><div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div>' +
+            '<div class="name">'+escHtml(i.name)+'</div>' +
+            '<div class="desc">'+escHtml(i.desc)+'</div>' +
+            (i.submitter ? '<div class="submitter">Submitted by '+escHtml(i.submitter)+'</div>' : '') +
+            '<div class="flip-hint">click to flip back</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
     ).join('');
   }
   document.getElementById('ideaCount').textContent = n + ' idea' + (n !== 1 ? 's' : '');

@@ -222,77 +222,77 @@
   /* Expanded card overlay — full-screen detail form */
   .idea-expand-overlay {
     position: absolute; inset: 0; z-index: 10;
-    background: rgba(15,23,42,.88); backdrop-filter: blur(10px);
-    display: flex; align-items: flex-start; justify-content: center;
-    padding: 24px; overflow-y: auto; animation: fadeIn .3s ease;
+    background: rgba(10,15,30,.92); backdrop-filter: blur(12px);
+    display: flex; align-items: stretch; justify-content: stretch;
+    padding: 16px; animation: fadeIn .3s ease; overflow: hidden;
   }
   .idea-expand-card {
     background: linear-gradient(135deg, var(--card), rgba(22,33,62,.98));
     border: 2px solid var(--border); border-radius: 20px;
-    padding: 32px 40px; max-width: 960px; width: 100%;
+    padding: 32px 44px; width: 100%; display: flex; flex-direction: column;
     animation: cardIn .4s ease; position: relative;
-    transition: transform .4s, box-shadow .4s;
+    transition: box-shadow .4s; overflow-y: auto;
   }
   .idea-expand-card:hover {
-    transform: perspective(1000px) rotateY(-1deg) rotateX(.5deg);
-    box-shadow: 0 16px 48px rgba(0,120,212,.15), 0 0 30px rgba(116,39,116,.08);
+    box-shadow: 0 0 60px rgba(0,120,212,.1), 0 0 120px rgba(116,39,116,.05);
   }
   .idea-expand-card .ex-close {
     position: absolute; top: 16px; right: 20px; background: rgba(255,255,255,.1);
     border: 1px solid rgba(255,255,255,.15); border-radius: 50%; width: 36px; height: 36px;
     display: flex; align-items: center; justify-content: center; cursor: pointer;
-    color: var(--muted); font-size: 1rem; transition: all .2s;
+    color: var(--muted); font-size: 1rem; transition: all .2s; z-index: 2;
   }
   .idea-expand-card .ex-close:hover { background: rgba(255,255,255,.2); color: #fff; }
   .idea-expand-card .ex-dept {
-    font-size: .7rem; padding: 4px 14px; border-radius: 12px; font-weight: 700;
+    font-size: .75rem; padding: 5px 16px; border-radius: 12px; font-weight: 700;
     text-transform: uppercase; letter-spacing: .5px; display: inline-block; margin-bottom: 10px;
   }
   .idea-expand-card .ex-name {
-    font-size: clamp(1.5rem, 2.8vw, 2.2rem); font-weight: 800; line-height: 1.15;
+    font-size: clamp(1.8rem, 3.2vw, 2.8rem); font-weight: 800; line-height: 1.1;
     background: linear-gradient(135deg, #fff, rgba(255,255,255,.8));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
   .idea-expand-card .ex-desc {
-    font-size: .95rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; max-width: 700px;
+    font-size: 1.05rem; color: var(--muted); line-height: 1.6; margin-bottom: 24px; max-width: 900px;
   }
   .idea-expand-card .ex-fields {
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; flex: 1;
   }
   .idea-expand-card .ef { display: flex; flex-direction: column; }
   .idea-expand-card .ef label {
-    font-size: .6rem; color: var(--muted); text-transform: uppercase;
-    letter-spacing: .5px; font-weight: 600; margin-bottom: 3px;
-    display: flex; align-items: center; gap: 4px;
+    font-size: .65rem; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .5px; font-weight: 600; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 5px;
   }
   .idea-expand-card .ef input,
   .idea-expand-card .ef textarea,
   .idea-expand-card .ef select {
     background: var(--dark); border: 1px solid var(--border); border-radius: 8px;
-    color: var(--text); padding: 8px 12px; font-size: .82rem; font-family: inherit;
-    transition: border-color .2s;
+    color: var(--text); padding: 10px 14px; font-size: .88rem; font-family: inherit;
+    transition: border-color .2s; flex: 1;
   }
-  .idea-expand-card .ef textarea { resize: vertical; min-height: 44px; }
+  .idea-expand-card .ef textarea { resize: vertical; min-height: 52px; }
   .idea-expand-card .ef input:focus,
   .idea-expand-card .ef textarea:focus,
   .idea-expand-card .ef select:focus { border-color: var(--ms-blue); outline: none; box-shadow: 0 0 0 3px rgba(0,120,212,.15); }
   .idea-expand-card .ex-section {
-    grid-column: 1 / -1; font-size: .6rem; font-weight: 700; color: var(--ms-blue);
-    text-transform: uppercase; letter-spacing: 1px; padding-top: 10px;
+    grid-column: 1 / -1; font-size: .65rem; font-weight: 700; color: var(--ms-blue);
+    text-transform: uppercase; letter-spacing: 1px; padding-top: 12px;
     border-top: 1px solid var(--border); margin-top: 4px;
   }
   .idea-expand-card .ex-actions {
     display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; align-items: center;
+    flex-shrink: 0;
   }
   .idea-expand-card .ex-actions button {
-    padding: 10px 24px; border: none; border-radius: 8px; font-weight: 700;
-    font-size: .85rem; cursor: pointer; transition: all .2s;
+    padding: 10px 28px; border: none; border-radius: 8px; font-weight: 700;
+    font-size: .9rem; cursor: pointer; transition: all .2s;
   }
   .idea-expand-card .ex-save { background: linear-gradient(135deg, var(--ms-blue), var(--ms-purple)); color: #fff; }
   .idea-expand-card .ex-save:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,120,212,.4); }
   .idea-expand-card .ex-cancel { background: var(--border); color: var(--text); }
-  .idea-expand-card .ex-saved { font-size: .7rem; color: #4ade80; margin-right: auto; }
+  .idea-expand-card .ex-saved { font-size: .75rem; color: #4ade80; margin-right: auto; }
 
   @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(.95); } to { opacity: 1; transform: none; } }
 
@@ -1783,9 +1783,9 @@ function renderEvalForm(idea) {
   return '<div class="eval-form" style="width:100%;">' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">' +
     '<div class="eval-section-label">Current State</div>' +
-    '<div class="eval-field"><label>People Involved</label><textarea id="ev-people-' + id + '" placeholder="How many people? Roles?">' + escHtml(ev.peopleInvolved || '') + '</textarea></div>' +
-    '<div class="eval-field"><label>Process Frequency</label><textarea id="ev-frequency-' + id + '" placeholder="How often? Volume?">' + escHtml(ev.processFrequency || '') + '</textarea></div>' +
-    '<div class="eval-field"><label>Time Per Occurrence</label><textarea id="ev-timePerOcc-' + id + '" placeholder="How long each time?">' + escHtml(ev.timePerOccurrence || '') + '</textarea></div>' +
+    '<div class="eval-field"><label>People Involved</label><input type="number" min="0" id="ev-people-' + id + '" placeholder="# of people" value="' + escAttr(ev.peopleInvolved || '') + '" oninput="calcTimeSavings(' + id + ',\'ev\')"></div>' +
+    '<div class="eval-field"><label>Frequency (tasks/wk)</label><input type="number" min="0" id="ev-frequency-' + id + '" placeholder="Tasks per week" value="' + escAttr(ev.processFrequency || '') + '" oninput="calcTimeSavings(' + id + ',\'ev\')"></div>' +
+    '<div class="eval-field"><label>Time Per Task (min)</label><input type="number" min="0" id="ev-timePerOcc-' + id + '" placeholder="Minutes per task" value="' + escAttr(ev.timePerOccurrence || '') + '" oninput="calcTimeSavings(' + id + ',\'ev\')"></div>' +
     '<div class="eval-field"><label>Systems & Tools</label><textarea id="ev-systems-' + id + '" placeholder="Systems, apps, databases?">' + escHtml(ev.systemsTools || '') + '</textarea></div>' +
     '<div class="eval-section-label">Pain Points & Opportunity</div>' +
     '<div class="eval-field"><label>Pain Points</label><textarea id="ev-pain-' + id + '" placeholder="Bottlenecks, errors, delays">' + escHtml(ev.painPoints || '') + '</textarea></div>' +
@@ -1794,7 +1794,7 @@ function renderEvalForm(idea) {
     '<div class="eval-field"><label>Ideal AI Solution</label><textarea id="ev-solution-' + id + '" placeholder="What should the AI agent do?">' + escHtml(ev.idealSolution || '') + '</textarea></div>' +
     '<div class="eval-field"><label>Data Sources</label><textarea id="ev-data-' + id + '" placeholder="Data/APIs/systems needed?">' + escHtml(ev.dataSources || '') + '</textarea></div>' +
     '<div class="eval-section-label">Business Case</div>' +
-    '<div class="eval-field"><label>Time Savings</label><textarea id="ev-timeSaved-' + id + '" placeholder="Hours saved per week/month?">' + escHtml(ev.estimatedTimeSavings || '') + '</textarea></div>' +
+    '<div class="eval-field"><label>Time Savings (auto)</label><input id="ev-timeSaved-' + id + '" readonly style="background:rgba(0,120,212,.12);color:#60a5fa;font-weight:600;cursor:default;" value="' + escAttr(ev.estimatedTimeSavings || '') + '" placeholder="Auto-calculated"></div>' +
     '<div class="eval-field"><label>Business Impact</label><textarea id="ev-impact-' + id + '" placeholder="Revenue, cost reduction, quality">' + escHtml(ev.businessImpact || '') + '</textarea></div>' +
     '<div class="eval-field"><label>Success Criteria</label><textarea id="ev-kpis-' + id + '" placeholder="Measurable KPIs">' + escHtml(ev.successCriteria || '') + '</textarea></div>' +
     '<div class="eval-field"><label>Stakeholders</label><textarea id="ev-stakeholders-' + id + '" placeholder="Who benefits? Who sponsors?">' + escHtml(ev.stakeholders || '') + '</textarea></div>' +
@@ -1843,7 +1843,7 @@ async function aiEvaluateIdea(ideaId) {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: 'You are a Microsoft AI specialist evaluating an AI agent use case during a customer workshop. Given the use case details and company context, provide a thorough evaluation. Be specific, practical, and quantify where possible. Return ONLY valid JSON:\n{"peopleInvolved":"","processFrequency":"","timePerOccurrence":"","currentProcess":"","systemsTools":"","painPoints":"","idealSolution":"","dataSources":"","estimatedTimeSavings":"","businessImpact":"","successCriteria":"","stakeholders":"","impactScore":5,"readinessScore":5,"complexity":"medium","risks":""}\nNo markdown, no explanation, just the JSON object.' },
+          { role: 'system', content: 'You are a Microsoft AI specialist evaluating an AI agent use case during a customer workshop. Given the use case details and company context, provide a thorough evaluation. Be specific, practical, and quantify where possible. Return ONLY valid JSON:\n{"peopleInvolved":"","processFrequency":"","timePerOccurrence":"","currentProcess":"","systemsTools":"","painPoints":"","idealSolution":"","dataSources":"","estimatedTimeSavings":"","businessImpact":"","successCriteria":"","stakeholders":"","impactScore":5,"readinessScore":5,"complexity":"medium","risks":""}\nIMPORTANT: peopleInvolved must be a number (e.g. "5"), processFrequency must be tasks per week as a number (e.g. "20"), timePerOccurrence must be minutes per task as a number (e.g. "30"). estimatedTimeSavings will be auto-calculated so return "" for it.\nNo markdown, no explanation, just the JSON object.' },
           { role: 'user', content: 'Evaluate this AI use case:\n\nName: ' + idea.name + '\nDepartment: ' + idea.dept + '\nDescription: ' + idea.desc + (context ? '\n\nContext:\n' + context : '') }
         ],
         temperature: 0.4,
@@ -1867,8 +1867,10 @@ async function aiEvaluateIdea(ideaId) {
     }
     if (parsed.impactScore) { const el = document.getElementById('ev-impactScore-' + ideaId); if (el) { el.value = parsed.impactScore; el.nextElementSibling.textContent = parsed.impactScore; } }
     if (parsed.readinessScore) { const el = document.getElementById('ev-readinessScore-' + ideaId); if (el) { el.value = parsed.readinessScore; el.nextElementSibling.textContent = parsed.readinessScore; } }
+    calcTimeSavings(ideaId, 'ev');
+    const calcSavings = document.getElementById('ev-timeSaved-' + ideaId)?.value || '';
 
-    idea.evaluation = { ...parsed, impactScore: parseInt(parsed.impactScore) || 5, readinessScore: parseInt(parsed.readinessScore) || 5, aiGenerated: true, evaluatedAt: new Date().toISOString() };
+    idea.evaluation = { ...parsed, estimatedTimeSavings: calcSavings, impactScore: parseInt(parsed.impactScore) || 5, readinessScore: parseInt(parsed.readinessScore) || 5, aiGenerated: true, evaluatedAt: new Date().toISOString() };
     renderEvaluation();
     renderPriority();
     autosave();
@@ -2214,6 +2216,18 @@ function renderParticipants() {
   });
 }
 
+function calcTimeSavings(ideaId, pfx) {
+  var pe, fe, te, se;
+  if (pfx === 'ev') { pe='ev-people-'; fe='ev-frequency-'; te='ev-timePerOcc-'; se='ev-timeSaved-'; }
+  else { pe='ex-people-'; fe='ex-frequency-'; te='ex-time-'; se='ex-savings-'; }
+  var people = parseFloat(document.getElementById(pe + ideaId)?.value) || 0;
+  var freq = parseFloat(document.getElementById(fe + ideaId)?.value) || 0;
+  var mins = parseFloat(document.getElementById(te + ideaId)?.value) || 0;
+  var hrs = people * freq * (mins / 60);
+  var el = document.getElementById(se + ideaId);
+  if (el) el.value = hrs > 0 ? hrs.toFixed(1) + ' hrs/week' : '';
+}
+
 function expandIdeaCard(ideaId) {
   const idea = state.ideas.find(i => i.id === ideaId);
   if (!idea) return;
@@ -2234,16 +2248,16 @@ function expandIdeaCard(ideaId) {
       (idea.desc ? '<div class="ex-desc">'+escHtml(idea.desc)+'</div>' : '') +
       '<div class="ex-fields">' +
         '<div class="ex-section">Current State</div>' +
-        '<div class="ef"><label>👥 People Involved</label><input id="ex-people-'+idea.id+'" placeholder="How many people? What roles?" value="'+escAttr(ev.peopleInvolved||'')+'"></div>' +
-        '<div class="ef"><label>🔄 Frequency</label><input id="ex-frequency-'+idea.id+'" placeholder="How often? Volume?" value="'+escAttr(ev.processFrequency||'')+'"></div>' +
-        '<div class="ef"><label>⏱️ Time Per Task</label><input id="ex-time-'+idea.id+'" placeholder="Hours per occurrence" value="'+escAttr(ev.timePerOccurrence||'')+'"></div>' +
+        '<div class="ef"><label>👥 People Involved</label><input type="number" min="0" id="ex-people-'+idea.id+'" placeholder="# of people doing this task" value="'+escAttr(ev.peopleInvolved||'')+'" oninput="calcTimeSavings('+idea.id+',\'ex\')"></div>' +
+        '<div class="ef"><label>🔄 Frequency (tasks/week)</label><input type="number" min="0" id="ex-frequency-'+idea.id+'" placeholder="Tasks per week" value="'+escAttr(ev.processFrequency||'')+'" oninput="calcTimeSavings('+idea.id+',\'ex\')"></div>' +
+        '<div class="ef"><label>⏱️ Time Per Task (min)</label><input type="number" min="0" id="ex-time-'+idea.id+'" placeholder="Minutes per task" value="'+escAttr(ev.timePerOccurrence||'')+'" oninput="calcTimeSavings('+idea.id+',\'ex\')"></div>' +
         '<div class="ef"><label>🔧 Systems &amp; Tools</label><input id="ex-systems-'+idea.id+'" placeholder="Apps, databases, platforms" value="'+escAttr(ev.systemsTools||'')+'"></div>' +
         '<div class="ef"><label>📝 Current Process</label><textarea id="ex-process-'+idea.id+'" placeholder="Workflow step by step">'+escHtml(ev.currentProcess||'')+'</textarea></div>' +
         '<div class="ef"><label>⚠️ Pain Points</label><textarea id="ex-pain-'+idea.id+'" placeholder="Bottlenecks, errors, delays">'+escHtml(ev.painPoints||'')+'</textarea></div>' +
         '<div class="ex-section">AI Solution &amp; Impact</div>' +
         '<div class="ef"><label>🤖 Ideal AI Solution</label><textarea id="ex-solution-'+idea.id+'" placeholder="What should the AI agent do?">'+escHtml(ev.idealSolution||'')+'</textarea></div>' +
         '<div class="ef"><label>🗄️ Data Sources</label><input id="ex-data-'+idea.id+'" placeholder="Data/APIs/systems needed" value="'+escAttr(ev.dataSources||'')+'"></div>' +
-        '<div class="ef"><label>⚡ Time Savings</label><input id="ex-savings-'+idea.id+'" placeholder="Hours saved per week/month" value="'+escAttr(ev.estimatedTimeSavings||'')+'"></div>' +
+        '<div class="ef"><label>⚡ Time Savings (auto)</label><input id="ex-savings-'+idea.id+'" readonly style="background:rgba(0,120,212,.12);color:#60a5fa;font-weight:600;cursor:default;" value="'+escAttr(ev.estimatedTimeSavings||'')+'" placeholder="Auto-calculated from above"></div>' +
         '<div class="ef"><label>📈 Business Impact</label><input id="ex-impact-'+idea.id+'" placeholder="Revenue, cost reduction, quality" value="'+escAttr(ev.businessImpact||'')+'"></div>' +
         '<div class="ef"><label>⚙️ Complexity</label><select id="ex-complexity-'+idea.id+'"><option value="">Select...</option><option value="low"'+(ev.complexity==='low'?' selected':'')+'>Low</option><option value="medium"'+(ev.complexity==='medium'?' selected':'')+'>Medium</option><option value="high"'+(ev.complexity==='high'?' selected':'')+'>High</option></select></div>' +
         '<div class="ef"><label>👤 Stakeholders</label><input id="ex-stakeholders-'+idea.id+'" placeholder="Sponsors, beneficiaries" value="'+escAttr(ev.stakeholders||'')+'"></div>' +
@@ -2255,6 +2269,7 @@ function expandIdeaCard(ideaId) {
       '</div>' +
     '</div>';
   grid.appendChild(overlay);
+  calcTimeSavings(idea.id, 'ex');
 }
 
 function saveExpandedCard(ideaId) {
@@ -2567,6 +2582,8 @@ function renderPanelIdeaList() {
   }).join('');
   const evalListEl = document.getElementById('evalList');
   if (evalListEl) evalListEl.innerHTML = evalHtml;
+  // Trigger time savings calc for any open eval forms
+  expandedEvalIds.forEach(id => calcTimeSavings(id, 'ev'));
 
   // Also update the idea list section
   const ideaListEl = document.getElementById('ideaList');

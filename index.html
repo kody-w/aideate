@@ -228,24 +228,61 @@
     position: absolute; bottom: 10px; right: 14px;
     font-size: .6rem; color: var(--muted); opacity: .4;
   }
+  .idea-front .front-status {
+    position: absolute; top: 14px; right: 14px;
+    font-size: .55rem; padding: 2px 8px; border-radius: 8px; font-weight: 700;
+  }
+  .idea-front .front-status.complete { background: rgba(16,124,16,.2); color: #4ade80; }
+  .idea-front .front-status.partial { background: rgba(251,191,36,.15); color: #fbbf24; }
+  .idea-front .front-status.empty { background: rgba(148,163,184,.1); color: var(--muted); }
 
-  /* BACK — details */
+  /* BACK — editable detail fields */
   .idea-back {
     background: var(--card);
     transform: rotateY(180deg);
-    padding: 20px;
+    padding: 14px 16px;
+    overflow-y: auto;
   }
-  .idea-back .dept {
-    font-size: .65rem; padding: 3px 10px; border-radius: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .5px; display: inline-block; margin-bottom: 10px;
+  .idea-back .back-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
   }
-  .idea-back .name { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
-  .idea-back .desc { font-size: .88rem; color: var(--muted); line-height: 1.6; flex: 1; }
-  .idea-back .submitter { font-size: .72rem; color: var(--muted); margin-top: 10px; opacity: .6; }
+  .idea-back .back-header .dept {
+    font-size: .6rem; padding: 2px 8px; border-radius: 8px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .idea-back .back-header .name { font-weight: 700; font-size: .9rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .idea-back .back-fields {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    flex: 1;
+  }
+  .idea-back .bf { display: flex; flex-direction: column; }
+  .idea-back .bf.full { grid-column: 1 / -1; }
+  .idea-back .bf label {
+    font-size: .55rem; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .5px; font-weight: 600; margin-bottom: 2px;
+  }
+  .idea-back .bf input,
+  .idea-back .bf textarea,
+  .idea-back .bf select {
+    background: var(--dark); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); padding: 5px 8px; font-size: .72rem; font-family: inherit;
+    transition: border-color .2s; width: 100%;
+  }
+  .idea-back .bf textarea { resize: none; min-height: 28px; }
+  .idea-back .bf input:focus,
+  .idea-back .bf textarea:focus,
+  .idea-back .bf select:focus { border-color: var(--ms-blue); outline: none; }
   .idea-back .flip-hint {
-    position: absolute; bottom: 10px; right: 14px;
-    font-size: .6rem; color: var(--muted); opacity: .4;
+    position: absolute; bottom: 6px; right: 10px;
+    font-size: .55rem; color: var(--muted); opacity: .4;
   }
+  .idea-back .filled-indicator {
+    position: absolute; top: 10px; right: 10px;
+    font-size: .55rem; padding: 2px 6px; border-radius: 6px; font-weight: 700;
+  }
+  .idea-back .filled-indicator.complete { background: rgba(16,124,16,.2); color: #4ade80; }
+  .idea-back .filled-indicator.partial { background: rgba(251,191,36,.15); color: #fbbf24; }
+  .idea-back .filled-indicator.empty { background: rgba(148,163,184,.1); color: var(--muted); }
 
   @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(.95); } to { opacity: 1; transform: none; } }
 
@@ -2047,6 +2084,50 @@ function renderParticipants() {
   });
 }
 
+function flipCard(el, evt) {
+  // Don't flip when clicking inside form fields
+  const target = evt ? evt.target : null;
+  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.closest('.back-fields'))) return;
+  el.classList.toggle('flipped');
+  // Save fields when flipping back to front
+  if (!el.classList.contains('flipped')) {
+    const id = parseInt(el.getAttribute('data-id'));
+    saveCardFields(id);
+  }
+}
+
+function saveCardFields(ideaId) {
+  const idea = state.ideas.find(i => i.id === ideaId);
+  if (!idea) return;
+  const g = (field) => document.getElementById('cf-' + field + '-' + ideaId)?.value || '';
+  idea.evaluation = {
+    ...(idea.evaluation || {}),
+    peopleInvolved: g('people'),
+    processFrequency: g('frequency'),
+    timePerOccurrence: g('time'),
+    systemsTools: g('systems'),
+    painPoints: g('pain'),
+    currentProcess: g('process'),
+    idealSolution: g('solution'),
+    dataSources: g('data'),
+    estimatedTimeSavings: g('savings'),
+    businessImpact: g('impact'),
+    complexity: g('complexity'),
+    stakeholders: g('stakeholders'),
+    evaluatedAt: new Date().toISOString()
+  };
+  autosave();
+}
+
+function getCardCompleteness(idea) {
+  const ev = idea.evaluation || {};
+  const fields = ['peopleInvolved','processFrequency','timePerOccurrence','systemsTools',
+    'painPoints','currentProcess','idealSolution','dataSources','estimatedTimeSavings',
+    'businessImpact','complexity','stakeholders'];
+  const filled = fields.filter(f => ev[f] && ev[f].trim && ev[f].trim() !== '').length;
+  return { filled, total: fields.length, pct: Math.round(filled / fields.length * 100) };
+}
+
 function renderIdeas() {
   const grid = document.getElementById('ideateGrid');
   const empty = document.getElementById('ideateEmpty');
@@ -2057,22 +2138,39 @@ function renderIdeas() {
   } else {
     if (empty) empty.style.display = 'none';
     grid.style.alignContent = n <= 20 ? 'stretch' : 'flex-start';
-    grid.innerHTML = state.ideas.map(i =>
-      '<div class="idea-card" onclick="this.classList.toggle(\'flipped\')">' +
+    grid.innerHTML = state.ideas.map(i => {
+      const ev = i.evaluation || {};
+      const comp = getCardCompleteness(i);
+      const statusClass = comp.pct === 100 ? 'complete' : comp.pct > 0 ? 'partial' : 'empty';
+      const statusLabel = comp.pct === 100 ? '&#10003; Ready' : comp.filled + '/' + comp.total;
+      return '<div class="idea-card" data-id="'+i.id+'" onclick="flipCard(this,event)">' +
         '<div class="idea-card-inner">' +
           '<div class="idea-front"><div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div>' +
+            '<span class="front-status '+statusClass+'">'+statusLabel+'</span>' +
             '<div class="name">'+escHtml(i.name)+'</div>' +
             '<div class="flip-hint">click to flip</div>' +
           '</div>' +
-          '<div class="idea-back"><div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div>' +
-            '<div class="name">'+escHtml(i.name)+'</div>' +
-            '<div class="desc">'+escHtml(i.desc)+'</div>' +
-            (i.submitter ? '<div class="submitter">Submitted by '+escHtml(i.submitter)+'</div>' : '') +
-            '<div class="flip-hint">click to flip back</div>' +
+          '<div class="idea-back">' +
+            '<div class="back-header"><span class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</span><span class="name">'+escHtml(i.name)+'</span></div>' +
+            '<div class="back-fields">' +
+              '<div class="bf"><label>People Involved</label><input id="cf-people-'+i.id+'" placeholder="How many? Roles?" value="'+escAttr(ev.peopleInvolved||'')+'"></div>' +
+              '<div class="bf"><label>Frequency</label><input id="cf-frequency-'+i.id+'" placeholder="How often? Volume?" value="'+escAttr(ev.processFrequency||'')+'"></div>' +
+              '<div class="bf"><label>Time Per Task</label><input id="cf-time-'+i.id+'" placeholder="Hours per occurrence" value="'+escAttr(ev.timePerOccurrence||'')+'"></div>' +
+              '<div class="bf"><label>Systems &amp; Tools</label><input id="cf-systems-'+i.id+'" placeholder="Apps, databases" value="'+escAttr(ev.systemsTools||'')+'"></div>' +
+              '<div class="bf"><label>Current Process</label><input id="cf-process-'+i.id+'" placeholder="Workflow today" value="'+escAttr(ev.currentProcess||'')+'"></div>' +
+              '<div class="bf"><label>Pain Points</label><input id="cf-pain-'+i.id+'" placeholder="Bottlenecks, errors" value="'+escAttr(ev.painPoints||'')+'"></div>' +
+              '<div class="bf"><label>Ideal AI Solution</label><input id="cf-solution-'+i.id+'" placeholder="What should AI do?" value="'+escAttr(ev.idealSolution||'')+'"></div>' +
+              '<div class="bf"><label>Data Sources</label><input id="cf-data-'+i.id+'" placeholder="Data/APIs needed" value="'+escAttr(ev.dataSources||'')+'"></div>' +
+              '<div class="bf"><label>Time Savings</label><input id="cf-savings-'+i.id+'" placeholder="Hours saved/week" value="'+escAttr(ev.estimatedTimeSavings||'')+'"></div>' +
+              '<div class="bf"><label>Business Impact</label><input id="cf-impact-'+i.id+'" placeholder="Revenue, cost, quality" value="'+escAttr(ev.businessImpact||'')+'"></div>' +
+              '<div class="bf"><label>Complexity</label><select id="cf-complexity-'+i.id+'"><option value="">Select...</option><option value="low"'+(ev.complexity==='low'?' selected':'')+'>Low</option><option value="medium"'+(ev.complexity==='medium'?' selected':'')+'>Medium</option><option value="high"'+(ev.complexity==='high'?' selected':'')+'>High</option></select></div>' +
+              '<div class="bf"><label>Stakeholders</label><input id="cf-stakeholders-'+i.id+'" placeholder="Sponsors, beneficiaries" value="'+escAttr(ev.stakeholders||'')+'"></div>' +
+            '</div>' +
+            '<div class="flip-hint">click border to flip back</div>' +
           '</div>' +
         '</div>' +
-      '</div>'
-    ).join('');
+      '</div>';
+    }).join('');
   }
   document.getElementById('ideaCount').textContent = n + ' idea' + (n !== 1 ? 's' : '');
 }

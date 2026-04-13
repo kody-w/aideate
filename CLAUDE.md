@@ -13,45 +13,44 @@ AIdeate is a local-first, privacy-safe workshop tool for identifying and priorit
 ./start.sh 9000     # Custom port
 ```
 
-HTTP is recommended. On `file://`, BroadcastChannel is unavailable but the presenter automatically falls back to localStorage polling for sync.
+HTTP is recommended. `file://` also works for basic functionality.
 
 ## Testing
 
-Open `tests.html` in a browser and click "Run All Tests." There are 37 tests covering JSON schema, BroadcastChannel sync, localStorage, file I/O, rendering, and state updates. There is no CLI test runner — tests run entirely in the browser DOM.
+Open `tests.html` in a browser and click "Run All Tests." There are 37 tests covering JSON schema, localStorage persistence, import/export, unified app structure, PII checks, and PWA functionality. There is no CLI test runner — tests run entirely in the browser DOM.
 
 ## Architecture
 
-### Two-window design
+### Single-page interactive presentation
 
-- **`index.html`** (Presenter) — 11-slide deck shown via screen share. Receives state updates and renders live data.
-- **`control.html`** (Control Panel) — Operator UI on a second monitor. Manages all workshop state and broadcasts changes.
-
-### Sync mechanism
-
-The control panel broadcasts state to the presenter via the **BroadcastChannel API** (browser-native, same-origin). Messages are typed objects: `{ type, ...payload }`. Session IDs prevent cross-talk between concurrent workshops.
+- **`index.html`** — The entire app in one file. A 12-slide presentation deck with a slide-out drawer for all operator controls.
+- The slide deck is the main view (full-screen, shareable via screen share).
+- A **gear icon (FAB)** in the bottom-right corner opens a **380px drawer** from the right edge containing all workshop controls.
+- Drawer sections are **context-aware** — they show/hide based on the current slide via `data-context` attributes.
+- Keyboard: arrow keys navigate slides, `G` toggles the drawer, `Escape` closes it, `F` toggles fullscreen.
 
 ### State management
 
-A single centralized `state` object in each HTML file holds all workshop data. Key fields: `sessionId`, `workshopName`, `companyName`, `phase` (ideate/vote/prioritize), `participants`, `ideas` (with votes/voters), `timerSeconds`, `demoSlides`, `departments`. Every mutation autosaves to `localStorage` and broadcasts to the presenter.
+A single centralized `state` object holds all workshop data. Key fields: `sessionId`, `workshopName`, `companyName`, `phase` (ideate/vote/evaluate/prioritize), `participants` (array of `{id, name, title, initials}`), `ideas` (with votes/voters/evaluation), `timerSeconds`, `demoSlides`, `departments`. Every mutation autosaves to `localStorage` and directly calls the relevant render functions.
 
 ### Persistence
 
-- **localStorage keys**: `aideate_autosave`, `aideate_session_id`, `aideate_presenter_state:{sessionId}`
+- **localStorage key**: `aideate_autosave`
 - **JSON import/export**: Full workshop state round-trips through `.json` files (see `samples/` for schema examples)
 
 ### PWA / Offline
 
-- `sw.js` — Service worker with stale-while-revalidate for HTML, cache-first for assets. Cache version: `aideate-v3`.
-- `manifest.json` — PWA manifest (Microsoft Fluent theme color `#0078d4`, `minimal-ui` display).
+- `sw.js` — Service worker with stale-while-revalidate for HTML, cache-first for assets. Cache version: `aideate-v4`.
+- `manifest.json` — PWA manifest (Microsoft Fluent theme color `#0078d4`, `standalone` display).
 
 ### AI Integration (optional)
 
-GitHub Models API (`models.inference.ai.azure.com`) for formatting raw chat text into structured use cases. Requires a user-provided GitHub Personal Access Token stored in localStorage. Triggered by the "Format with AI" button in the control panel.
+GitHub Models API (`models.inference.ai.azure.com`) for formatting raw chat text into structured use cases and AI-powered evaluation of ideas. Requires a user-provided GitHub Personal Access Token stored in localStorage. Triggered by "Format with AI" and "Fill with AI" buttons in the drawer.
 
 ## Key Constraints
 
 - **No build step or transpilation** — edit HTML/JS/CSS directly, changes are live on reload.
 - **No dependencies** — zero npm packages, zero CDN links. Everything is vanilla JS/CSS.
-- **Single-file architecture** — each HTML file is self-contained with inline `<script>` and `<style>` tags. There is no `src/` directory.
+- **Single-file architecture** — `index.html` is self-contained with inline `<script>` and `<style>` tags. There is no `src/` directory.
 - **Privacy-first** — no PII hardcoded, no server calls except optional AI formatting, all data stays in browser localStorage.
 - **License** — internal Microsoft tool, not for external distribution.

@@ -3,3 +3,6 @@ projects/
 
 # Obsidian vault — local notes and knowledge base
 vault/
+
+# RAPP AIdeation — separate Flask/React app, not part of the static tool
+rapp_aideate/

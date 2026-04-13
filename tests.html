@@ -17,7 +17,7 @@ button { background: #0078d4; color: #fff; border: none; padding: 8px 20px; bord
 </style>
 </head>
 <body>
-<h1>🧪 AIdeate Workshop Tests</h1>
+<h1>AIdeate Workshop Tests</h1>
 <button onclick="runTests()">Run All Tests</button>
 <div id="results"></div>
 <div id="summary"></div>
@@ -31,7 +31,7 @@ function logTest(name, passed, detail) {
   results.push({ name, passed, detail });
   const div = document.createElement('div');
   div.className = `test ${passed ? 'pass' : 'fail'}`;
-  div.textContent = `${passed ? '✅' : '❌'} ${name}${detail ? ' — ' + detail : ''}`;
+  div.textContent = `${passed ? 'PASS' : 'FAIL'} ${name}${detail ? ' — ' + detail : ''}`;
   container.appendChild(div);
 }
 
@@ -46,7 +46,7 @@ async function runTests() {
   container.innerHTML = '';
   results.length = 0;
 
-  // ═══ 1. JSON Schema Tests ═══
+  // ═══ 1. JSON Schema Tests (1–12) ═══
   const sampleState = {
     version: '1.0',
     sessionId: 'test-session-123',
@@ -126,59 +126,18 @@ async function runTests() {
     logTest('Empty state: valid JSON', false, e.message);
   }
 
-  // ═══ 2. BroadcastChannel Tests ═══
-  // Test 10: BroadcastChannel creation
-  try {
-    const testChannel = new BroadcastChannel('aideate-test-' + Date.now());
-    logTest('BroadcastChannel: can create', true);
-    testChannel.close();
-  } catch (e) {
-    logTest('BroadcastChannel: can create', false, e.message);
-  }
-
-  // Test 11: BroadcastChannel message round-trip
-  try {
-    const sid = 'test-' + Date.now();
-    const ch1 = new BroadcastChannel('aideate-workshop-' + sid);
-    const ch2 = new BroadcastChannel('aideate-workshop-' + sid);
-    const received = await new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error('Timeout')), 2000);
-      ch2.onmessage = (e) => { clearTimeout(timeout); resolve(e.data); };
-      ch1.postMessage({ type: 'test', payload: 'hello' });
-    });
-    logTest('BroadcastChannel: message round-trip', received.type === 'test' && received.payload === 'hello');
-    ch1.close(); ch2.close();
-  } catch (e) {
-    logTest('BroadcastChannel: message round-trip', false, e.message);
-  }
-
-  // Test 12: Session-scoped channels don't cross-talk
-  try {
-    const ch1 = new BroadcastChannel('aideate-workshop-session-A');
-    const ch2 = new BroadcastChannel('aideate-workshop-session-B');
-    let gotMessage = false;
-    ch2.onmessage = () => { gotMessage = true; };
-    ch1.postMessage({ type: 'test' });
-    await new Promise(r => setTimeout(r, 200));
-    logTest('BroadcastChannel: session isolation (no cross-talk)', !gotMessage);
-    ch1.close(); ch2.close();
-  } catch (e) {
-    logTest('BroadcastChannel: session isolation', false, e.message);
-  }
-
-  // ═══ 3. localStorage Tests ═══
-  // Test 13: localStorage autosave
+  // Test 10: localStorage autosave + restore
   try {
     const key = 'aideate_test_' + Date.now();
     localStorage.setItem(key, JSON.stringify(sampleState));
-    const restored = JSON.parse(localStorage.getItem(key));
-    logTest('localStorage: autosave + restore', restored.workshopName === 'Test Workshop' && restored.ideas.length === 2);
+    const restoredLS = JSON.parse(localStorage.getItem(key));
+    logTest('localStorage: autosave + restore', restoredLS.workshopName === 'Test Workshop' && restoredLS.ideas.length === 2);
     localStorage.removeItem(key);
   } catch (e) {
     logTest('localStorage: autosave + restore', false, e.message);
   }
 
-  // Test 14: localStorage size check (should handle typical workshop)
+  // Test 11: localStorage size check (should handle typical workshop)
   try {
     const bigState = { ...sampleState };
     bigState.ideas = Array.from({ length: 100 }, (_, i) => ({
@@ -194,8 +153,7 @@ async function runTests() {
     logTest('localStorage: handles large workshop', false, e.message);
   }
 
-  // ═══ 4. File Export/Import Tests ═══
-  // Test 15: Blob creation for export
+  // Test 12: Export Blob creation
   try {
     const blob = new Blob([JSON.stringify(sampleState, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -205,7 +163,9 @@ async function runTests() {
     logTest('Export: Blob + ObjectURL creation', false, e.message);
   }
 
-  // Test 16: Import validation — reject bad version
+  // ═══ 2. Import / Export Tests (13–14) ═══
+
+  // Test 13: Import validation — reject bad version
   try {
     const bad = { ...sampleState, version: '99.0' };
     const isValid = bad.version === '1.0';
@@ -214,10 +174,10 @@ async function runTests() {
     logTest('Import validation: reject wrong version', false, e.message);
   }
 
-  // Test 17: Import validation — handle missing fields gracefully
+  // Test 14: Import — handle partial JSON with defaults
   try {
     const partial = { version: '1.0', workshopName: 'Partial' };
-    const restored = {
+    const restoredPartial = {
       workshopName: partial.workshopName || '',
       companyName: partial.companyName || '',
       participants: partial.participants || [],
@@ -227,63 +187,65 @@ async function runTests() {
       demoSlides: partial.demoSlides || [{label:'',url:'',visible:false},{label:'',url:'',visible:false},{label:'',url:'',visible:false},{label:'',url:'',visible:false}],
       departments: partial.departments || ['Sales','Operations','HR','IT']
     };
-    logTest('Import: handles partial JSON with defaults', restored.ideas.length === 0 && restored.phase === 'ideate' && restored.demoSlides.length === 4);
+    logTest('Import: handles partial JSON with defaults', restoredPartial.ideas.length === 0 && restoredPartial.phase === 'ideate' && restoredPartial.demoSlides.length === 4);
   } catch (e) {
     logTest('Import: handles partial JSON with defaults', false, e.message);
   }
 
-  // ═══ 5. No PII Hardcoded Tests ═══
-  // Test 18: Control panel has no hardcoded company names
+  // ═══ 3. Unified App Structure Tests (15–21) ═══
+
+  let appHtml = '';
   try {
-    const resp = await fetch('control.html');
-    const html = await resp.text();
-    const hasHardcoded = /manpower|cargill|experis|nike|deloitte/i.test(html);
-    logTest('Control: no hardcoded company names', !hasHardcoded);
+    appHtml = await (await fetch('index.html')).text();
   } catch (e) {
-    logTest('Control: no hardcoded company names', false, 'Could not fetch file — run from same directory');
+    logTest('SETUP: Could not fetch index.html', false, e.message);
   }
 
-  // Test 19: Presenter has no hardcoded company names
-  try {
-    const resp = await fetch('index.html');
-    const html = await resp.text();
-    const hasHardcoded = /manpower|cargill|experis|nike|deloitte/i.test(html);
-    logTest('Presenter: no hardcoded company names', !hasHardcoded);
-  } catch (e) {
-    logTest('Presenter: no hardcoded company names', false, 'Could not fetch file — run from same directory');
+  // Test 15: App contains drawer markup
+  logTest('App: contains drawer markup (.drawer, .drawer-fab)', appHtml.includes('class="drawer"') && appHtml.includes('drawer-fab'));
+
+  // Test 16: App contains all phase controls
+  logTest('App: contains phase control buttons (ideate/vote/evaluate/prioritize)', appHtml.includes('setPhase') && appHtml.includes("'ideate'") && appHtml.includes("'vote'") && appHtml.includes("'evaluate'") && appHtml.includes("'prioritize'"));
+
+  // Test 17: App contains idea management functions
+  logTest('App: contains idea management (addIdea, removeIdea)', appHtml.includes('function addIdea') && appHtml.includes('function removeIdea'));
+
+  // Test 18: App contains AI integration functions
+  logTest('App: contains AI integration (aiFormatIdea, aiEvaluateIdea)', appHtml.includes('function aiFormatIdea') && appHtml.includes('function aiEvaluateIdea'));
+
+  // Test 19: App contains evaluation functions
+  logTest('App: contains evaluation (saveIdeaEvaluation, renderEvaluation)', appHtml.includes('function saveIdeaEvaluation') && appHtml.includes('function renderEvaluation'));
+
+  // Test 20: App contains report generation
+  logTest('App: contains report generation (generateReport)', appHtml.includes('function generateReport'));
+
+  // Test 21: App contains timer functions
+  logTest('App: contains timer functions (startTimer, stopTimer)', appHtml.includes('function startTimer') && appHtml.includes('function stopTimer'));
+
+  // ═══ 4. No PII Tests (22–23) ═══
+
+  // Test 22: No hardcoded company names in app
+  {
+    const hasHardcoded = /manpower|cargill|experis|nike|deloitte/i.test(appHtml);
+    logTest('App: no hardcoded company names', !hasHardcoded);
   }
 
-  // Test 20: Both files use MS Blue (#0078d4)
-  try {
-    const c = await (await fetch('control.html')).text();
-    const p = await (await fetch('index.html')).text();
-    logTest('Theme: both files use #0078d4 (MS Blue)', c.includes('0078d4') && p.includes('0078d4'));
-  } catch (e) {
-    logTest('Theme: MS Blue check', false, 'Could not fetch files');
-  }
+  // Test 23: Theme uses #0078d4 (MS Blue)
+  logTest('Theme: app uses #0078d4 (MS Blue)', appHtml.includes('0078d4'));
 
-  // Test 21: Both use session-scoped BroadcastChannel
-  try {
-    const c = await (await fetch('control.html')).text();
-    const p = await (await fetch('index.html')).text();
-    logTest('Channel: both use session-scoped naming', c.includes('aideate-workshop-') && p.includes('aideate-workshop-'));
-  } catch (e) {
-    logTest('Channel: session-scoped naming', false, 'Could not fetch files');
-  }
+  // ═══ 5. PWA Tests (24–37) ═══
 
-  // ═══ 6. PWA Tests ═══
-
-  // Test 22: manifest.json is valid and loadable
+  // Test 24: manifest.json is valid JSON
   try {
     const resp = await fetch('manifest.json');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const manifest = await resp.json();
+    await resp.json();
     logTest('PWA: manifest.json is valid JSON', true);
   } catch (e) {
     logTest('PWA: manifest.json is valid JSON', false, e.message);
   }
 
-  // Test 23: manifest has required PWA fields
+  // Test 25: manifest has required PWA fields
   try {
     const manifest = await (await fetch('manifest.json')).json();
     const required = ['name', 'short_name', 'start_url', 'display', 'icons', 'theme_color', 'background_color'];
@@ -293,15 +255,15 @@ async function runTests() {
     logTest('PWA: manifest required fields', false, e.message);
   }
 
-  // Test 24: manifest display is minimal-ui (not standalone, to support 2-window flow)
+  // Test 26: manifest display is standalone (single window)
   try {
     const manifest = await (await fetch('manifest.json')).json();
-    logTest('PWA: display is minimal-ui', manifest.display === 'minimal-ui', manifest.display);
+    logTest('PWA: display is standalone', manifest.display === 'standalone', manifest.display);
   } catch (e) {
     logTest('PWA: display mode', false, e.message);
   }
 
-  // Test 25: manifest theme_color is MS Blue
+  // Test 27: manifest theme_color is MS Blue
   try {
     const manifest = await (await fetch('manifest.json')).json();
     logTest('PWA: theme_color is #0078d4', manifest.theme_color === '#0078d4');
@@ -309,7 +271,7 @@ async function runTests() {
     logTest('PWA: theme_color', false, e.message);
   }
 
-  // Test 26: manifest has at least one icon
+  // Test 28: manifest has at least one icon
   try {
     const manifest = await (await fetch('manifest.json')).json();
     logTest('PWA: has icons array with entries', Array.isArray(manifest.icons) && manifest.icons.length > 0);
@@ -317,7 +279,7 @@ async function runTests() {
     logTest('PWA: icons', false, e.message);
   }
 
-  // Test 27: icon.svg is loadable
+  // Test 29: icon.svg is loadable and is SVG
   try {
     const resp = await fetch('icon.svg');
     const text = await resp.text();
@@ -326,21 +288,20 @@ async function runTests() {
     logTest('PWA: icon.svg', false, e.message);
   }
 
-  // Test 28: sw.js is loadable
+  // Test 30: sw.js is loadable and has install handler
   try {
     const resp = await fetch('sw.js');
     const text = await resp.text();
-    logTest('PWA: sw.js loads and contains install handler', resp.ok && text.includes("addEventListener('install'"));
+    logTest('PWA: sw.js loads and has install handler', resp.ok && text.includes("addEventListener('install'"));
   } catch (e) {
     logTest('PWA: sw.js', false, e.message);
   }
 
-  // Test 29: Service worker can be registered
+  // Test 31: Service worker registration succeeds
   try {
     if ('serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.register('sw.js');
       logTest('PWA: service worker registration succeeds', !!reg.scope);
-      // Unregister test SW to avoid side effects
       await reg.unregister();
     } else {
       logTest('PWA: service worker registration succeeds', false, 'serviceWorker not supported');
@@ -349,72 +310,27 @@ async function runTests() {
     logTest('PWA: service worker registration', false, e.message);
   }
 
-  // Test 30: Both HTML files have manifest link
-  try {
-    const c = await (await fetch('control.html')).text();
-    const p = await (await fetch('index.html')).text();
-    logTest('PWA: both files link manifest.json', c.includes('manifest.json') && p.includes('manifest.json'));
-  } catch (e) {
-    logTest('PWA: manifest link', false, e.message);
-  }
+  // Test 32: App file links manifest.json
+  logTest('PWA: app links manifest.json', appHtml.includes('manifest.json'));
 
-  // Test 31: Both HTML files have theme-color meta
-  try {
-    const c = await (await fetch('control.html')).text();
-    const p = await (await fetch('index.html')).text();
-    logTest('PWA: both files have theme-color meta', c.includes('theme-color') && p.includes('theme-color'));
-  } catch (e) {
-    logTest('PWA: theme-color meta', false, e.message);
-  }
+  // Test 33: App file has theme-color meta
+  logTest('PWA: app has theme-color meta', appHtml.includes('theme-color'));
 
-  // Test 32: Both HTML files register service worker
-  try {
-    const c = await (await fetch('control.html')).text();
-    const p = await (await fetch('index.html')).text();
-    logTest('PWA: both files register sw.js', c.includes("register('sw.js')") && p.includes("register('sw.js')"));
-  } catch (e) {
-    logTest('PWA: SW registration code', false, e.message);
-  }
+  // Test 34: App file registers sw.js
+  logTest('PWA: app registers sw.js', appHtml.includes("register('sw.js')"));
 
-  // Test 33: Control panel has download button
-  try {
-    const c = await (await fetch('control.html')).text();
-    logTest('PWA: control panel has download link', c.includes('Download App') && c.includes('downloadAppZip'));
-  } catch (e) {
-    logTest('PWA: download button', false, e.message);
-  }
+  // Test 35: App file has download button (downloadAppZip)
+  logTest('PWA: app has download function', appHtml.includes('downloadAppZip'));
 
-  // Test 34: Control panel has install button
-  try {
-    const c = await (await fetch('control.html')).text();
-    logTest('PWA: control panel has install button', c.includes('installBtn') && c.includes('installPWA'));
-  } catch (e) {
-    logTest('PWA: install button', false, e.message);
-  }
+  // Test 36: App file has install button (installPWA)
+  logTest('PWA: app has install button', appHtml.includes('installBtn') && appHtml.includes('installPWA'));
 
-  // Test 35: Presenter has control panel link
-  try {
-    const p = await (await fetch('index.html')).text();
-    logTest('PWA: presenter has control panel link', p.includes('control.html') && p.includes('Control'));
-  } catch (e) {
-    logTest('PWA: control link in presenter', false, e.message);
-  }
-
-  // Test 36: BroadcastChannel in control.html is guarded with try/catch
-  try {
-    const c = await (await fetch('control.html')).text();
-    const hasGuard = c.includes('BroadcastChannel unavailable');
-    logTest('PWA: control BroadcastChannel has error guard', hasGuard);
-  } catch (e) {
-    logTest('PWA: BroadcastChannel guard', false, e.message);
-  }
-
-  // Test 37: sw.js caches all critical app files
+  // Test 37: sw.js caches index.html but NOT control.html
   try {
     const sw = await (await fetch('sw.js')).text();
-    const criticalFiles = ['index.html', 'control.html', 'manifest.json', 'icon.svg'];
-    const allCached = criticalFiles.every(f => sw.includes(f));
-    logTest('PWA: sw.js caches all critical files', allCached);
+    const cachesIndex = sw.includes('index.html');
+    const noControl = !sw.includes('control.html');
+    logTest('PWA: sw.js caches index.html (no control.html)', cachesIndex && noControl);
   } catch (e) {
     logTest('PWA: SW cache list', false, e.message);
   }

@@ -4,7 +4,7 @@
   "description": "Local-first AI use-case prioritization workshop tool. No server, no data leaves your device.",
   "start_url": "./index.html",
   "scope": "./",
-  "display": "minimal-ui",
+  "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#0078d4",
   "orientation": "any",

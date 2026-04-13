@@ -786,7 +786,7 @@
     <p class="subtitle" id="welcomeCompany" style="margin: 0 auto; font-size: 1.1rem; opacity: .7;"></p>
     <p class="subtitle" style="margin: 12px auto 0;" id="welcomeDurationText">
       Over the next 90 minutes, we'll identify, prioritize, and build the business case
-      for AI use cases specific to your organization.
+      for business challenges where AI can drive the most impact.
     </p>
     <div class="stat-row" style="justify-content:center;">
       <div class="stat"><div class="num">4</div><div class="label">Phases</div></div>
@@ -804,12 +804,12 @@
   <div style="max-width:900px; text-align:center;">
     <div class="tag" style="background:rgba(116,39,116,.2); color:#c490c4;">Today's Journey</div>
     <h2>What We'll Do Together</h2>
-    <p class="subtitle" style="margin: 0 auto 36px;">Four phases, each building on the last. You'll go from raw ideas to a prioritized AI roadmap.</p>
+    <p class="subtitle" style="margin: 0 auto 36px;">Four phases, each building on the last. You'll go from business challenges to a prioritized AI roadmap.</p>
     <div class="card-grid cols-4">
-      <div class="card" style="border-top:3px solid var(--ms-blue);"><span class="icon">💡</span><h3>Ideate</h3><p>Brainstorm AI use cases. Submit ideas from your phone or laptop. AI helps fill in the details.</p></div>
+      <div class="card" style="border-top:3px solid var(--ms-blue);"><span class="icon">💡</span><h3>Ideate</h3><p>Surface business challenges and pain points across your organization. Call them out — we'll capture everything.</p></div>
       <div class="card" style="border-top:3px solid var(--ms-purple);"><span class="icon">🗳️</span><h3>Vote</h3><p>Review all ideas and vote on the ones you believe will have the most impact. Everyone gets a voice.</p></div>
-      <div class="card" style="border-top:3px solid var(--ms-green);"><span class="icon">📋</span><h3>Define</h3><p>Deep-dive into the top-voted ideas. AI helps build the business case — problems, benefits, risks.</p></div>
-      <div class="card" style="border-top:3px solid var(--ms-orange);"><span class="icon">📊</span><h3>Prioritize</h3><p>Rank ideas by impact vs. effort. Walk out with an executive-ready roadmap and next steps.</p></div>
+      <div class="card" style="border-top:3px solid var(--ms-green);"><span class="icon">📋</span><h3>Define</h3><p>Deep-dive into the top-voted challenges. Map the current state, pain points, and potential AI solutions.</p></div>
+      <div class="card" style="border-top:3px solid var(--ms-orange);"><span class="icon">📊</span><h3>Prioritize</h3><p>Rank challenges by impact vs. effort. Walk out with an executive-ready roadmap and next steps.</p></div>
     </div>
   </div>
   <div class="slide-number"></div>
@@ -823,11 +823,11 @@
     <div class="tag" style="background:rgba(251,146,60,.2); color:#fb923c;">Discovery → Action</div>
     <h2>We Came Prepared</h2>
     <p class="subtitle" id="preparedSubtitle" style="margin: 0 auto 16px;">
-      From our discovery sessions, we've identified AI agent opportunities focused on workflows that go beyond 1st-party Copilot features.
+      From our discovery sessions, we've identified business challenges and workflow bottlenecks where AI can deliver measurable impact.
     </p>
     <div id="preparedCards">
       <div class="prepared-placeholder">
-        <div style="margin-bottom:12px;">💡 Load a template or import a project file to populate the use-case menu</div>
+        <div style="margin-bottom:12px;">💡 Load a template or import a project file to populate the challenge menu</div>
         <button onclick="openDrawer()" style="background:rgba(251,146,60,.25); color:#fb923c; border:1px solid rgba(251,146,60,.4); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">
           ⚙️ Open Controls to Load Data
         </button>
@@ -870,14 +870,14 @@
     <div class="action-box" style="text-align:left; margin: 20px auto 0;">
       <h3>🎯 How This Works:</h3>
       <ol class="step-list">
-        <li><span class="num">1</span> We may have pre-loaded use cases from discovery sessions as a starting point</li>
+        <li><span class="num">1</span> We may have pre-loaded challenges from discovery sessions as a starting point</li>
         <li><span class="num">2</span> <strong>Add more ideas</strong> — call them out and I'll type them in</li>
         <li><span class="num">3</span> <strong>Vote</strong> — tell me your top picks</li>
         <li><span class="num">4</span> <strong>Define &amp; Prioritize</strong> — AI builds the business case, we walk out with a roadmap</li>
       </ol>
     </div>
     <div style="margin-top:20px; padding:16px; background:rgba(255,255,255,.08); border-radius:12px; border:1px solid rgba(255,255,255,.15);">
-      <p style="font-size:.95rem;">💡 <strong>Your ideas matter most.</strong> Any pre-loaded use cases are just a starting point — add, modify, or replace anything.</p>
+      <p style="font-size:.95rem;">💡 <strong>Your ideas matter most.</strong> Any pre-loaded scenarios are just a starting point — add, modify, or replace anything.</p>
     </div>
   </div>
   <div class="slide-number"></div>
@@ -898,17 +898,17 @@
     <div class="participants-badge" id="participantCount1"><div class="roster-avatars" id="roster1"></div><span>👥 0 participants</span></div>
   </div>
   <div class="ideate-grid" id="ideateGrid">
-    <div class="empty-state" id="ideateEmpty"><div class="icon">💡</div><h2>Waiting for ideas...</h2><p>Use cases will appear here as they're added</p></div>
+    <div class="empty-state" id="ideateEmpty"><div class="icon">💡</div><h2>Waiting for ideas...</h2><p>Business challenges will appear here as they're added</p></div>
   </div>
   <button class="add-idea-fab" onclick="showAddIdeaPopup()" title="Add idea (+)">+</button>
   <!-- Add-idea popup overlay -->
   <div class="add-idea-overlay" id="addIdeaOverlay">
     <div class="add-idea-card">
-      <h2>💡 Add Use Case</h2>
+      <h2>💡 Add Business Challenge</h2>
       <div class="form-grid">
-        <div class="form-field"><label>Use Case Name</label><input type="text" id="popupIdeaName" placeholder="e.g. Sales Call Prep Agent" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitIdeaFromPopup();}"></div>
+        <div class="form-field"><label>Challenge Name</label><input type="text" id="popupIdeaName" placeholder="e.g. Manual sales call prep takes 45 min per account" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitIdeaFromPopup();}"></div>
         <div class="form-field"><label>Department</label><select id="popupIdeaDept"></select></div>
-        <div class="form-field full"><label>Description</label><textarea id="popupIdeaDesc" placeholder="What does this AI agent do? What problem does it solve?" rows="3"></textarea></div>
+        <div class="form-field full"><label>Description</label><textarea id="popupIdeaDesc" placeholder="Describe the business problem. What's broken, slow, or painful today?" rows="3"></textarea></div>
         <div class="form-field"><label>Submitted By</label><input type="text" id="popupIdeaSubmitter" placeholder="Name"></div>
       </div>
       <div class="form-actions">
@@ -992,7 +992,7 @@
   <div class="priority-container" id="priorityContainer">
     <div class="podium" id="podium"></div>
     <table class="results-table" id="resultsTable">
-      <thead><tr><th>#</th><th>Use Case</th><th>Department</th><th>Votes</th><th>%</th><th>Status</th></tr></thead>
+      <thead><tr><th>#</th><th>Challenge</th><th>Department</th><th>Votes</th><th>%</th><th>Status</th></tr></thead>
       <tbody id="resultsBody"></tbody>
     </table>
   </div>
@@ -1080,7 +1080,7 @@
     <h3>📂 Templates</h3>
     <div class="d-row">
       <select id="templateSelect" style="flex:1;">
-        <option value="">Load industry use cases...</option>
+        <option value="">Load industry challenges...</option>
         <optgroup label="Cross-Industry"><option value="templates/general.json">General / Cross-Industry</option></optgroup>
         <optgroup label="Commercial">
           <option value="templates/b2b-sales.json">B2B Sales</option>
@@ -1112,7 +1112,7 @@
   <!-- ADD IDEAS -->
   <div class="drawer-section" data-context="slide-9,slide-3">
     <h3>💡 Ideas <span class="badge" style="background:rgba(16,124,16,.2);color:var(--ms-green);" id="ideaCountBadge">0</span></h3>
-    <div class="d-row"><input type="text" id="newIdeaName" placeholder="Use case name" style="flex:1;" onkeydown="if(event.key==='Enter')addIdea()"><select id="newIdeaDept" style="width:100px;"></select></div>
+    <div class="d-row"><input type="text" id="newIdeaName" placeholder="Challenge name" style="flex:1;" onkeydown="if(event.key==='Enter')addIdea()"><select id="newIdeaDept" style="width:100px;"></select></div>
     <div class="d-row"><input type="text" id="newIdeaDesc" placeholder="Brief description" style="flex:1;"><input type="text" id="newIdeaSubmitter" placeholder="Submitter" style="width:80px;"><button class="btn-green" onclick="addIdea()">+</button></div>
     <div class="idea-list" id="ideaList"></div>
   </div>
@@ -1122,7 +1122,7 @@
     <h3>✨ Paste from Chat <span class="ai-badge">AI</span></h3>
     <p style="font-size:.68rem;color:var(--muted);margin-bottom:6px;">Paste rough text — AI extracts the idea.</p>
     <div class="ai-paste-area">
-      <textarea id="chatPasteInput" placeholder="Paste from chat, e.g.:&#10;Sarah: what about an agent that auto-generates project status reports?" rows="3"></textarea>
+      <textarea id="chatPasteInput" placeholder="Paste from chat, e.g.:&#10;Sarah: we spend hours manually compiling project status reports every week" rows="3"></textarea>
       <div class="d-row" style="margin-top:6px;margin-bottom:0;">
         <button class="btn-purple" onclick="aiFormatIdea()" id="aiFormatBtn">✨ Format</button>
         <button class="btn-sm" style="background:var(--border);color:var(--text);" onclick="document.getElementById('chatPasteInput').value=''; hideAiResult();">Clear</button>
@@ -1791,7 +1791,7 @@ function renderEvalForm(idea) {
     '<div class="eval-field"><label>Pain Points</label><textarea id="ev-pain-' + id + '" placeholder="Bottlenecks, errors, delays">' + escHtml(ev.painPoints || '') + '</textarea></div>' +
     '<div class="eval-field"><label>Current Process</label><textarea id="ev-process-' + id + '" placeholder="Workflow step by step">' + escHtml(ev.currentProcess || '') + '</textarea></div>' +
     '<div class="eval-section-label">AI Solution Design</div>' +
-    '<div class="eval-field"><label>Ideal AI Solution</label><textarea id="ev-solution-' + id + '" placeholder="What should the AI agent do?">' + escHtml(ev.idealSolution || '') + '</textarea></div>' +
+    '<div class="eval-field"><label>Ideal AI Solution</label><textarea id="ev-solution-' + id + '" placeholder="How could AI address this challenge?">' + escHtml(ev.idealSolution || '') + '</textarea></div>' +
     '<div class="eval-field"><label>Data Sources</label><textarea id="ev-data-' + id + '" placeholder="Data/APIs/systems needed?">' + escHtml(ev.dataSources || '') + '</textarea></div>' +
     '<div class="eval-section-label">Business Case</div>' +
     '<div class="eval-field"><label>Time Savings (auto)</label><input id="ev-timeSaved-' + id + '" readonly style="background:rgba(0,120,212,.12);color:#60a5fa;font-weight:600;cursor:default;" value="' + escAttr(ev.estimatedTimeSavings || '') + '" placeholder="Auto-calculated"></div>' +
@@ -1843,8 +1843,8 @@ async function aiEvaluateIdea(ideaId) {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: 'You are a Microsoft AI specialist evaluating an AI agent use case during a customer workshop. Given the use case details and company context, provide a thorough evaluation. Be specific, practical, and quantify where possible. Return ONLY valid JSON:\n{"peopleInvolved":"","processFrequency":"","timePerOccurrence":"","currentProcess":"","systemsTools":"","painPoints":"","idealSolution":"","dataSources":"","estimatedTimeSavings":"","businessImpact":"","successCriteria":"","stakeholders":"","impactScore":5,"readinessScore":5,"complexity":"medium","risks":""}\nIMPORTANT: peopleInvolved must be a number (e.g. "5"), processFrequency must be tasks per week as a number (e.g. "20"), timePerOccurrence must be minutes per task as a number (e.g. "30"). estimatedTimeSavings will be auto-calculated so return "" for it.\nNo markdown, no explanation, just the JSON object.' },
-          { role: 'user', content: 'Evaluate this AI use case:\n\nName: ' + idea.name + '\nDepartment: ' + idea.dept + '\nDescription: ' + idea.desc + (context ? '\n\nContext:\n' + context : '') }
+          { role: 'system', content: 'You are a Microsoft AI specialist evaluating a business challenge for AI potential during a customer workshop. Given the challenge details and company context, provide a thorough evaluation. Be specific, practical, and quantify where possible. Return ONLY valid JSON:\n{"peopleInvolved":"","processFrequency":"","timePerOccurrence":"","currentProcess":"","systemsTools":"","painPoints":"","idealSolution":"","dataSources":"","estimatedTimeSavings":"","businessImpact":"","successCriteria":"","stakeholders":"","impactScore":5,"readinessScore":5,"complexity":"medium","risks":""}\nIMPORTANT: peopleInvolved must be a number (e.g. "5"), processFrequency must be tasks per week as a number (e.g. "20"), timePerOccurrence must be minutes per task as a number (e.g. "30"). estimatedTimeSavings will be auto-calculated so return "" for it.\nNo markdown, no explanation, just the JSON object.' },
+          { role: 'user', content: 'Evaluate this business challenge for AI potential:\n\nName: ' + idea.name + '\nDepartment: ' + idea.dept + '\nDescription: ' + idea.desc + (context ? '\n\nContext:\n' + context : '') }
         ],
         temperature: 0.4,
         max_tokens: 1200
@@ -1908,8 +1908,8 @@ async function aiFormatIdea() {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: 'You extract and format AI agent use case ideas from raw chat text. Return ONLY valid JSON: {"name":"Short use case name","department":"One of: ' + deptList + '","description":"Clean 1-2 sentence description","submitter":"Person who suggested it"}. No markdown, just JSON.' },
-          { role: 'user', content: 'Extract and format this raw workshop chat into a clean AI agent use case:\n\n' + raw }
+          { role: 'system', content: 'You extract and format business challenge ideas from raw workshop chat text. Return ONLY valid JSON: {"name":"Short challenge name (focus on the problem, not a solution)","department":"One of: ' + deptList + '","description":"Clean 1-2 sentence description of the business problem","submitter":"Person who suggested it"}. No markdown, just JSON.' },
+          { role: 'user', content: 'Extract and format this raw workshop chat into a clean business challenge:\n\n' + raw }
         ],
         temperature: 0.3,
         max_tokens: 300
@@ -2000,10 +2000,10 @@ function generateReport() {
 
   const html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>AIdeate Report — '+esc(state.workshopName||'Workshop')+'</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:"Segoe UI",system-ui,sans-serif;background:#0f172a;color:#e2e8f0;padding:40px;line-height:1.6;}@media print{body{background:#fff;color:#1a1a2e;padding:20px;}.no-print{display:none !important;}div[style*="background:#16213e"]{background:#f1f5f9 !important;border-color:#cbd5e1 !important;}}h1{font-size:2rem;font-weight:800;margin-bottom:4px;}h2{font-size:1.3rem;font-weight:700;margin:32px 0 16px;padding-bottom:8px;border-bottom:2px solid #2a3a5c;}table{width:100%;border-collapse:collapse;}th{text-align:left;padding:8px 12px;font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #2a3a5c;}tr:nth-child(even) td{background:rgba(255,255,255,.03);}</style></head><body>' +
     '<div class="no-print" style="margin-bottom:24px;display:flex;gap:8px;"><button onclick="window.print()" style="background:#0078d4;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;">Print / Save PDF</button><button onclick="window.close()" style="background:#2a3a5c;color:#e2e8f0;border:none;padding:10px 24px;border-radius:8px;font-size:.9rem;cursor:pointer;">Close</button></div>' +
-    '<div style="background:linear-gradient(135deg,#0078d4,#742774);padding:32px;border-radius:16px;margin-bottom:32px;"><div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;opacity:.8;margin-bottom:8px;">AI Use Case Assessment Report</div><h1>'+esc(state.workshopName||'AI Workshop')+'</h1>'+(state.companyName?'<div style="font-size:1.1rem;opacity:.85;margin-top:4px;">'+esc(state.companyName)+'</div>':'')+'<div style="display:flex;gap:24px;margin-top:20px;flex-wrap:wrap;"><div><div style="font-size:2rem;font-weight:800;">'+sorted.length+'</div><div style="font-size:.75rem;opacity:.7;">Use Cases</div></div><div><div style="font-size:2rem;font-weight:800;">'+evaluated.length+'</div><div style="font-size:.75rem;opacity:.7;">Evaluated</div></div><div><div style="font-size:2rem;font-weight:800;">'+totalVotes+'</div><div style="font-size:.75rem;opacity:.7;">Votes</div></div><div><div style="font-size:2rem;font-weight:800;">'+state.participants.length+'</div><div style="font-size:.75rem;opacity:.7;">Participants</div></div></div><div style="font-size:.8rem;opacity:.6;margin-top:16px;">'+date+'</div></div>' +
+    '<div style="background:linear-gradient(135deg,#0078d4,#742774);padding:32px;border-radius:16px;margin-bottom:32px;"><div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;opacity:.8;margin-bottom:8px;">AI Opportunity Assessment Report</div><h1>'+esc(state.workshopName||'AI Workshop')+'</h1>'+(state.companyName?'<div style="font-size:1.1rem;opacity:.85;margin-top:4px;">'+esc(state.companyName)+'</div>':'')+'<div style="display:flex;gap:24px;margin-top:20px;flex-wrap:wrap;"><div><div style="font-size:2rem;font-weight:800;">'+sorted.length+'</div><div style="font-size:.75rem;opacity:.7;">Challenges</div></div><div><div style="font-size:2rem;font-weight:800;">'+evaluated.length+'</div><div style="font-size:.75rem;opacity:.7;">Evaluated</div></div><div><div style="font-size:2rem;font-weight:800;">'+totalVotes+'</div><div style="font-size:.75rem;opacity:.7;">Votes</div></div><div><div style="font-size:2rem;font-weight:800;">'+state.participants.length+'</div><div style="font-size:.75rem;opacity:.7;">Participants</div></div></div><div style="font-size:.8rem;opacity:.6;margin-top:16px;">'+date+'</div></div>' +
     (state.participants.length ? '<h2>Workshop Participants</h2><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">'+participantHtml+'</div>' : '') +
-    '<h2>Executive Summary</h2><div style="background:#16213e;border:1px solid #2a3a5c;border-radius:12px;padding:20px;margin-bottom:8px;"><p style="font-size:.95rem;line-height:1.7;">'+esc(state.companyName||'The organization')+'\'s AI workshop identified <strong>'+sorted.length+' potential AI use cases</strong> across '+[...new Set(sorted.map(i=>i.dept))].length+' departments. Through collaborative voting ('+totalVotes+' votes from '+state.participants.length+' participants), the team prioritized their highest-impact opportunities. '+evaluated.length+' received full evaluation.'+(quickWins.length?' Top recommendation: <strong>'+esc(quickWins[0].name)+'</strong> (Impact: '+quickWins[0].evaluation.impactScore+'/10, Readiness: '+quickWins[0].evaluation.readinessScore+'/10).':'')+'</p></div>' +
-    '<h2>Ranked Use Cases</h2><table><thead><tr><th>#</th><th>Use Case</th><th>Dept</th><th>Votes</th><th>Impact</th><th>Ready</th><th>Complexity</th><th>Eval</th></tr></thead><tbody>'+summaryRows+'</tbody></table>' +
+    '<h2>Executive Summary</h2><div style="background:#16213e;border:1px solid #2a3a5c;border-radius:12px;padding:20px;margin-bottom:8px;"><p style="font-size:.95rem;line-height:1.7;">'+esc(state.companyName||'The organization')+'\'s AI workshop identified <strong>'+sorted.length+' business challenges with AI potential</strong> across '+[...new Set(sorted.map(i=>i.dept))].length+' departments. Through collaborative voting ('+totalVotes+' votes from '+state.participants.length+' participants), the team prioritized their highest-impact opportunities. '+evaluated.length+' received full evaluation.'+(quickWins.length?' Top recommendation: <strong>'+esc(quickWins[0].name)+'</strong> (Impact: '+quickWins[0].evaluation.impactScore+'/10, Readiness: '+quickWins[0].evaluation.readinessScore+'/10).':'')+'</p></div>' +
+    '<h2>Ranked Challenges</h2><table><thead><tr><th>#</th><th>Challenge</th><th>Dept</th><th>Votes</th><th>Impact</th><th>Ready</th><th>Complexity</th><th>Eval</th></tr></thead><tbody>'+summaryRows+'</tbody></table>' +
     (evaluated.length >= 2 ? '<h2>Impact vs. Readiness</h2><div style="position:relative;background:#16213e;border:1px solid #2a3a5c;border-radius:12px;padding:40px 40px 50px 50px;height:360px;margin-bottom:8px;"><div style="position:absolute;left:50%;top:8px;transform:translateX(-50%);font-size:.7rem;color:#94a3b8;">HIGH IMPACT</div><div style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);font-size:.7rem;color:#94a3b8;">LOW IMPACT</div><div style="position:absolute;left:8px;top:50%;transform:translateY(-50%) rotate(-90deg);font-size:.7rem;color:#94a3b8;">LOW READINESS</div><div style="position:absolute;right:8px;top:50%;transform:translateY(-50%) rotate(90deg);font-size:.7rem;color:#94a3b8;">HIGH READINESS</div><div style="position:absolute;inset:40px 40px 40px 50px;border:1px dashed #2a3a5c;"><div style="position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed #2a3a5c;"></div><div style="position:absolute;top:50%;left:0;right:0;border-top:1px dashed #2a3a5c;"></div><div style="position:absolute;top:4px;right:4px;font-size:.6rem;color:#4ade80;">QUICK WINS</div><div style="position:absolute;top:4px;left:4px;font-size:.6rem;color:#fbbf24;">STRATEGIC</div><div style="position:absolute;bottom:4px;right:4px;font-size:.6rem;color:#94a3b8;">EASY WINS</div><div style="position:absolute;bottom:4px;left:4px;font-size:.6rem;color:#f87171;">RECONSIDER</div>'+gridDots+'</div></div><div style="margin-bottom:8px;">'+gridLegend+'</div>' : '') +
     (quickWins.length ? '<h2>Recommended Quick Wins</h2><p style="font-size:.85rem;color:#94a3b8;margin-bottom:12px;">Highest combined Impact + Readiness — start here.</p>'+recsHtml : '') +
     '<h2>Detailed Evaluations</h2>'+useCaseCards+
@@ -2012,7 +2012,7 @@ function generateReport() {
   const w = window.open('', '_blank');
   w.document.write(html);
   w.document.close();
-  log('Report generated with ' + sorted.length + ' use cases');
+  log('Report generated with ' + sorted.length + ' challenges');
 }
 
 // ══════════════════════════════════════════════
@@ -2152,14 +2152,14 @@ function renderWelcomeSlide() {
   else title.innerHTML = 'Welcome to Your<br>AI Workshop';
   company.textContent = state.companyName || '';
   const dur = state.workshopDuration || 90;
-  document.getElementById('welcomeDurationText').textContent = 'Over the next ' + dur + ' minutes, we\u2019ll identify, prioritize, and build the business case for AI use cases specific to your organization.';
+  document.getElementById('welcomeDurationText').textContent = 'Over the next ' + dur + ' minutes, we\u2019ll identify, prioritize, and build the business case for business challenges where AI can drive the most impact.';
   document.getElementById('welcomeDurationStat').textContent = '~' + dur;
 }
 
 function renderPreparedSlide() {
   const container = document.getElementById('preparedCards');
   if (state.ideas.length === 0) {
-    container.innerHTML = '<div class="prepared-placeholder"><div style="margin-bottom:12px;">💡 Load a template or import a project to populate the use-case menu</div><button onclick="openDrawer()" style="background:rgba(251,146,60,.25); color:#fb923c; border:1px solid rgba(251,146,60,.4); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">⚙️ Open Controls</button></div>';
+    container.innerHTML = '<div class="prepared-placeholder"><div style="margin-bottom:12px;">💡 Load a template or import a project to populate the challenge menu</div><button onclick="openDrawer()" style="background:rgba(251,146,60,.25); color:#fb923c; border:1px solid rgba(251,146,60,.4); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">⚙️ Open Controls</button></div>';
     return;
   }
   container.innerHTML = '<div class="usecase-menu">' + state.ideas.map((idea, i) =>
@@ -2255,7 +2255,7 @@ function expandIdeaCard(ideaId) {
         '<div class="ef"><label>📝 Current Process</label><textarea id="ex-process-'+idea.id+'" placeholder="Workflow step by step">'+escHtml(ev.currentProcess||'')+'</textarea></div>' +
         '<div class="ef"><label>⚠️ Pain Points</label><textarea id="ex-pain-'+idea.id+'" placeholder="Bottlenecks, errors, delays">'+escHtml(ev.painPoints||'')+'</textarea></div>' +
         '<div class="ex-section">AI Solution &amp; Impact</div>' +
-        '<div class="ef"><label>🤖 Ideal AI Solution</label><textarea id="ex-solution-'+idea.id+'" placeholder="What should the AI agent do?">'+escHtml(ev.idealSolution||'')+'</textarea></div>' +
+        '<div class="ef"><label>🤖 Ideal AI Solution</label><textarea id="ex-solution-'+idea.id+'" placeholder="How could AI address this challenge?">'+escHtml(ev.idealSolution||'')+'</textarea></div>' +
         '<div class="ef"><label>🗄️ Data Sources</label><input id="ex-data-'+idea.id+'" placeholder="Data/APIs/systems needed" value="'+escAttr(ev.dataSources||'')+'"></div>' +
         '<div class="ef"><label>⚡ Time Savings (auto)</label><input id="ex-savings-'+idea.id+'" readonly style="background:rgba(0,120,212,.12);color:#60a5fa;font-weight:600;cursor:default;" value="'+escAttr(ev.estimatedTimeSavings||'')+'" placeholder="Auto-calculated from above"></div>' +
         '<div class="ef"><label>📈 Business Impact</label><input id="ex-impact-'+idea.id+'" placeholder="Revenue, cost reduction, quality" value="'+escAttr(ev.businessImpact||'')+'"></div>' +
@@ -2469,7 +2469,7 @@ function renderEvaluation() {
   const medals = ['🥇', '🥈', '🥉'];
 
   if (sorted.length === 0) {
-    showcase.innerHTML = '<div style="text-align:center;color:var(--muted);width:100%;"><div style="font-size:4rem;margin-bottom:16px;">📋</div><h2 style="font-size:1.4rem;margin-bottom:8px;color:var(--text);">Use Case Deep Dive</h2><p>Add ideas and vote first, then evaluate the top picks here</p></div>';
+    showcase.innerHTML = '<div style="text-align:center;color:var(--muted);width:100%;"><div style="font-size:4rem;margin-bottom:16px;">📋</div><h2 style="font-size:1.4rem;margin-bottom:8px;color:var(--text);">Challenge Deep Dive</h2><p>Add ideas and vote first, then evaluate the top picks here</p></div>';
     strip.innerHTML = '';
     if (label) label.textContent = '0 ideas';
     return;

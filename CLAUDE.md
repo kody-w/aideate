@@ -23,7 +23,7 @@ Open `tests.html` in a browser and click "Run All Tests." There are 63 tests cov
 
 ### Single-page interactive presentation
 
-- **`index.html`** — The entire app in one file. A 12-slide presentation deck with a slide-out drawer for all operator controls.
+- **`index.html`** — The entire app in one file. A 14-slide Microsoft-branded presentation deck with a slide-out drawer for all operator controls.
 - The slide deck is the main view (full-screen, shareable via screen share).
 - A **gear icon (FAB)** in the bottom-right corner opens a **380px drawer** from the right edge containing all workshop controls.
 - Drawer sections are **context-aware** — they show/hide based on the current slide via `data-context` attributes.
@@ -40,7 +40,7 @@ A single centralized `state` object holds all workshop data. Key fields: `sessio
 
 ### PWA / Offline
 
-- `sw.js` — Service worker with stale-while-revalidate for HTML, cache-first for assets. Cache version: `aideate-v5`.
+- `sw.js` — Service worker with stale-while-revalidate for HTML, cache-first for assets. Cache version: `aideate-v6`.
 - `manifest.json` — PWA manifest (Microsoft Fluent theme color `#0078d4`, `standalone` display).
 
 ### AI Integration (optional)

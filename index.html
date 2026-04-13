@@ -523,34 +523,43 @@
   .add-idea-fab:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(0,120,212,.5); }
 
   .add-idea-overlay {
-    position: absolute; inset: 0; background: rgba(15,23,42,.85); backdrop-filter: blur(8px);
-    display: none; align-items: flex-start; justify-content: center; padding: 60px 24px 24px;
-    z-index: 10; animation: fadeIn .3s ease; overflow-y: auto;
+    position: absolute; inset: 0; z-index: 10;
+    background: rgba(10,15,30,.92); backdrop-filter: blur(12px);
+    display: none; align-items: stretch; justify-content: stretch;
+    padding: 16px; animation: fadeIn .3s ease; overflow: hidden;
   }
   .add-idea-overlay.open { display: flex; }
   .add-idea-card {
-    background: var(--card); border: 2px solid var(--border); border-radius: 16px;
-    padding: 32px; max-width: 720px; width: 100%; animation: cardIn .4s ease;
+    background: linear-gradient(135deg, var(--card), rgba(22,33,62,.98));
+    border: 2px solid var(--border); border-radius: 20px;
+    padding: 32px 44px; width: 100%; display: flex; flex-direction: column;
+    animation: cardIn .4s ease; position: relative;
+    transition: box-shadow .4s; overflow-y: auto;
   }
-  .add-idea-card h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; }
-  .add-idea-card .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .add-idea-card:hover { box-shadow: 0 0 60px rgba(0,120,212,.08); }
+  .add-idea-card h2 { font-size: clamp(1.6rem, 2.8vw, 2.4rem); font-weight: 800; margin-bottom: 20px; }
+  .add-idea-card .form-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; flex: 1;
+  }
   .add-idea-card .form-field { display: flex; flex-direction: column; gap: 4px; }
   .add-idea-card .form-field.full { grid-column: 1 / -1; }
+  .add-idea-card .form-section { grid-column: 1 / -1; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ms-blue); margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.06); }
+  .add-idea-card .form-section:first-child { margin-top: 0; border-top: none; padding-top: 0; }
   .add-idea-card .form-field label { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
   .add-idea-card .form-field input,
   .add-idea-card .form-field select,
   .add-idea-card .form-field textarea {
     background: var(--dark); border: 1px solid var(--border); border-radius: 8px;
-    color: var(--text); padding: 10px 12px; font-size: .9rem; font-family: inherit;
+    color: var(--text); padding: 10px 14px; font-size: .88rem; font-family: inherit;
     transition: border-color .2s;
   }
   .add-idea-card .form-field input:focus,
   .add-idea-card .form-field select:focus,
-  .add-idea-card .form-field textarea:focus { border-color: var(--ms-blue); outline: none; }
-  .add-idea-card .form-field textarea { resize: vertical; min-height: 60px; }
-  .add-idea-card .form-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .add-idea-card .form-field textarea:focus { border-color: var(--ms-blue); outline: none; box-shadow: 0 0 0 3px rgba(0,120,212,.15); }
+  .add-idea-card .form-field textarea { resize: vertical; min-height: 52px; }
+  .add-idea-card .form-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; flex-shrink: 0; }
   .add-idea-card .form-actions button {
-    padding: 10px 24px; border: none; border-radius: 8px; font-weight: 700;
+    padding: 12px 28px; border: none; border-radius: 10px; font-weight: 700;
     font-size: .9rem; cursor: pointer; transition: all .2s;
   }
   .add-idea-card .btn-submit { background: linear-gradient(135deg, var(--ms-blue), var(--ms-purple)); color: #fff; }
@@ -917,16 +926,41 @@
   <!-- Add-idea popup overlay -->
   <div class="add-idea-overlay" id="addIdeaOverlay">
     <div class="add-idea-card">
+      <div class="ex-close" onclick="hideAddIdeaPopup()">✕</div>
       <h2>💡 Add Business Challenge</h2>
       <div class="form-grid">
+        <div class="form-section">Challenge Details</div>
         <div class="form-field"><label>Challenge Name</label><input type="text" id="popupIdeaName" placeholder="e.g. Manual sales call prep takes 45 min per account" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitIdeaFromPopup();}"></div>
         <div class="form-field"><label>Department</label><select id="popupIdeaDept"></select></div>
-        <div class="form-field full"><label>Description</label><textarea id="popupIdeaDesc" placeholder="Describe the business problem. What's broken, slow, or painful today?" rows="3"></textarea></div>
         <div class="form-field"><label>Submitted By</label><input type="text" id="popupIdeaSubmitter" placeholder="Name"></div>
+        <div class="form-field full"><label>Description</label><textarea id="popupIdeaDesc" placeholder="Describe the business problem. What's broken, slow, or painful today?" rows="2"></textarea></div>
+        <div class="form-section">Current State</div>
+        <div class="form-field"><label>👥 People Involved</label><input type="number" min="0" id="popupPeople" placeholder="# of people doing this task" oninput="calcTimeSavingsPopup()"></div>
+        <div class="form-field"><label>🔄 Frequency (tasks/week)</label><input type="number" min="0" id="popupFrequency" placeholder="Tasks per week" oninput="calcTimeSavingsPopup()"></div>
+        <div class="form-field"><label>⏱️ Time Per Task (min)</label><input type="number" min="0" id="popupTime" placeholder="Minutes per task" oninput="calcTimeSavingsPopup()"></div>
+        <div class="form-field"><label>🔧 Systems & Tools</label><input id="popupSystems" placeholder="Apps, databases, platforms"></div>
+        <div class="form-field"><label>📝 Current Process</label><textarea id="popupProcess" placeholder="Workflow step by step" rows="2"></textarea></div>
+        <div class="form-field"><label>⚠️ Pain Points</label><textarea id="popupPain" placeholder="Bottlenecks, errors, delays" rows="2"></textarea></div>
+        <div class="form-section">AI Solution & Impact</div>
+        <div class="form-field"><label>🤖 Ideal AI Solution</label><textarea id="popupSolution" placeholder="How could AI address this challenge?" rows="2"></textarea></div>
+        <div class="form-field"><label>🗄️ Data Sources</label><input id="popupData" placeholder="Data/APIs/systems needed"></div>
+        <div class="form-field"><label>⚡ Time Savings (auto)</label><input id="popupSavings" readonly style="background:rgba(0,120,212,.12);color:#60a5fa;font-weight:600;cursor:default;" placeholder="Auto-calculated"></div>
+        <div class="form-field"><label>📈 Business Impact</label><input id="popupImpact" placeholder="Revenue, cost reduction, quality"></div>
+        <div class="form-field"><label>✅ Expected Benefits</label><textarea id="popupBenefits" placeholder="Concrete, measurable benefits" rows="2"></textarea></div>
+        <div class="form-field"><label>🎯 Strategic Alignment</label><textarea id="popupAlignment" placeholder="How does this align with business priorities?" rows="2"></textarea></div>
+        <div class="form-section">Scoring & Feasibility</div>
+        <div class="form-field"><label>⚙️ Complexity</label><select id="popupComplexity"><option value="">Select...</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
+        <div class="form-field"><label>🗓️ Timeline</label><select id="popupTimeline"><option value="">Select...</option><option value="quick-win">Quick Win (1-2 months)</option><option value="standard">Standard (3-6 months)</option><option value="strategic">Strategic (6+ months)</option></select></div>
+        <div class="form-field"><label>🟢 Data Readiness</label><select id="popupDataReady"><option value="">Select...</option><option value="green">Green — Data ready</option><option value="amber">Amber — Some gaps</option><option value="red">Red — Significant work needed</option></select></div>
+        <div class="form-section">Ownership & Risk</div>
+        <div class="form-field"><label>👤 Stakeholders</label><input id="popupStakeholders" placeholder="Sponsors, beneficiaries"></div>
+        <div class="form-field"><label>🏢 Executive Sponsor</label><input id="popupSponsor" placeholder="Sponsor name and title"></div>
+        <div class="form-field"><label>📏 Success Criteria</label><textarea id="popupKpis" placeholder="Measurable KPIs and success metrics" rows="2"></textarea></div>
+        <div class="form-field"><label>🚧 Risks & Blockers</label><textarea id="popupRisks" placeholder="Data quality, compliance, blockers" rows="2"></textarea></div>
       </div>
       <div class="form-actions">
         <button class="btn-cancel" onclick="hideAddIdeaPopup()">Cancel</button>
-        <button class="btn-submit" onclick="submitIdeaFromPopup()">Add Idea</button>
+        <button class="btn-submit" onclick="submitIdeaFromPopup()">Add Challenge</button>
       </div>
     </div>
   </div>
@@ -1680,9 +1714,24 @@ function showAddIdeaPopup() {
 
 function hideAddIdeaPopup() {
   document.getElementById('addIdeaOverlay').classList.remove('open');
-  document.getElementById('popupIdeaName').value = '';
-  document.getElementById('popupIdeaDesc').value = '';
-  document.getElementById('popupIdeaSubmitter').value = '';
+  ['popupIdeaName','popupIdeaDesc','popupIdeaSubmitter','popupPeople','popupFrequency',
+   'popupTime','popupSystems','popupProcess','popupPain','popupSolution','popupData',
+   'popupSavings','popupImpact','popupBenefits','popupAlignment','popupStakeholders',
+   'popupSponsor','popupKpis','popupRisks'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  ['popupComplexity','popupTimeline','popupDataReady'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.selectedIndex = 0;
+  });
+}
+
+function calcTimeSavingsPopup() {
+  var people = parseFloat(document.getElementById('popupPeople')?.value) || 0;
+  var freq = parseFloat(document.getElementById('popupFrequency')?.value) || 0;
+  var mins = parseFloat(document.getElementById('popupTime')?.value) || 0;
+  var hrs = people * freq * (mins / 60);
+  var el = document.getElementById('popupSavings');
+  if (el) el.value = hrs > 0 ? hrs.toFixed(1) + ' hrs/week' : '';
 }
 
 function submitIdeaFromPopup() {
@@ -1691,7 +1740,32 @@ function submitIdeaFromPopup() {
   const desc = document.getElementById('popupIdeaDesc').value.trim();
   const submitter = document.getElementById('popupIdeaSubmitter').value.trim();
   if (!name) { document.getElementById('popupIdeaName').focus(); return; }
-  state.ideas.push({ id: Date.now(), name, dept, desc, submitter: submitter || 'Facilitator', votes: 0, voters: [] });
+  const pg = (id) => document.getElementById(id)?.value || '';
+  const evaluation = {
+    peopleInvolved: pg('popupPeople'),
+    processFrequency: pg('popupFrequency'),
+    timePerOccurrence: pg('popupTime'),
+    systemsTools: pg('popupSystems'),
+    currentProcess: pg('popupProcess'),
+    painPoints: pg('popupPain'),
+    idealSolution: pg('popupSolution'),
+    dataSources: pg('popupData'),
+    estimatedTimeSavings: pg('popupSavings'),
+    businessImpact: pg('popupImpact'),
+    expectedBenefits: pg('popupBenefits'),
+    strategicAlignment: pg('popupAlignment'),
+    complexity: pg('popupComplexity'),
+    implementationTimeline: pg('popupTimeline'),
+    dataReadiness: pg('popupDataReady'),
+    stakeholders: pg('popupStakeholders'),
+    sponsorName: pg('popupSponsor'),
+    successCriteria: pg('popupKpis'),
+    risks: pg('popupRisks'),
+    evaluatedAt: new Date().toISOString()
+  };
+  // Only attach evaluation if any field was filled
+  const hasEval = Object.values(evaluation).some(v => v && v !== '' && v !== evaluation.evaluatedAt);
+  state.ideas.push({ id: Date.now(), name, dept, desc, submitter: submitter || 'Facilitator', votes: 0, voters: [], ...(hasEval ? { evaluation } : {}) });
   hideAddIdeaPopup();
   renderPanelIdeaList();
   renderIdeas();

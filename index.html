@@ -559,6 +559,19 @@
   .add-idea-card .btn-cancel:hover { background: rgba(255,255,255,.15); }
 
   /* Footer */
+  .deliverables-bar {
+    display: flex; gap: 12px; justify-content: center; padding: 16px 40px;
+    flex-shrink: 0; width: 100%; flex-wrap: wrap;
+  }
+  .deliverable-btn {
+    background: linear-gradient(135deg, var(--ms-blue), var(--ms-purple));
+    color: #fff; border: none; padding: 12px 28px; border-radius: 10px;
+    font-size: .9rem; font-weight: 700; cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .deliverable-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,120,212,.4); }
+  .deliverable-btn.secondary { background: var(--card); border: 1px solid var(--border); color: var(--text); font-weight: 600; }
+  .deliverable-btn.secondary:hover { box-shadow: 0 4px 12px rgba(0,0,0,.3); }
   .phase-footer {
     background: var(--card); border-top: 1px solid var(--border);
     padding: 12px 40px; display: flex; align-items: center; gap: 16px;
@@ -996,6 +1009,11 @@
       <tbody id="resultsBody"></tbody>
     </table>
   </div>
+  <div class="deliverables-bar" id="deliverablesBar">
+    <button class="deliverable-btn" onclick="downloadReportDocx()">📄 Download Word (.docx)</button>
+    <button class="deliverable-btn" onclick="generateReport()">📊 View Report / Save PDF</button>
+    <button class="deliverable-btn secondary" onclick="exportWorkshop()">💾 Export JSON</button>
+  </div>
   <div class="phase-footer">
     <div class="status-dot"></div><span>Final Results</span><span id="totalIdeas">0 ideas evaluated</span>
   </div>
@@ -1163,7 +1181,10 @@
     <div class="import-export">
       <button class="btn-blue" onclick="importWorkshop()">📥 Import</button>
       <button class="btn-green" onclick="exportWorkshop()">📤 Export</button>
-      <button class="btn-orange" onclick="generateReport()">📊 Report</button>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+      <button class="btn-orange" onclick="downloadReportDocx()">📄 Word</button>
+      <button class="btn-orange" onclick="generateReport()">📊 PDF Report</button>
     </div>
     <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
       <button class="btn-sm" style="background:var(--border);color:var(--muted);" onclick="clearAutosave()">🗑️ Clear Cache</button>
@@ -1733,23 +1754,29 @@ function toggleEvalForm(ideaId) {
 function saveIdeaEvaluation(ideaId) {
   const idea = state.ideas.find(i => i.id === ideaId);
   if (!idea) return;
+  const evg = (fld) => document.getElementById('ev-' + fld + '-' + ideaId)?.value || '';
   idea.evaluation = {
-    peopleInvolved: document.getElementById('ev-people-' + ideaId)?.value || '',
-    processFrequency: document.getElementById('ev-frequency-' + ideaId)?.value || '',
-    timePerOccurrence: document.getElementById('ev-timePerOcc-' + ideaId)?.value || '',
-    currentProcess: document.getElementById('ev-process-' + ideaId)?.value || '',
-    systemsTools: document.getElementById('ev-systems-' + ideaId)?.value || '',
-    painPoints: document.getElementById('ev-pain-' + ideaId)?.value || '',
-    idealSolution: document.getElementById('ev-solution-' + ideaId)?.value || '',
-    dataSources: document.getElementById('ev-data-' + ideaId)?.value || '',
-    estimatedTimeSavings: document.getElementById('ev-timeSaved-' + ideaId)?.value || '',
-    businessImpact: document.getElementById('ev-impact-' + ideaId)?.value || '',
-    successCriteria: document.getElementById('ev-kpis-' + ideaId)?.value || '',
-    stakeholders: document.getElementById('ev-stakeholders-' + ideaId)?.value || '',
-    impactScore: parseInt(document.getElementById('ev-impactScore-' + ideaId)?.value) || 5,
-    readinessScore: parseInt(document.getElementById('ev-readinessScore-' + ideaId)?.value) || 5,
-    complexity: document.getElementById('ev-complexity-' + ideaId)?.value || '',
-    risks: document.getElementById('ev-risks-' + ideaId)?.value || '',
+    peopleInvolved: evg('people'),
+    processFrequency: evg('frequency'),
+    timePerOccurrence: evg('timePerOcc'),
+    currentProcess: evg('process'),
+    systemsTools: evg('systems'),
+    painPoints: evg('pain'),
+    idealSolution: evg('solution'),
+    dataSources: evg('data'),
+    estimatedTimeSavings: evg('timeSaved'),
+    businessImpact: evg('impact'),
+    expectedBenefits: evg('benefits'),
+    strategicAlignment: evg('alignment'),
+    successCriteria: evg('kpis'),
+    stakeholders: evg('stakeholders'),
+    sponsorName: evg('sponsor'),
+    impactScore: parseInt(evg('impactScore')) || 5,
+    readinessScore: parseInt(evg('readinessScore')) || 5,
+    complexity: evg('complexity'),
+    implementationTimeline: evg('timeline'),
+    dataReadiness: evg('dataReady'),
+    risks: evg('risks'),
     aiGenerated: idea.evaluation?.aiGenerated || false,
     evaluatedAt: new Date().toISOString()
   };
@@ -1796,12 +1823,17 @@ function renderEvalForm(idea) {
     '<div class="eval-section-label">Business Case</div>' +
     '<div class="eval-field"><label>Time Savings (auto)</label><input id="ev-timeSaved-' + id + '" readonly style="background:rgba(0,120,212,.12);color:#60a5fa;font-weight:600;cursor:default;" value="' + escAttr(ev.estimatedTimeSavings || '') + '" placeholder="Auto-calculated"></div>' +
     '<div class="eval-field"><label>Business Impact</label><textarea id="ev-impact-' + id + '" placeholder="Revenue, cost reduction, quality">' + escHtml(ev.businessImpact || '') + '</textarea></div>' +
+    '<div class="eval-field"><label>Expected Benefits</label><textarea id="ev-benefits-' + id + '" placeholder="Concrete, measurable benefits">' + escHtml(ev.expectedBenefits || '') + '</textarea></div>' +
+    '<div class="eval-field"><label>Strategic Alignment</label><textarea id="ev-alignment-' + id + '" placeholder="How does this align with business priorities?">' + escHtml(ev.strategicAlignment || '') + '</textarea></div>' +
     '<div class="eval-field"><label>Success Criteria</label><textarea id="ev-kpis-' + id + '" placeholder="Measurable KPIs">' + escHtml(ev.successCriteria || '') + '</textarea></div>' +
     '<div class="eval-field"><label>Stakeholders</label><textarea id="ev-stakeholders-' + id + '" placeholder="Who benefits? Who sponsors?">' + escHtml(ev.stakeholders || '') + '</textarea></div>' +
+    '<div class="eval-field"><label>Executive Sponsor</label><input id="ev-sponsor-' + id + '" placeholder="Sponsor name and title" value="' + escAttr(ev.sponsorName || '') + '"></div>' +
     '<div class="eval-section-label">Scoring & Risk</div>' +
     '<div class="eval-field"><label>Impact Score</label><div class="score-row"><input type="range" id="ev-impactScore-' + id + '" min="1" max="10" value="' + (ev.impactScore || 5) + '" oninput="this.nextElementSibling.textContent=this.value"><span class="score-val">' + (ev.impactScore || 5) + '</span><span style="font-size:.6rem;color:var(--muted);">1-10</span></div></div>' +
     '<div class="eval-field"><label>Readiness Score</label><div class="score-row"><input type="range" id="ev-readinessScore-' + id + '" min="1" max="10" value="' + (ev.readinessScore || 5) + '" oninput="this.nextElementSibling.textContent=this.value"><span class="score-val">' + (ev.readinessScore || 5) + '</span><span style="font-size:.6rem;color:var(--muted);">1-10</span></div></div>' +
     '<div class="eval-field"><label>Complexity</label><select id="ev-complexity-' + id + '"><option value=""' + (!ev.complexity ? ' selected' : '') + '>Select...</option><option value="low"' + (ev.complexity === 'low' ? ' selected' : '') + '>Low</option><option value="medium"' + (ev.complexity === 'medium' ? ' selected' : '') + '>Medium</option><option value="high"' + (ev.complexity === 'high' ? ' selected' : '') + '>High</option></select></div>' +
+    '<div class="eval-field"><label>Timeline</label><select id="ev-timeline-' + id + '"><option value=""' + (!ev.implementationTimeline ? ' selected' : '') + '>Select...</option><option value="quick-win"' + (ev.implementationTimeline === 'quick-win' ? ' selected' : '') + '>Quick Win (1-2 mo)</option><option value="standard"' + (ev.implementationTimeline === 'standard' ? ' selected' : '') + '>Standard (3-6 mo)</option><option value="strategic"' + (ev.implementationTimeline === 'strategic' ? ' selected' : '') + '>Strategic (6+ mo)</option></select></div>' +
+    '<div class="eval-field"><label>Data Readiness</label><select id="ev-dataReady-' + id + '"><option value=""' + (!ev.dataReadiness ? ' selected' : '') + '>Select...</option><option value="green"' + (ev.dataReadiness === 'green' ? ' selected' : '') + '>Green</option><option value="amber"' + (ev.dataReadiness === 'amber' ? ' selected' : '') + '>Amber</option><option value="red"' + (ev.dataReadiness === 'red' ? ' selected' : '') + '>Red</option></select></div>' +
     '<div class="eval-field"><label>Risks & Blockers</label><textarea id="ev-risks-' + id + '" placeholder="Data quality, compliance, blockers">' + escHtml(ev.risks || '') + '</textarea></div>' +
     '</div>' +
     '<div class="eval-actions">' +
@@ -1843,7 +1875,7 @@ async function aiEvaluateIdea(ideaId) {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: 'You are a Microsoft AI specialist evaluating a business challenge for AI potential during a customer workshop. Given the challenge details and company context, provide a thorough evaluation. Be specific, practical, and quantify where possible. Return ONLY valid JSON:\n{"peopleInvolved":"","processFrequency":"","timePerOccurrence":"","currentProcess":"","systemsTools":"","painPoints":"","idealSolution":"","dataSources":"","estimatedTimeSavings":"","businessImpact":"","successCriteria":"","stakeholders":"","impactScore":5,"readinessScore":5,"complexity":"medium","risks":""}\nIMPORTANT: peopleInvolved must be a number (e.g. "5"), processFrequency must be tasks per week as a number (e.g. "20"), timePerOccurrence must be minutes per task as a number (e.g. "30"). estimatedTimeSavings will be auto-calculated so return "" for it.\nNo markdown, no explanation, just the JSON object.' },
+          { role: 'system', content: 'You are a Microsoft AI specialist evaluating a business challenge for AI potential during a customer workshop. Given the challenge details and company context, provide a thorough evaluation. Be specific, practical, and quantify where possible. Return ONLY valid JSON:\n{"peopleInvolved":"","processFrequency":"","timePerOccurrence":"","currentProcess":"","systemsTools":"","painPoints":"","idealSolution":"","dataSources":"","estimatedTimeSavings":"","businessImpact":"","expectedBenefits":"","strategicAlignment":"","successCriteria":"","stakeholders":"","sponsorName":"","impactScore":5,"readinessScore":5,"complexity":"medium","implementationTimeline":"","dataReadiness":"","risks":""}\nIMPORTANT: peopleInvolved must be a number (e.g. "5"), processFrequency must be tasks per week as a number (e.g. "20"), timePerOccurrence must be minutes per task as a number (e.g. "30"). estimatedTimeSavings will be auto-calculated so return "" for it. complexity must be "low","medium", or "high". implementationTimeline must be "quick-win","standard", or "strategic". dataReadiness must be "green","amber", or "red".\nNo markdown, no explanation, just the JSON object.' },
           { role: 'user', content: 'Evaluate this business challenge for AI potential:\n\nName: ' + idea.name + '\nDepartment: ' + idea.dept + '\nDescription: ' + idea.desc + (context ? '\n\nContext:\n' + context : '') }
         ],
         temperature: 0.4,
@@ -1860,7 +1892,7 @@ async function aiEvaluateIdea(ideaId) {
     const parsed = JSON.parse(jsonStr);
 
     // Populate form fields
-    const fields = { people:'peopleInvolved', frequency:'processFrequency', timePerOcc:'timePerOccurrence', process:'currentProcess', systems:'systemsTools', pain:'painPoints', solution:'idealSolution', data:'dataSources', timeSaved:'estimatedTimeSavings', impact:'businessImpact', kpis:'successCriteria', stakeholders:'stakeholders', complexity:'complexity', risks:'risks' };
+    const fields = { people:'peopleInvolved', frequency:'processFrequency', timePerOcc:'timePerOccurrence', process:'currentProcess', systems:'systemsTools', pain:'painPoints', solution:'idealSolution', data:'dataSources', timeSaved:'estimatedTimeSavings', impact:'businessImpact', benefits:'expectedBenefits', alignment:'strategicAlignment', kpis:'successCriteria', stakeholders:'stakeholders', sponsor:'sponsorName', complexity:'complexity', timeline:'implementationTimeline', dataReady:'dataReadiness', risks:'risks' };
     for (const [short, full] of Object.entries(fields)) {
       const el = document.getElementById('ev-' + short + '-' + ideaId);
       if (el && parsed[full]) el.value = parsed[full];
@@ -1977,7 +2009,9 @@ function generateReport() {
   const useCaseCards = sorted.map((idea, i) => {
     const ev = idea.evaluation || {};
     const medal = i === 0 ? '&#x1F947;' : i === 1 ? '&#x1F948;' : i === 2 ? '&#x1F949;' : '#' + (i+1);
-    const fields = [{label:'People Involved',val:ev.peopleInvolved},{label:'Process Frequency',val:ev.processFrequency},{label:'Time Per Occurrence',val:ev.timePerOccurrence},{label:'Systems & Tools',val:ev.systemsTools},{label:'Current Process',val:ev.currentProcess},{label:'Pain Points',val:ev.painPoints},{label:'Ideal AI Solution',val:ev.idealSolution},{label:'Data Sources',val:ev.dataSources},{label:'Time Savings',val:ev.estimatedTimeSavings},{label:'Business Impact',val:ev.businessImpact},{label:'Success Criteria',val:ev.successCriteria},{label:'Stakeholders',val:ev.stakeholders},{label:'Risks & Blockers',val:ev.risks}];
+    const tlLabels = {'quick-win':'Quick Win (1-2 months)','standard':'Standard (3-6 months)','strategic':'Strategic (6+ months)'};
+    const drLabels = {'green':'Green — Ready','amber':'Amber — Some gaps','red':'Red — Significant work needed'};
+    const fields = [{label:'People Involved',val:ev.peopleInvolved},{label:'Process Frequency',val:ev.processFrequency},{label:'Time Per Occurrence',val:ev.timePerOccurrence},{label:'Systems & Tools',val:ev.systemsTools},{label:'Current Process',val:ev.currentProcess},{label:'Pain Points',val:ev.painPoints},{label:'Ideal AI Solution',val:ev.idealSolution},{label:'Data Sources',val:ev.dataSources},{label:'Time Savings',val:ev.estimatedTimeSavings},{label:'Business Impact',val:ev.businessImpact},{label:'Expected Benefits',val:ev.expectedBenefits},{label:'Strategic Alignment',val:ev.strategicAlignment},{label:'Success Criteria',val:ev.successCriteria},{label:'Stakeholders',val:ev.stakeholders},{label:'Executive Sponsor',val:ev.sponsorName},{label:'Implementation Timeline',val:tlLabels[ev.implementationTimeline]||ev.implementationTimeline},{label:'Data Readiness',val:drLabels[ev.dataReadiness]||ev.dataReadiness},{label:'Risks & Blockers',val:ev.risks}];
     const fieldsHtml = idea.evaluation ? fields.map(f => f.val ? '<div style="margin-bottom:12px;"><div style="font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">'+f.label+'</div><div style="font-size:.85rem;line-height:1.5;">'+esc(f.val)+'</div></div>' : '').join('') : '<p style="color:#94a3b8;font-style:italic;">Not yet evaluated</p>';
     return '<div style="background:#16213e;border:2px solid #2a3a5c;border-radius:12px;padding:24px;margin-bottom:20px;page-break-inside:avoid;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;"><span style="font-size:1.4rem;">'+medal+'</span><div style="flex:1;"><div style="font-size:1.2rem;font-weight:800;">'+esc(idea.name)+'</div><div style="font-size:.8rem;color:#94a3b8;">'+esc(idea.dept)+' &middot; '+idea.votes+' votes</div></div>'+(idea.evaluation?'<div style="display:flex;gap:12px;"><div style="text-align:center;"><div style="font-size:.6rem;color:#94a3b8;text-transform:uppercase;">Impact</div><div style="font-size:1.4rem;font-weight:800;color:'+scoreColor(ev.impactScore||0)+';">'+(ev.impactScore||'-')+'</div></div><div style="text-align:center;"><div style="font-size:.6rem;color:#94a3b8;text-transform:uppercase;">Readiness</div><div style="font-size:1.4rem;font-weight:800;color:'+scoreColor(ev.readinessScore||0)+';">'+(ev.readinessScore||'-')+'</div></div><div style="text-align:center;"><div style="font-size:.6rem;color:#94a3b8;text-transform:uppercase;">Complexity</div><div style="margin-top:4px;">'+complexityLabel(ev.complexity)+'</div></div></div>':'')+'</div>'+(idea.desc?'<p style="color:#e2e8f0;margin-bottom:16px;font-size:.9rem;line-height:1.5;">'+esc(idea.desc)+'</p>':'')+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;">'+fieldsHtml+'</div></div>';
   }).join('');
@@ -2013,6 +2047,148 @@ function generateReport() {
   w.document.write(html);
   w.document.close();
   log('Report generated with ' + sorted.length + ' challenges');
+}
+
+function downloadReportDocx() {
+  const sorted = [...state.ideas].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+  const evaluated = sorted.filter(i => i.evaluation);
+  const totalVotes = sorted.reduce((s, i) => s + (i.votes || 0), 0);
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  const esc = s => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const te = new TextEncoder();
+
+  // Helper: OOXML paragraph
+  function p(text, style, bold, color) {
+    let pPr = style ? '<w:pPr><w:pStyle w:val="'+style+'"/></w:pPr>' : '';
+    let rPr = '';
+    if (bold || color) {
+      rPr = '<w:rPr>';
+      if (bold) rPr += '<w:b/>';
+      if (color) rPr += '<w:color w:val="'+color+'"/>';
+      rPr += '</w:rPr>';
+    }
+    return '<w:p>'+pPr+'<w:r>'+rPr+'<w:t xml:space="preserve">'+esc(text)+'</w:t></w:r></w:p>';
+  }
+
+  // Helper: table cell
+  function tc(text, bold, shade) {
+    let rPr = bold ? '<w:rPr><w:b/><w:sz w:val="20"/></w:rPr>' : '<w:rPr><w:sz w:val="20"/></w:rPr>';
+    let tcPr = shade ? '<w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="'+shade+'"/></w:tcPr>' : '';
+    return '<w:tc>'+tcPr+'<w:p><w:r>'+rPr+'<w:t xml:space="preserve">'+esc(text)+'</w:t></w:r></w:p></w:tc>';
+  }
+
+  // Build document body
+  let body = '';
+
+  // Title
+  body += p(state.workshopName || 'AI Workshop', 'Title');
+  body += p('AI Opportunity Assessment Report', 'Subtitle');
+  if (state.companyName) body += p(state.companyName, 'Subtitle');
+  body += p(date);
+  body += p('');
+
+  // Summary stats
+  body += p('Executive Summary', 'Heading1');
+  const quickWins = evaluated.map(i => ({...i, score:(i.evaluation.impactScore||0)+(i.evaluation.readinessScore||0)})).sort((a,b)=>b.score-a.score).slice(0,3);
+  let summary = (state.companyName || 'The organization') + '\'s AI workshop identified ' + sorted.length + ' business challenges with AI potential across ' + [...new Set(sorted.map(i=>i.dept))].length + ' departments. Through collaborative voting (' + totalVotes + ' votes from ' + state.participants.length + ' participants), the team prioritized their highest-impact opportunities. ' + evaluated.length + ' received full evaluation.';
+  if (quickWins.length) summary += ' Top recommendation: ' + quickWins[0].name + ' (Impact: ' + quickWins[0].evaluation.impactScore + '/10, Readiness: ' + quickWins[0].evaluation.readinessScore + '/10).';
+  body += p(summary);
+  body += p('');
+
+  // Participants
+  if (state.participants.length) {
+    body += p('Workshop Participants', 'Heading1');
+    body += p(state.participants.map(pp => pp.name + (pp.title ? ' — ' + pp.title : '')).join(', '));
+    body += p('');
+  }
+
+  // Ranked Challenges Table
+  body += p('Ranked Challenges', 'Heading1');
+  let tbl = '<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:w="5000" w:type="pct"/><w:tblBorders><w:top w:val="single" w:sz="4" w:color="999999"/><w:left w:val="single" w:sz="4" w:color="999999"/><w:bottom w:val="single" w:sz="4" w:color="999999"/><w:right w:val="single" w:sz="4" w:color="999999"/><w:insideH w:val="single" w:sz="4" w:color="999999"/><w:insideV w:val="single" w:sz="4" w:color="999999"/></w:tblBorders></w:tblPr>';
+  tbl += '<w:tr>' + tc('#', true, 'D9E2F3') + tc('Challenge', true, 'D9E2F3') + tc('Dept', true, 'D9E2F3') + tc('Votes', true, 'D9E2F3') + tc('Impact', true, 'D9E2F3') + tc('Ready', true, 'D9E2F3') + tc('Complexity', true, 'D9E2F3') + tc('Timeline', true, 'D9E2F3') + tc('Data', true, 'D9E2F3') + tc('Sponsor', true, 'D9E2F3') + '</w:tr>';
+  sorted.forEach((idea, i) => {
+    const ev = idea.evaluation || {};
+    const tl = {'quick-win':'Quick Win','standard':'Standard','strategic':'Strategic'};
+    const dr = {'green':'Green','amber':'Amber','red':'Red'};
+    tbl += '<w:tr>' + tc(String(i+1)) + tc(idea.name) + tc(idea.dept) + tc(String(idea.votes || 0)) + tc(ev.impactScore ? ev.impactScore+'/10' : '-') + tc(ev.readinessScore ? ev.readinessScore+'/10' : '-') + tc(ev.complexity ? ev.complexity.charAt(0).toUpperCase()+ev.complexity.slice(1) : 'N/A') + tc(tl[ev.implementationTimeline] || '-') + tc(dr[ev.dataReadiness] || '-') + tc(ev.sponsorName || '-') + '</w:tr>';
+  });
+  tbl += '</w:tbl>';
+  body += tbl;
+  body += p('');
+
+  // Quick Wins
+  if (quickWins.length) {
+    body += p('Recommended Quick Wins', 'Heading1');
+    body += p('Highest combined Impact + Readiness scores — start here.');
+    quickWins.forEach((idea, i) => {
+      const ev = idea.evaluation;
+      body += p((i+1) + '. ' + idea.name, null, true);
+      body += p('Impact: ' + ev.impactScore + '/10  |  Readiness: ' + ev.readinessScore + '/10  |  Complexity: ' + (ev.complexity || 'N/A'));
+      if (ev.estimatedTimeSavings) body += p('Estimated Savings: ' + ev.estimatedTimeSavings);
+      body += p('');
+    });
+  }
+
+  // Detailed Evaluations
+  body += p('Detailed Evaluations', 'Heading1');
+  sorted.forEach((idea, i) => {
+    const ev = idea.evaluation || {};
+    body += p((i+1) + '. ' + idea.name + ' (' + idea.dept + ')', 'Heading2');
+    if (idea.desc) body += p(idea.desc);
+    body += p('Votes: ' + (idea.votes || 0) + (idea.voters && idea.voters.length ? ' — ' + idea.voters.join(', ') : ''));
+    if (!idea.evaluation) { body += p('Not yet evaluated.', null, false, '999999'); body += p(''); return; }
+    const fields = [
+      ['People Involved', ev.peopleInvolved], ['Process Frequency', ev.processFrequency],
+      ['Time Per Task', ev.timePerOccurrence], ['Systems & Tools', ev.systemsTools],
+      ['Current Process', ev.currentProcess], ['Pain Points', ev.painPoints],
+      ['Ideal AI Solution', ev.idealSolution], ['Data Sources', ev.dataSources],
+      ['Time Savings', ev.estimatedTimeSavings], ['Business Impact', ev.businessImpact],
+      ['Expected Benefits', ev.expectedBenefits], ['Strategic Alignment', ev.strategicAlignment],
+      ['Success Criteria', ev.successCriteria], ['Stakeholders', ev.stakeholders],
+      ['Executive Sponsor', ev.sponsorName], ['Risks & Blockers', ev.risks]
+    ];
+    fields.forEach(([label, val]) => {
+      if (val) body += '<w:p><w:r><w:rPr><w:b/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">'+esc(label)+': </w:t></w:r><w:r><w:rPr><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">'+esc(String(val))+'</w:t></w:r></w:p>';
+    });
+    const tlMap = {'quick-win':'Quick Win (1-2 months)','standard':'Standard (3-6 months)','strategic':'Strategic (6+ months)'};
+    const drMap = {'green':'Green — Ready','amber':'Amber — Some gaps','red':'Red — Significant work needed'};
+    if (ev.impactScore) body += p('Impact Score: ' + ev.impactScore + '/10  |  Readiness Score: ' + (ev.readinessScore||'-') + '/10  |  Complexity: ' + (ev.complexity ? ev.complexity.charAt(0).toUpperCase()+ev.complexity.slice(1) : 'N/A'));
+    if (ev.implementationTimeline) body += p('Implementation Timeline: ' + (tlMap[ev.implementationTimeline] || ev.implementationTimeline));
+    if (ev.dataReadiness) body += p('Data Readiness: ' + (drMap[ev.dataReadiness] || ev.dataReadiness));
+    body += p('');
+  });
+
+  // Footer
+  body += p('');
+  body += p('Generated by AIdeate — ' + date + ' — Microsoft AI Acceleration', null, false, '999999');
+
+  // Assemble OOXML files
+  const contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>';
+
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
+
+  const docRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:pPr><w:spacing w:after="120"/></w:pPr><w:rPr><w:sz w:val="56"/><w:b/><w:color w:val="0078D4"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Subtitle"><w:name w:val="Subtitle"/><w:pPr><w:spacing w:after="80"/></w:pPr><w:rPr><w:sz w:val="28"/><w:color w:val="666666"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:pPr><w:spacing w:before="360" w:after="120"/></w:pPr><w:rPr><w:sz w:val="36"/><w:b/><w:color w:val="0078D4"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:pPr><w:spacing w:before="240" w:after="80"/></w:pPr><w:rPr><w:sz w:val="28"/><w:b/><w:color w:val="333333"/></w:rPr></w:style><w:style w:type="table" w:styleId="TableGrid"><w:name w:val="Table Grid"/><w:tblPr><w:tblBorders><w:top w:val="single" w:sz="4" w:color="auto"/><w:left w:val="single" w:sz="4" w:color="auto"/><w:bottom w:val="single" w:sz="4" w:color="auto"/><w:right w:val="single" w:sz="4" w:color="auto"/><w:insideH w:val="single" w:sz="4" w:color="auto"/><w:insideV w:val="single" w:sz="4" w:color="auto"/></w:tblBorders></w:tblPr></w:style></w:styles>';
+
+  const document_xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>' + body + '</w:body></w:document>';
+
+  const zipData = buildZip([
+    { name: '[Content_Types].xml', data: te.encode(contentTypes) },
+    { name: '_rels/.rels', data: te.encode(rels) },
+    { name: 'word/_rels/document.xml.rels', data: te.encode(docRels) },
+    { name: 'word/document.xml', data: te.encode(document_xml) },
+    { name: 'word/styles.xml', data: te.encode(styles) }
+  ]);
+
+  const blob = new Blob([zipData], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (state.workshopName || 'AIdeate_Report').replace(/[^a-zA-Z0-9 _-]/g, '') + '.docx';
+  a.click();
+  URL.revokeObjectURL(url);
+  log('Downloaded Word report');
 }
 
 // ══════════════════════════════════════════════
@@ -2259,8 +2435,19 @@ function expandIdeaCard(ideaId) {
         '<div class="ef"><label>🗄️ Data Sources</label><input id="ex-data-'+idea.id+'" placeholder="Data/APIs/systems needed" value="'+escAttr(ev.dataSources||'')+'"></div>' +
         '<div class="ef"><label>⚡ Time Savings (auto)</label><input id="ex-savings-'+idea.id+'" readonly style="background:rgba(0,120,212,.12);color:#60a5fa;font-weight:600;cursor:default;" value="'+escAttr(ev.estimatedTimeSavings||'')+'" placeholder="Auto-calculated from above"></div>' +
         '<div class="ef"><label>📈 Business Impact</label><input id="ex-impact-'+idea.id+'" placeholder="Revenue, cost reduction, quality" value="'+escAttr(ev.businessImpact||'')+'"></div>' +
+        '<div class="ef"><label>✅ Expected Benefits</label><textarea id="ex-benefits-'+idea.id+'" placeholder="Concrete, measurable benefits (2-4 bullets)">'+escHtml(ev.expectedBenefits||'')+'</textarea></div>' +
+        '<div class="ef"><label>🎯 Strategic Alignment</label><textarea id="ex-alignment-'+idea.id+'" placeholder="How does this align with business priorities?">'+escHtml(ev.strategicAlignment||'')+'</textarea></div>' +
+        '<div class="ex-section">Scoring &amp; Feasibility</div>' +
+        '<div class="ef"><label>💥 Impact Score</label><div style="display:flex;align-items:center;gap:10px;"><input type="range" id="ex-impactScore-'+idea.id+'" min="1" max="10" value="'+(ev.impactScore||5)+'" oninput="this.nextElementSibling.textContent=this.value" style="flex:1;"><span style="font-weight:700;font-size:1.1rem;min-width:24px;text-align:center;">'+(ev.impactScore||5)+'</span><span style="font-size:.7rem;color:var(--muted);">/10</span></div></div>' +
+        '<div class="ef"><label>🔋 Readiness Score</label><div style="display:flex;align-items:center;gap:10px;"><input type="range" id="ex-readinessScore-'+idea.id+'" min="1" max="10" value="'+(ev.readinessScore||5)+'" oninput="this.nextElementSibling.textContent=this.value" style="flex:1;"><span style="font-weight:700;font-size:1.1rem;min-width:24px;text-align:center;">'+(ev.readinessScore||5)+'</span><span style="font-size:.7rem;color:var(--muted);">/10</span></div></div>' +
         '<div class="ef"><label>⚙️ Complexity</label><select id="ex-complexity-'+idea.id+'"><option value="">Select...</option><option value="low"'+(ev.complexity==='low'?' selected':'')+'>Low</option><option value="medium"'+(ev.complexity==='medium'?' selected':'')+'>Medium</option><option value="high"'+(ev.complexity==='high'?' selected':'')+'>High</option></select></div>' +
+        '<div class="ef"><label>🗓️ Implementation Timeline</label><select id="ex-timeline-'+idea.id+'"><option value="">Select...</option><option value="quick-win"'+(ev.implementationTimeline==='quick-win'?' selected':'')+'>Quick Win (1-2 months)</option><option value="standard"'+(ev.implementationTimeline==='standard'?' selected':'')+'>Standard (3-6 months)</option><option value="strategic"'+(ev.implementationTimeline==='strategic'?' selected':'')+'>Strategic (6+ months)</option></select></div>' +
+        '<div class="ef"><label>🟢 Data Readiness</label><select id="ex-dataReady-'+idea.id+'"><option value="">Select...</option><option value="green"'+(ev.dataReadiness==='green'?' selected':'')+'>Green — Data ready</option><option value="amber"'+(ev.dataReadiness==='amber'?' selected':'')+'>Amber — Some gaps</option><option value="red"'+(ev.dataReadiness==='red'?' selected':'')+'>Red — Significant work needed</option></select></div>' +
+        '<div class="ex-section">Ownership &amp; Risk</div>' +
         '<div class="ef"><label>👤 Stakeholders</label><input id="ex-stakeholders-'+idea.id+'" placeholder="Sponsors, beneficiaries" value="'+escAttr(ev.stakeholders||'')+'"></div>' +
+        '<div class="ef"><label>🏢 Executive Sponsor</label><input id="ex-sponsor-'+idea.id+'" placeholder="Sponsor name and title" value="'+escAttr(ev.sponsorName||'')+'"></div>' +
+        '<div class="ef"><label>📏 Success Criteria</label><textarea id="ex-kpis-'+idea.id+'" placeholder="Measurable KPIs and success metrics">'+escHtml(ev.successCriteria||'')+'</textarea></div>' +
+        '<div class="ef"><label>🚧 Risks &amp; Blockers</label><textarea id="ex-risks-'+idea.id+'" placeholder="Data quality, compliance, blockers and mitigations">'+escHtml(ev.risks||'')+'</textarea></div>' +
       '</div>' +
       '<div class="ex-actions">' +
         '<span class="ex-saved" id="exSavedMsg"></span>' +
@@ -2288,8 +2475,17 @@ function saveExpandedCard(ideaId) {
     dataSources: g('data'),
     estimatedTimeSavings: g('savings'),
     businessImpact: g('impact'),
+    expectedBenefits: g('benefits'),
+    strategicAlignment: g('alignment'),
+    impactScore: parseInt(g('impactScore')) || 5,
+    readinessScore: parseInt(g('readinessScore')) || 5,
     complexity: g('complexity'),
+    implementationTimeline: g('timeline'),
+    dataReadiness: g('dataReady'),
     stakeholders: g('stakeholders'),
+    sponsorName: g('sponsor'),
+    successCriteria: g('kpis'),
+    risks: g('risks'),
     evaluatedAt: new Date().toISOString()
   };
   autosave();
@@ -2313,8 +2509,14 @@ function getCardCompleteness(idea) {
   const ev = idea.evaluation || {};
   const fields = ['peopleInvolved','processFrequency','timePerOccurrence','systemsTools',
     'painPoints','currentProcess','idealSolution','dataSources','estimatedTimeSavings',
-    'businessImpact','complexity','stakeholders'];
-  const filled = fields.filter(f => ev[f] && ev[f].trim && ev[f].trim() !== '').length;
+    'businessImpact','expectedBenefits','strategicAlignment','complexity',
+    'implementationTimeline','dataReadiness','stakeholders','sponsorName',
+    'successCriteria','risks'];
+  const filled = fields.filter(f => {
+    const v = ev[f];
+    if (typeof v === 'number') return v > 0;
+    return v && v.trim && v.trim() !== '';
+  }).length;
   return { filled, total: fields.length, pct: Math.round(filled / fields.length * 100) };
 }
 
@@ -2501,8 +2703,16 @@ function renderEvaluation() {
       { label: 'Ideal AI Solution', val: ev.idealSolution, icon: '🤖' },
       { label: 'Time Savings', val: ev.estimatedTimeSavings, icon: '⚡' },
       { label: 'Business Impact', val: ev.businessImpact, icon: '📈' },
+      { label: 'Expected Benefits', val: ev.expectedBenefits, icon: '✅' },
+      { label: 'Strategic Alignment', val: ev.strategicAlignment, icon: '🎯' }
+    ]},
+    { title: 'Ownership & Feasibility', fields: [
       { label: 'Stakeholders', val: ev.stakeholders, icon: '👤' },
+      { label: 'Executive Sponsor', val: ev.sponsorName, icon: '🏢' },
       { label: 'Complexity', val: ev.complexity ? ev.complexity.charAt(0).toUpperCase() + ev.complexity.slice(1) : '', icon: '⚙️' },
+      { label: 'Timeline', val: {'quick-win':'Quick Win','standard':'Standard','strategic':'Strategic'}[ev.implementationTimeline] || '', icon: '🗓️' },
+      { label: 'Data Readiness', val: {'green':'Green','amber':'Amber','red':'Red'}[ev.dataReadiness] || '', icon: '🟢' },
+      { label: 'Success Criteria', val: ev.successCriteria, icon: '📏' },
       { label: 'Risks & Blockers', val: ev.risks, icon: '🚧' }
     ]}
   ];

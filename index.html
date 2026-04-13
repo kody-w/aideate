@@ -185,104 +185,114 @@
     perspective: 1200px;
   }
 
-  /* Flip-card wrapper */
+  /* Idea card — Jeopardy-style front face */
   .idea-card {
     flex: 1 1 300px; min-width: 240px; max-width: 100%;
-    position: relative; cursor: pointer;
-    animation: cardIn .4s ease;
-  }
-  .idea-card-inner {
-    position: relative; width: 100%; height: 100%;
-    transition: transform .5s ease;
-    transform-style: preserve-3d;
-  }
-  .idea-card.flipped .idea-card-inner { transform: rotateY(180deg); }
-
-  .idea-front, .idea-back {
-    backface-visibility: hidden; -webkit-backface-visibility: hidden;
-    border-radius: 12px; border: 2px solid var(--border);
-    display: flex; flex-direction: column; overflow: hidden;
-  }
-  /* Front is in-flow to size the card; back overlays it */
-  .idea-front { position: relative; min-height: 100%; }
-  .idea-back { position: absolute; inset: 0; }
-
-  /* FRONT — big Jeopardy-style name */
-  .idea-front {
     background: linear-gradient(135deg, var(--card), rgba(22,33,62,.95));
-    align-items: center; justify-content: center; text-align: center;
-    padding: 24px;
+    border: 2px solid var(--border); border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 24px; position: relative;
+    cursor: pointer; animation: cardIn .4s ease;
+    transition: transform .3s, box-shadow .3s, border-color .3s;
   }
-  .idea-front .dept {
+  .idea-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,120,212,.2); border-color: rgba(0,120,212,.4); }
+  .idea-card .dept {
     position: absolute; top: 14px; left: 14px;
     font-size: .65rem; padding: 3px 10px; border-radius: 10px; font-weight: 700;
     text-transform: uppercase; letter-spacing: .5px;
   }
-  .idea-front .name {
+  .idea-card .name {
     font-weight: 800; font-size: clamp(1.1rem, 2.2vw, 1.8rem);
     line-height: 1.2; padding: 0 8px;
     background: linear-gradient(135deg, #fff, rgba(255,255,255,.8));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .idea-front .flip-hint {
+  .idea-card .card-hint {
     position: absolute; bottom: 10px; right: 14px;
     font-size: .6rem; color: var(--muted); opacity: .4;
   }
-  .idea-front .front-status {
+  .idea-card .front-status {
     position: absolute; top: 14px; right: 14px;
     font-size: .55rem; padding: 2px 8px; border-radius: 8px; font-weight: 700;
   }
-  .idea-front .front-status.complete { background: rgba(16,124,16,.2); color: #4ade80; }
-  .idea-front .front-status.partial { background: rgba(251,191,36,.15); color: #fbbf24; }
-  .idea-front .front-status.empty { background: rgba(148,163,184,.1); color: var(--muted); }
+  .idea-card .front-status.complete { background: rgba(16,124,16,.2); color: #4ade80; }
+  .idea-card .front-status.partial { background: rgba(251,191,36,.15); color: #fbbf24; }
+  .idea-card .front-status.empty { background: rgba(148,163,184,.1); color: var(--muted); }
 
-  /* BACK — editable detail fields */
-  .idea-back {
-    background: var(--card);
-    transform: rotateY(180deg);
-    padding: 14px 16px;
-    overflow-y: auto;
+  /* Expanded card overlay — full-screen detail form */
+  .idea-expand-overlay {
+    position: absolute; inset: 0; z-index: 10;
+    background: rgba(15,23,42,.88); backdrop-filter: blur(10px);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 24px; overflow-y: auto; animation: fadeIn .3s ease;
   }
-  .idea-back .back-header {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  .idea-expand-card {
+    background: linear-gradient(135deg, var(--card), rgba(22,33,62,.98));
+    border: 2px solid var(--border); border-radius: 20px;
+    padding: 32px 40px; max-width: 960px; width: 100%;
+    animation: cardIn .4s ease; position: relative;
+    transition: transform .4s, box-shadow .4s;
   }
-  .idea-back .back-header .dept {
-    font-size: .6rem; padding: 2px 8px; border-radius: 8px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .5px;
+  .idea-expand-card:hover {
+    transform: perspective(1000px) rotateY(-1deg) rotateX(.5deg);
+    box-shadow: 0 16px 48px rgba(0,120,212,.15), 0 0 30px rgba(116,39,116,.08);
   }
-  .idea-back .back-header .name { font-weight: 700; font-size: .9rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .idea-back .back-fields {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
-    flex: 1;
+  .idea-expand-card .ex-close {
+    position: absolute; top: 16px; right: 20px; background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.15); border-radius: 50%; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    color: var(--muted); font-size: 1rem; transition: all .2s;
   }
-  .idea-back .bf { display: flex; flex-direction: column; }
-  .idea-back .bf.full { grid-column: 1 / -1; }
-  .idea-back .bf label {
-    font-size: .55rem; color: var(--muted); text-transform: uppercase;
-    letter-spacing: .5px; font-weight: 600; margin-bottom: 2px;
+  .idea-expand-card .ex-close:hover { background: rgba(255,255,255,.2); color: #fff; }
+  .idea-expand-card .ex-dept {
+    font-size: .7rem; padding: 4px 14px; border-radius: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px; display: inline-block; margin-bottom: 10px;
   }
-  .idea-back .bf input,
-  .idea-back .bf textarea,
-  .idea-back .bf select {
-    background: var(--dark); border: 1px solid var(--border); border-radius: 6px;
-    color: var(--text); padding: 5px 8px; font-size: .72rem; font-family: inherit;
-    transition: border-color .2s; width: 100%;
+  .idea-expand-card .ex-name {
+    font-size: clamp(1.5rem, 2.8vw, 2.2rem); font-weight: 800; line-height: 1.15;
+    background: linear-gradient(135deg, #fff, rgba(255,255,255,.8));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
   }
-  .idea-back .bf textarea { resize: none; min-height: 28px; }
-  .idea-back .bf input:focus,
-  .idea-back .bf textarea:focus,
-  .idea-back .bf select:focus { border-color: var(--ms-blue); outline: none; }
-  .idea-back .flip-hint {
-    position: absolute; bottom: 6px; right: 10px;
-    font-size: .55rem; color: var(--muted); opacity: .4;
+  .idea-expand-card .ex-desc {
+    font-size: .95rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; max-width: 700px;
   }
-  .idea-back .filled-indicator {
-    position: absolute; top: 10px; right: 10px;
-    font-size: .55rem; padding: 2px 6px; border-radius: 6px; font-weight: 700;
+  .idea-expand-card .ex-fields {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
   }
-  .idea-back .filled-indicator.complete { background: rgba(16,124,16,.2); color: #4ade80; }
-  .idea-back .filled-indicator.partial { background: rgba(251,191,36,.15); color: #fbbf24; }
-  .idea-back .filled-indicator.empty { background: rgba(148,163,184,.1); color: var(--muted); }
+  .idea-expand-card .ef { display: flex; flex-direction: column; }
+  .idea-expand-card .ef label {
+    font-size: .6rem; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .5px; font-weight: 600; margin-bottom: 3px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .idea-expand-card .ef input,
+  .idea-expand-card .ef textarea,
+  .idea-expand-card .ef select {
+    background: var(--dark); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); padding: 8px 12px; font-size: .82rem; font-family: inherit;
+    transition: border-color .2s;
+  }
+  .idea-expand-card .ef textarea { resize: vertical; min-height: 44px; }
+  .idea-expand-card .ef input:focus,
+  .idea-expand-card .ef textarea:focus,
+  .idea-expand-card .ef select:focus { border-color: var(--ms-blue); outline: none; box-shadow: 0 0 0 3px rgba(0,120,212,.15); }
+  .idea-expand-card .ex-section {
+    grid-column: 1 / -1; font-size: .6rem; font-weight: 700; color: var(--ms-blue);
+    text-transform: uppercase; letter-spacing: 1px; padding-top: 10px;
+    border-top: 1px solid var(--border); margin-top: 4px;
+  }
+  .idea-expand-card .ex-actions {
+    display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; align-items: center;
+  }
+  .idea-expand-card .ex-actions button {
+    padding: 10px 24px; border: none; border-radius: 8px; font-weight: 700;
+    font-size: .85rem; cursor: pointer; transition: all .2s;
+  }
+  .idea-expand-card .ex-save { background: linear-gradient(135deg, var(--ms-blue), var(--ms-purple)); color: #fff; }
+  .idea-expand-card .ex-save:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,120,212,.4); }
+  .idea-expand-card .ex-cancel { background: var(--border); color: var(--text); }
+  .idea-expand-card .ex-saved { font-size: .7rem; color: #4ade80; margin-right: auto; }
 
   @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(.95); } to { opacity: 1; transform: none; } }
 
@@ -402,44 +412,97 @@
   .results-table tr td:first-child { border-radius: 8px 0 0 8px; font-weight: 700; }
   .results-table tr td:last-child { border-radius: 0 8px 8px 0; }
 
-  /* Evaluate slide — Jeopardy grid + popup */
-  .eval-container { flex: 1; padding: 24px 40px; overflow-y: auto; position: relative; }
-  .eval-board {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px; width: 100%;
-  }
-  .eval-card {
-    background: var(--card); border: 2px solid var(--border); border-radius: 12px;
-    padding: 18px; cursor: default; transition: all .3s; position: relative;
-  }
-  .eval-card.evaluated { border-color: rgba(74,222,128,.3); }
-  .eval-card.focused { border-color: var(--ms-blue); box-shadow: 0 0 20px rgba(0,120,212,.3); }
-  .eval-card .dept { font-size: .65rem; padding: 3px 10px; border-radius: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; display: inline-block; margin-bottom: 8px; }
-  .eval-card .name { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
-  .eval-card .desc { font-size: .82rem; color: var(--muted); line-height: 1.5; }
-  .eval-card .card-votes { position: absolute; top: -10px; right: 16px; background: var(--ms-blue); color: #fff; font-weight: 800; font-size: .8rem; padding: 3px 10px; border-radius: 12px; }
-  .eval-card .card-status { margin-top: 10px; font-size: .65rem; font-weight: 700; }
-  .eval-card .card-scores { display: flex; gap: 8px; margin-top: 10px; }
-  .eval-card .card-scores .score-pill { font-size: .65rem; padding: 2px 8px; border-radius: 8px; font-weight: 700; }
+  /* Evaluate slide — winner showcase + runner-up strip */
+  .eval-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
-  /* Popup overlay */
-  .eval-popup-overlay {
-    position: absolute; inset: 0; background: rgba(15,23,42,.85); backdrop-filter: blur(8px);
-    display: flex; align-items: flex-start; justify-content: center; padding: 24px;
-    z-index: 10; animation: fadeIn .3s ease; overflow-y: auto;
+  /* Showcase: the focused/winner card fills the main area */
+  .eval-showcase {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 32px 48px; overflow-y: auto;
   }
-  .eval-detail-card {
-    background: var(--card); border: 2px solid var(--border); border-radius: 16px;
-    padding: 28px; max-width: 1100px; width: 100%; animation: cardIn .4s ease;
+  .showcase-card {
+    background: linear-gradient(135deg, var(--card), rgba(22,33,62,.95));
+    border: 2px solid var(--border); border-radius: 20px;
+    padding: 36px 44px; max-width: 1100px; width: 100%;
+    animation: cardIn .5s ease;
+    transition: transform .4s ease, box-shadow .4s ease;
+    position: relative;
   }
-  .eval-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-  .eval-header .eval-name { font-size: 1.5rem; font-weight: 800; flex: 1; }
-  .eval-header .eval-votes { font-size: 1rem; color: var(--muted); }
-  .eval-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .eval-answer { background: var(--dark); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
-  .eval-answer label { font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; display: block; margin-bottom: 4px; }
-  .eval-answer .value { font-size: .85rem; line-height: 1.5; }
-  .eval-answer .value:empty::after { content: 'Pending...'; color: var(--muted); font-style: italic; }
+  .showcase-card:hover {
+    transform: perspective(1000px) rotateY(-2deg) rotateX(1deg) scale(1.01);
+    box-shadow: 0 20px 60px rgba(0,120,212,.2), 0 0 40px rgba(116,39,116,.1);
+  }
+  .showcase-card .sc-rank {
+    position: absolute; top: -20px; left: 36px;
+    font-size: 2.2rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,.3));
+  }
+  .showcase-card .sc-votes {
+    position: absolute; top: 16px; right: 24px;
+    background: var(--ms-blue); color: #fff; font-weight: 800; font-size: 1.1rem;
+    padding: 6px 16px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,120,212,.4);
+  }
+  .showcase-card .sc-dept {
+    font-size: .7rem; padding: 4px 14px; border-radius: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px; display: inline-block; margin-bottom: 12px;
+  }
+  .showcase-card .sc-name {
+    font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; line-height: 1.15;
+    background: linear-gradient(135deg, #fff, rgba(255,255,255,.8));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .showcase-card .sc-desc {
+    font-size: 1rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; max-width: 800px;
+  }
+  .showcase-card .sc-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+  }
+  .showcase-card .sc-field {
+    background: var(--dark); border: 1px solid var(--border); border-radius: 10px; padding: 12px;
+    transition: border-color .3s, transform .3s;
+  }
+  .showcase-card .sc-field:hover { border-color: rgba(0,120,212,.3); transform: translateY(-2px); }
+  .showcase-card .sc-field label {
+    font-size: .58rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+    display: flex; align-items: center; gap: 5px; margin-bottom: 4px;
+  }
+  .showcase-card .sc-field .val { font-size: .85rem; line-height: 1.5; min-height: 1.2em; }
+  .showcase-card .sc-field .val:empty::after { content: 'Pending...'; color: var(--muted); font-style: italic; }
+  .showcase-card .sc-section-label {
+    grid-column: 1 / -1; font-size: .6rem; font-weight: 700; color: var(--ms-blue);
+    text-transform: uppercase; letter-spacing: 1px; padding-top: 8px;
+    border-top: 1px solid var(--border); margin-top: 4px;
+  }
+  .showcase-card .sc-meta {
+    display: flex; gap: 20px; align-items: center; margin-top: 16px; padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .showcase-card .sc-stat { text-align: center; }
+  .showcase-card .sc-stat .sc-stat-val { font-size: 1.5rem; font-weight: 800; }
+  .showcase-card .sc-stat .sc-stat-label { font-size: .55rem; color: var(--muted); text-transform: uppercase; }
+
+  /* Runner-up strip at bottom */
+  .eval-strip {
+    background: rgba(0,0,0,.3); border-top: 1px solid var(--border);
+    padding: 12px 40px; display: flex; gap: 10px; flex-shrink: 0;
+    overflow-x: auto; backdrop-filter: blur(8px); align-items: stretch;
+  }
+  .eval-strip-card {
+    background: var(--card); border: 2px solid var(--border); border-radius: 10px;
+    padding: 10px 16px; cursor: pointer; transition: all .3s;
+    flex-shrink: 0; min-width: 160px; max-width: 240px;
+    display: flex; flex-direction: column; position: relative;
+  }
+  .eval-strip-card:hover { border-color: var(--ms-blue); transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,120,212,.3); }
+  .eval-strip-card.active { border-color: var(--ms-blue); background: rgba(0,120,212,.1); }
+  .eval-strip-card .strip-rank { font-size: .6rem; font-weight: 800; color: var(--muted); margin-bottom: 2px; }
+  .eval-strip-card .strip-name { font-size: .8rem; font-weight: 700; line-height: 1.2; flex: 1; }
+  .eval-strip-card .strip-votes { font-size: .6rem; color: var(--muted); margin-top: 4px; }
+  .eval-strip-card .strip-badge {
+    position: absolute; top: 6px; right: 8px; font-size: .5rem; padding: 1px 6px;
+    border-radius: 4px; font-weight: 700;
+  }
+
   .complexity-badge { display: inline-block; padding: 3px 12px; border-radius: 10px; font-size: .75rem; font-weight: 700; text-transform: uppercase; }
   .complexity-badge.low { background: rgba(74,222,128,.15); color: #4ade80; }
   .complexity-badge.medium { background: rgba(251,191,36,.15); color: #fbbf24; }
@@ -902,7 +965,10 @@
     </div>
     <div class="participants-badge" id="participantCount4"><div class="roster-avatars" id="roster4"></div><span>👥 0 participants</span></div>
   </div>
-  <div class="eval-container" id="evalContainer"></div>
+  <div class="eval-container" id="evalContainer">
+    <div class="eval-showcase" id="evalShowcase"></div>
+    <div class="eval-strip" id="evalStrip"></div>
+  </div>
   <div class="phase-footer">
     <div class="status-dot"></div><span>Deep Dive</span><span id="evalFocusLabel">Waiting for selection...</span>
   </div>
@@ -1296,6 +1362,8 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); navigateBy(-1); }
   if (e.key === 'g' || e.key === 'G') { e.preventDefault(); toggleDrawer(); }
   if (e.key === 'Escape') {
+    const expandOverlay = document.querySelector('.idea-expand-overlay');
+    if (expandOverlay) { closeExpandedCard(); return; }
     const addOverlay = document.getElementById('addIdeaOverlay');
     if (addOverlay && addOverlay.classList.contains('open')) { hideAddIdeaPopup(); return; }
     closeDrawer();
@@ -2146,22 +2214,53 @@ function renderParticipants() {
   });
 }
 
-function flipCard(el, evt) {
-  // Don't flip when clicking inside form fields
-  const target = evt ? evt.target : null;
-  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.closest('.back-fields'))) return;
-  el.classList.toggle('flipped');
-  // Save fields when flipping back to front
-  if (!el.classList.contains('flipped')) {
-    const id = parseInt(el.getAttribute('data-id'));
-    saveCardFields(id);
-  }
-}
-
-function saveCardFields(ideaId) {
+function expandIdeaCard(ideaId) {
   const idea = state.ideas.find(i => i.id === ideaId);
   if (!idea) return;
-  const g = (field) => document.getElementById('cf-' + field + '-' + ideaId)?.value || '';
+  const ev = idea.evaluation || {};
+  const grid = document.getElementById('ideateGrid');
+  // Remove any existing overlay
+  const old = grid.querySelector('.idea-expand-overlay');
+  if (old) old.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'idea-expand-overlay';
+  overlay.onclick = function(e) { if (e.target === overlay) closeExpandedCard(); };
+  overlay.innerHTML =
+    '<div class="idea-expand-card">' +
+      '<div class="ex-close" onclick="closeExpandedCard()">✕</div>' +
+      '<div class="ex-dept '+getDeptClass(idea.dept)+'">'+escHtml(idea.dept)+'</div>' +
+      '<div class="ex-name">'+escHtml(idea.name)+'</div>' +
+      (idea.desc ? '<div class="ex-desc">'+escHtml(idea.desc)+'</div>' : '') +
+      '<div class="ex-fields">' +
+        '<div class="ex-section">Current State</div>' +
+        '<div class="ef"><label>👥 People Involved</label><input id="ex-people-'+idea.id+'" placeholder="How many people? What roles?" value="'+escAttr(ev.peopleInvolved||'')+'"></div>' +
+        '<div class="ef"><label>🔄 Frequency</label><input id="ex-frequency-'+idea.id+'" placeholder="How often? Volume?" value="'+escAttr(ev.processFrequency||'')+'"></div>' +
+        '<div class="ef"><label>⏱️ Time Per Task</label><input id="ex-time-'+idea.id+'" placeholder="Hours per occurrence" value="'+escAttr(ev.timePerOccurrence||'')+'"></div>' +
+        '<div class="ef"><label>🔧 Systems &amp; Tools</label><input id="ex-systems-'+idea.id+'" placeholder="Apps, databases, platforms" value="'+escAttr(ev.systemsTools||'')+'"></div>' +
+        '<div class="ef"><label>📝 Current Process</label><textarea id="ex-process-'+idea.id+'" placeholder="Workflow step by step">'+escHtml(ev.currentProcess||'')+'</textarea></div>' +
+        '<div class="ef"><label>⚠️ Pain Points</label><textarea id="ex-pain-'+idea.id+'" placeholder="Bottlenecks, errors, delays">'+escHtml(ev.painPoints||'')+'</textarea></div>' +
+        '<div class="ex-section">AI Solution &amp; Impact</div>' +
+        '<div class="ef"><label>🤖 Ideal AI Solution</label><textarea id="ex-solution-'+idea.id+'" placeholder="What should the AI agent do?">'+escHtml(ev.idealSolution||'')+'</textarea></div>' +
+        '<div class="ef"><label>🗄️ Data Sources</label><input id="ex-data-'+idea.id+'" placeholder="Data/APIs/systems needed" value="'+escAttr(ev.dataSources||'')+'"></div>' +
+        '<div class="ef"><label>⚡ Time Savings</label><input id="ex-savings-'+idea.id+'" placeholder="Hours saved per week/month" value="'+escAttr(ev.estimatedTimeSavings||'')+'"></div>' +
+        '<div class="ef"><label>📈 Business Impact</label><input id="ex-impact-'+idea.id+'" placeholder="Revenue, cost reduction, quality" value="'+escAttr(ev.businessImpact||'')+'"></div>' +
+        '<div class="ef"><label>⚙️ Complexity</label><select id="ex-complexity-'+idea.id+'"><option value="">Select...</option><option value="low"'+(ev.complexity==='low'?' selected':'')+'>Low</option><option value="medium"'+(ev.complexity==='medium'?' selected':'')+'>Medium</option><option value="high"'+(ev.complexity==='high'?' selected':'')+'>High</option></select></div>' +
+        '<div class="ef"><label>👤 Stakeholders</label><input id="ex-stakeholders-'+idea.id+'" placeholder="Sponsors, beneficiaries" value="'+escAttr(ev.stakeholders||'')+'"></div>' +
+      '</div>' +
+      '<div class="ex-actions">' +
+        '<span class="ex-saved" id="exSavedMsg"></span>' +
+        '<button class="ex-cancel" onclick="closeExpandedCard()">Close</button>' +
+        '<button class="ex-save" onclick="saveExpandedCard('+idea.id+')">Save Details</button>' +
+      '</div>' +
+    '</div>';
+  grid.appendChild(overlay);
+}
+
+function saveExpandedCard(ideaId) {
+  const idea = state.ideas.find(i => i.id === ideaId);
+  if (!idea) return;
+  const g = (field) => document.getElementById('ex-' + field + '-' + ideaId)?.value || '';
   idea.evaluation = {
     ...(idea.evaluation || {}),
     peopleInvolved: g('people'),
@@ -2179,6 +2278,20 @@ function saveCardFields(ideaId) {
     evaluatedAt: new Date().toISOString()
   };
   autosave();
+  renderIdeas(); // updates status badges
+  const msg = document.getElementById('exSavedMsg');
+  if (msg) { msg.textContent = '✓ Saved'; setTimeout(() => { if (msg) msg.textContent = ''; }, 2000); }
+  log('Saved details: ' + idea.name);
+}
+
+function closeExpandedCard() {
+  const overlay = document.querySelector('.idea-expand-overlay');
+  if (overlay) {
+    // Auto-save if there's an open card
+    const saveBtn = overlay.querySelector('.ex-save');
+    if (saveBtn) saveBtn.click();
+    overlay.remove();
+  }
 }
 
 function getCardCompleteness(idea) {
@@ -2201,36 +2314,14 @@ function renderIdeas() {
     if (empty) empty.style.display = 'none';
     grid.style.alignContent = n <= 20 ? 'stretch' : 'flex-start';
     grid.innerHTML = state.ideas.map(i => {
-      const ev = i.evaluation || {};
       const comp = getCardCompleteness(i);
       const statusClass = comp.pct === 100 ? 'complete' : comp.pct > 0 ? 'partial' : 'empty';
       const statusLabel = comp.pct === 100 ? '&#10003; Ready' : comp.filled + '/' + comp.total;
-      return '<div class="idea-card" data-id="'+i.id+'" onclick="flipCard(this,event)">' +
-        '<div class="idea-card-inner">' +
-          '<div class="idea-front"><div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div>' +
-            '<span class="front-status '+statusClass+'">'+statusLabel+'</span>' +
-            '<div class="name">'+escHtml(i.name)+'</div>' +
-            '<div class="flip-hint">click to flip</div>' +
-          '</div>' +
-          '<div class="idea-back">' +
-            '<div class="back-header"><span class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</span><span class="name">'+escHtml(i.name)+'</span></div>' +
-            '<div class="back-fields">' +
-              '<div class="bf"><label>People Involved</label><input id="cf-people-'+i.id+'" placeholder="How many? Roles?" value="'+escAttr(ev.peopleInvolved||'')+'"></div>' +
-              '<div class="bf"><label>Frequency</label><input id="cf-frequency-'+i.id+'" placeholder="How often? Volume?" value="'+escAttr(ev.processFrequency||'')+'"></div>' +
-              '<div class="bf"><label>Time Per Task</label><input id="cf-time-'+i.id+'" placeholder="Hours per occurrence" value="'+escAttr(ev.timePerOccurrence||'')+'"></div>' +
-              '<div class="bf"><label>Systems &amp; Tools</label><input id="cf-systems-'+i.id+'" placeholder="Apps, databases" value="'+escAttr(ev.systemsTools||'')+'"></div>' +
-              '<div class="bf"><label>Current Process</label><input id="cf-process-'+i.id+'" placeholder="Workflow today" value="'+escAttr(ev.currentProcess||'')+'"></div>' +
-              '<div class="bf"><label>Pain Points</label><input id="cf-pain-'+i.id+'" placeholder="Bottlenecks, errors" value="'+escAttr(ev.painPoints||'')+'"></div>' +
-              '<div class="bf"><label>Ideal AI Solution</label><input id="cf-solution-'+i.id+'" placeholder="What should AI do?" value="'+escAttr(ev.idealSolution||'')+'"></div>' +
-              '<div class="bf"><label>Data Sources</label><input id="cf-data-'+i.id+'" placeholder="Data/APIs needed" value="'+escAttr(ev.dataSources||'')+'"></div>' +
-              '<div class="bf"><label>Time Savings</label><input id="cf-savings-'+i.id+'" placeholder="Hours saved/week" value="'+escAttr(ev.estimatedTimeSavings||'')+'"></div>' +
-              '<div class="bf"><label>Business Impact</label><input id="cf-impact-'+i.id+'" placeholder="Revenue, cost, quality" value="'+escAttr(ev.businessImpact||'')+'"></div>' +
-              '<div class="bf"><label>Complexity</label><select id="cf-complexity-'+i.id+'"><option value="">Select...</option><option value="low"'+(ev.complexity==='low'?' selected':'')+'>Low</option><option value="medium"'+(ev.complexity==='medium'?' selected':'')+'>Medium</option><option value="high"'+(ev.complexity==='high'?' selected':'')+'>High</option></select></div>' +
-              '<div class="bf"><label>Stakeholders</label><input id="cf-stakeholders-'+i.id+'" placeholder="Sponsors, beneficiaries" value="'+escAttr(ev.stakeholders||'')+'"></div>' +
-            '</div>' +
-            '<div class="flip-hint">click border to flip back</div>' +
-          '</div>' +
-        '</div>' +
+      return '<div class="idea-card" onclick="expandIdeaCard('+i.id+')">' +
+        '<div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div>' +
+        '<span class="front-status '+statusClass+'">'+statusLabel+'</span>' +
+        '<div class="name">'+escHtml(i.name)+'</div>' +
+        '<div class="card-hint">click to open</div>' +
       '</div>';
     }).join('');
   }
@@ -2356,51 +2447,94 @@ function renderPriority() {
 }
 
 function renderEvaluation() {
-  const container = document.getElementById('evalContainer');
+  const showcase = document.getElementById('evalShowcase');
+  const strip = document.getElementById('evalStrip');
   const label = document.getElementById('evalFocusLabel');
   const sorted = [...state.ideas].sort((a, b) => (b.votes || 0) - (a.votes || 0));
-  const focusedIdea = state.evalFocusId ? state.ideas.find(i => i.id === state.evalFocusId) : null;
-  function scoreColor(s) { return s >= 8 ? '#4ade80' : s >= 5 ? '#fbbf24' : '#f87171'; }
+  const medals = ['🥇', '🥈', '🥉'];
 
   if (sorted.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:80px 40px;color:var(--muted);width:100%;"><div style="font-size:4rem;margin-bottom:16px;">📋</div><h2 style="font-size:1.4rem;margin-bottom:8px;color:var(--text);">Use Case Deep Dive</h2><p>Add ideas and vote first, then evaluate the top picks here</p></div>';
+    showcase.innerHTML = '<div style="text-align:center;color:var(--muted);width:100%;"><div style="font-size:4rem;margin-bottom:16px;">📋</div><h2 style="font-size:1.4rem;margin-bottom:8px;color:var(--text);">Use Case Deep Dive</h2><p>Add ideas and vote first, then evaluate the top picks here</p></div>';
+    strip.innerHTML = '';
     if (label) label.textContent = '0 ideas';
     return;
   }
 
-  const evalCount = sorted.filter(i => i.evaluation).length;
-  if (label) label.textContent = focusedIdea ? 'Evaluating: ' + focusedIdea.name : evalCount + ' of ' + sorted.length + ' evaluated — open controls (G) to select';
+  // Determine which idea to showcase: focused, or default to #1
+  const focusId = state.evalFocusId || sorted[0].id;
+  const focusedIdea = state.ideas.find(i => i.id === focusId) || sorted[0];
+  const focusRank = sorted.findIndex(i => i.id === focusedIdea.id);
+  const ev = focusedIdea.evaluation || {};
+  const hasEval = Object.keys(ev).some(k => ev[k] && typeof ev[k] === 'string' && ev[k].trim());
 
-  const boardHtml = sorted.map(i => {
-    const ev = i.evaluation || {};
-    const hasEval = !!i.evaluation;
-    let scoresHtml = '';
-    if (hasEval) {
-      scoresHtml = '<div class="card-scores"><span class="score-pill" style="background:rgba(0,120,212,.15);color:'+scoreColor(ev.impactScore||0)+';">Impact: '+(ev.impactScore||'-')+'</span><span class="score-pill" style="background:rgba(0,120,212,.15);color:'+scoreColor(ev.readinessScore||0)+';">Ready: '+(ev.readinessScore||'-')+'</span>'+(ev.complexity?'<span class="score-pill complexity-badge '+ev.complexity+'">'+ev.complexity+'</span>':'')+'</div>';
-    }
-    return '<div class="eval-card'+(hasEval?' evaluated':'')+(state.evalFocusId===i.id?' focused':'')+'"><div class="card-votes">'+(i.votes||0)+'</div><div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div><div class="name">'+escHtml(i.name)+'</div><div class="desc">'+escHtml(i.desc||'')+'</div>'+scoresHtml+'<div class="card-status"><span class="eval-status-badge '+(hasEval?'done':'pending')+'">'+(hasEval?'✓ Evaluated':'Pending')+'</span></div></div>';
-  }).join('');
+  if (label) label.textContent = 'Evaluating: ' + focusedIdea.name + ' (#' + (focusRank + 1) + ')';
 
-  let popupHtml = '';
-  if (focusedIdea) {
-    const ev = focusedIdea.evaluation || {};
-    const hasEval = !!focusedIdea.evaluation;
-    const complexityHtml = ev.complexity ? '<span class="complexity-badge '+ev.complexity+'">'+ev.complexity+'</span>' : '<span style="color:var(--muted);font-style:italic;">Not assessed</span>';
-    const sections = [
-      {title:'Current State',fields:[{label:'People Involved',value:ev.peopleInvolved,icon:'👥'},{label:'Process Frequency',value:ev.processFrequency,icon:'🔄'},{label:'Time Per Occurrence',value:ev.timePerOccurrence,icon:'⏱️'},{label:'Systems & Tools',value:ev.systemsTools,icon:'🔧'}]},
-      {title:'Problem & Opportunity',fields:[{label:'Current Process',value:ev.currentProcess,icon:'📝'},{label:'Pain Points',value:ev.painPoints,icon:'⚠️'}]},
-      {title:'AI Solution',fields:[{label:'Ideal AI Solution',value:ev.idealSolution,icon:'🤖'},{label:'Data Sources',value:ev.dataSources,icon:'🗄️'}]},
-      {title:'Business Case',fields:[{label:'Time Savings',value:ev.estimatedTimeSavings,icon:'⚡'},{label:'Business Impact',value:ev.businessImpact,icon:'📈'},{label:'Success Criteria',value:ev.successCriteria,icon:'🎯'},{label:'Stakeholders',value:ev.stakeholders,icon:'👤'},{label:'Risks & Blockers',value:ev.risks,icon:'🚧'}]}
-    ];
-    const sectionsHtml = hasEval ? sections.map(s =>
-      '<div style="font-size:.65rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px;">'+s.title+'</div><div class="eval-grid">'+s.fields.map(f =>
-        '<div class="eval-answer"><label>'+f.icon+' '+f.label+'</label><div class="value">'+(f.value?escHtml(f.value):'')+'</div></div>'
-      ).join('')+'</div>'
-    ).join('') : '<div style="text-align:center;padding:32px;color:var(--muted);"><div style="font-size:2.5rem;margin-bottom:12px;">📋</div><p style="font-size:1rem;">Evaluation in progress — open controls (G) to fill in details</p></div>';
-    popupHtml = '<div class="eval-popup-overlay"><div class="eval-detail-card"><div class="eval-header"><div class="dept '+getDeptClass(focusedIdea.dept)+'" style="font-size:.7rem;padding:4px 12px;border-radius:10px;display:inline-block;">'+escHtml(focusedIdea.dept)+'</div><div class="eval-name">'+escHtml(focusedIdea.name)+'</div><div class="eval-votes">🗳️ '+(focusedIdea.votes||0)+' vote'+((focusedIdea.votes||0)!==1?'s':'')+'</div>'+(hasEval?'<div style="display:flex;gap:14px;align-items:center;"><div style="text-align:center;"><div style="font-size:.5rem;color:var(--muted);text-transform:uppercase;">Impact</div><div style="font-size:1.4rem;font-weight:800;color:'+scoreColor(ev.impactScore||0)+';">'+(ev.impactScore||'-')+'</div></div><div style="text-align:center;"><div style="font-size:.5rem;color:var(--muted);text-transform:uppercase;">Readiness</div><div style="font-size:1.4rem;font-weight:800;color:'+scoreColor(ev.readinessScore||0)+';">'+(ev.readinessScore||'-')+'</div></div><div>'+complexityHtml+'</div></div>':'')+'</div>'+(focusedIdea.desc?'<p style="color:var(--muted);font-size:.9rem;margin-bottom:8px;line-height:1.5;">'+escHtml(focusedIdea.desc)+'</p>':'')+sectionsHtml+(ev.aiGenerated?'<div style="margin-top:12px;font-size:.65rem;color:var(--muted);text-align:right;">✨ AI-assisted evaluation</div>':'')+'</div></div>';
+  // Build showcase card
+  const sections = [
+    { title: 'Current State', fields: [
+      { label: 'People Involved', val: ev.peopleInvolved, icon: '👥' },
+      { label: 'Process Frequency', val: ev.processFrequency, icon: '🔄' },
+      { label: 'Time Per Task', val: ev.timePerOccurrence, icon: '⏱️' },
+      { label: 'Systems & Tools', val: ev.systemsTools, icon: '🔧' }
+    ]},
+    { title: 'Problem & Opportunity', fields: [
+      { label: 'Current Process', val: ev.currentProcess, icon: '📝' },
+      { label: 'Pain Points', val: ev.painPoints, icon: '⚠️' },
+      { label: 'Data Sources', val: ev.dataSources, icon: '🗄️' }
+    ]},
+    { title: 'AI Solution & Impact', fields: [
+      { label: 'Ideal AI Solution', val: ev.idealSolution, icon: '🤖' },
+      { label: 'Time Savings', val: ev.estimatedTimeSavings, icon: '⚡' },
+      { label: 'Business Impact', val: ev.businessImpact, icon: '📈' },
+      { label: 'Stakeholders', val: ev.stakeholders, icon: '👤' },
+      { label: 'Complexity', val: ev.complexity ? ev.complexity.charAt(0).toUpperCase() + ev.complexity.slice(1) : '', icon: '⚙️' },
+      { label: 'Risks & Blockers', val: ev.risks, icon: '🚧' }
+    ]}
+  ];
+
+  const fieldsHtml = sections.map(s =>
+    '<div class="sc-section-label">' + s.title + '</div>' +
+    s.fields.map(f =>
+      '<div class="sc-field"><label>' + f.icon + ' ' + f.label + '</label><div class="val">' + (f.val ? escHtml(f.val) : '') + '</div></div>'
+    ).join('')
+  ).join('');
+
+  // Score/complexity bar if evaluated
+  let metaHtml = '';
+  if (hasEval) {
+    function sc(s) { return s >= 8 ? '#4ade80' : s >= 5 ? '#fbbf24' : '#f87171'; }
+    metaHtml = '<div class="sc-meta">' +
+      (ev.impactScore ? '<div class="sc-stat"><div class="sc-stat-val" style="color:'+sc(ev.impactScore)+'">'+ev.impactScore+'</div><div class="sc-stat-label">Impact</div></div>' : '') +
+      (ev.readinessScore ? '<div class="sc-stat"><div class="sc-stat-val" style="color:'+sc(ev.readinessScore)+'">'+ev.readinessScore+'</div><div class="sc-stat-label">Readiness</div></div>' : '') +
+      (ev.complexity ? '<div class="sc-stat"><span class="complexity-badge '+ev.complexity+'">'+ev.complexity+'</span><div class="sc-stat-label">Complexity</div></div>' : '') +
+      (ev.successCriteria ? '<div style="flex:1;"><div style="font-size:.55rem;color:var(--muted);text-transform:uppercase;margin-bottom:2px;">🎯 Success Criteria</div><div style="font-size:.8rem;line-height:1.4;">'+escHtml(ev.successCriteria)+'</div></div>' : '') +
+    '</div>';
   }
 
-  container.innerHTML = '<div class="eval-board">'+boardHtml+'</div>'+popupHtml;
+  showcase.innerHTML =
+    '<div class="showcase-card">' +
+      '<div class="sc-rank">' + (medals[focusRank] || '#' + (focusRank + 1)) + '</div>' +
+      '<div class="sc-votes">🗳️ ' + (focusedIdea.votes || 0) + ' vote' + ((focusedIdea.votes || 0) !== 1 ? 's' : '') + '</div>' +
+      '<div class="sc-dept ' + getDeptClass(focusedIdea.dept) + '">' + escHtml(focusedIdea.dept) + '</div>' +
+      '<div class="sc-name">' + escHtml(focusedIdea.name) + '</div>' +
+      (focusedIdea.desc ? '<div class="sc-desc">' + escHtml(focusedIdea.desc) + '</div>' : '') +
+      (hasEval
+        ? '<div class="sc-grid">' + fieldsHtml + '</div>' + metaHtml
+        : '<div style="text-align:center;padding:24px;color:var(--muted);"><p style="font-size:1rem;">Details pending — flip this card in the Ideate phase or use the drawer (G) to fill in evaluation</p></div>') +
+      (ev.aiGenerated ? '<div style="margin-top:8px;font-size:.6rem;color:var(--muted);text-align:right;">✨ AI-assisted</div>' : '') +
+    '</div>';
+
+  // Runner-up strip
+  strip.innerHTML = sorted.map((idea, idx) => {
+    const isActive = idea.id === focusedIdea.id;
+    const hasE = !!idea.evaluation;
+    return '<div class="eval-strip-card' + (isActive ? ' active' : '') + '" onclick="focusEvalIdea(' + idea.id + ')">' +
+      '<div class="strip-rank">' + (medals[idx] || '#' + (idx + 1)) + '</div>' +
+      '<div class="strip-name">' + escHtml(idea.name) + '</div>' +
+      '<div class="strip-votes">' + (idea.votes || 0) + ' votes</div>' +
+      '<span class="strip-badge eval-status-badge ' + (hasE ? 'done' : 'pending') + '">' + (hasE ? '✓' : '...') + '</span>' +
+    '</div>';
+  }).join('');
 }
 
 // ══════════════════════════════════════════════

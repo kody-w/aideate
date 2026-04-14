@@ -3460,7 +3460,6 @@ function renderIdeas() {
       var ev = i.evaluation || {};
       if (ev.currentProcess) details.push({ label: 'Process', text: ev.currentProcess });
       if (ev.painPoints) details.push({ label: 'Pain Points', text: ev.painPoints });
-      if (ev.idealSolution) details.push({ label: 'AI Solution', text: ev.idealSolution });
       if (ev.estimatedTimeSavings) details.push({ label: 'Time Savings', text: ev.estimatedTimeSavings });
       if (ev.businessImpact) details.push({ label: 'Impact', text: ev.businessImpact });
       var detailsHtml = details.length > 0
@@ -3522,7 +3521,6 @@ function renderVotes() {
     var ev = i.evaluation || {};
     if (ev.currentProcess) details.push({ label: 'Process', text: ev.currentProcess });
     if (ev.painPoints) details.push({ label: 'Pain Points', text: ev.painPoints });
-    if (ev.idealSolution) details.push({ label: 'AI Solution', text: ev.idealSolution });
     if (ev.estimatedTimeSavings) details.push({ label: 'Time Savings', text: ev.estimatedTimeSavings });
     if (ev.businessImpact) details.push({ label: 'Impact', text: ev.businessImpact });
     var detailsHtml = details.length > 0

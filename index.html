@@ -57,19 +57,20 @@
   .key-hint {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
     background: rgba(0,0,0,.6); padding: 8px 22px; border-radius: 20px;
-    font-size: .8rem; opacity: .5; z-index: 100; pointer-events: none;
-    backdrop-filter: blur(8px);
+    font-size: .8rem; opacity: 0; z-index: 100; pointer-events: none;
+    backdrop-filter: blur(8px); transition: opacity .3s ease;
   }
+  body.chrome-visible .key-hint { opacity: .5; }
 
   /* Top-right utility buttons */
   .export-btn {
     position: fixed; top: 12px; right: 24px; z-index: 100;
     background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.1); color: var(--muted);
     padding: 6px 14px; border-radius: 16px; font-size: .7rem; cursor: pointer;
-    backdrop-filter: blur(8px); transition: all .3s; opacity: .4;
+    backdrop-filter: blur(8px); transition: all .3s; opacity: 0; pointer-events: none;
   }
-  .export-btn:hover { opacity: 1; color: var(--text); border-color: var(--ms-blue); }
-  .export-btn.hidden-on-live { opacity: 0; pointer-events: none; }
+  body.chrome-visible .export-btn { opacity: .4; pointer-events: auto; }
+  body.chrome-visible .export-btn:hover { opacity: 1; color: var(--text); border-color: var(--ms-blue); }
 
   /* Transitions */
   .slide { animation: fadeIn .5s ease; }
@@ -1050,40 +1051,47 @@
     <div class="ms-logo"><svg viewBox="0 0 23 23" width="18" height="18"><rect width="11" height="11" fill="#f25022"/><rect x="12" width="11" height="11" fill="#7fba00"/><rect y="12" width="11" height="11" fill="#00a4ef"/><rect x="12" y="12" width="11" height="11" fill="#ffb900"/></svg> Microsoft</div>
     <div class="ms-header-title">AI Acceleration Workshop</div>
   </div>
-  <div class="slide-two-col">
-    <div class="col-text">
-      <h2 style="font-size:2.2rem;">What is the AI Acceleration Program?</h2>
-      <p style="font-size:1rem;color:var(--muted);line-height:1.7;">The Microsoft AI Acceleration Program is a hands-on engagement designed to help organizations move from AI curiosity to AI action. We work with your team to identify high-impact business challenges, assess AI readiness, and build a prioritized roadmap.</p>
-      <div class="feature-card">
-        <div class="fc-icon" style="background:rgba(0,120,212,.15);color:#60a5fa;">🎯</div>
-        <div class="fc-text"><h4>Identify</h4><p>Surface real business pain points across departments — not hypothetical use cases.</p></div>
+  <div style="width:100%; max-width:1100px;">
+    <div style="text-align:center; margin-bottom:40px;">
+      <h2 style="font-size:2.4rem; margin-bottom:12px;">The AI Acceleration Program</h2>
+      <p style="font-size:1.1rem; color:var(--muted); line-height:1.6; max-width:700px; margin:0 auto;">A hands-on engagement to move your organization from AI curiosity to AI action. We identify what matters, build the business case, and leave you with a roadmap.</p>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:32px;">
+      <div style="background:rgba(0,120,212,.08); border:1px solid rgba(0,120,212,.15); border-radius:14px; padding:28px; text-align:center;">
+        <div style="width:56px; height:56px; border-radius:14px; background:rgba(0,120,212,.15); display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin:0 auto 16px;">🎯</div>
+        <h3 style="font-size:1.1rem; margin-bottom:8px;">Identify</h3>
+        <p style="font-size:.85rem; color:var(--muted); line-height:1.5;">Surface real business pain points across departments — your challenges, your words.</p>
       </div>
-      <div class="feature-card">
-        <div class="fc-icon" style="background:rgba(16,124,16,.15);color:#4ade80;">📐</div>
-        <div class="fc-text"><h4>Assess</h4><p>Evaluate each opportunity for impact, feasibility, data readiness, and ROI potential.</p></div>
+      <div style="background:rgba(16,124,16,.08); border:1px solid rgba(16,124,16,.15); border-radius:14px; padding:28px; text-align:center;">
+        <div style="width:56px; height:56px; border-radius:14px; background:rgba(16,124,16,.15); display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin:0 auto 16px;">📐</div>
+        <h3 style="font-size:1.1rem; margin-bottom:8px;">Assess</h3>
+        <p style="font-size:.85rem; color:var(--muted); line-height:1.5;">Evaluate each opportunity for impact, feasibility, data readiness, and ROI potential.</p>
       </div>
-      <div class="feature-card">
-        <div class="fc-icon" style="background:rgba(116,39,116,.15);color:#c490c4;">🗺️</div>
-        <div class="fc-text"><h4>Prioritize</h4><p>Walk out with an executive-ready roadmap of quick wins and strategic AI investments.</p></div>
+      <div style="background:rgba(116,39,116,.08); border:1px solid rgba(116,39,116,.15); border-radius:14px; padding:28px; text-align:center;">
+        <div style="width:56px; height:56px; border-radius:14px; background:rgba(116,39,116,.15); display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin:0 auto 16px;">🗺️</div>
+        <h3 style="font-size:1.1rem; margin-bottom:8px;">Prioritize</h3>
+        <p style="font-size:.85rem; color:var(--muted); line-height:1.5;">Walk out with an executive-ready roadmap of quick wins and strategic AI investments.</p>
       </div>
     </div>
-    <div class="col-visual">
-      <div style="background:rgba(0,120,212,.08);border:1px solid rgba(0,120,212,.2);border-radius:16px;padding:28px;width:100%;">
-        <div style="font-size:.7rem;text-transform:uppercase;color:var(--ms-blue);font-weight:700;letter-spacing:1px;margin-bottom:16px;">What You'll Walk Away With</div>
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <div style="display:flex;align-items:center;gap:12px;"><div style="width:8px;height:8px;border-radius:50%;background:#4ade80;flex-shrink:0;"></div><span style="font-size:.9rem;">Prioritized list of AI opportunities ranked by impact</span></div>
-          <div style="display:flex;align-items:center;gap:12px;"><div style="width:8px;height:8px;border-radius:50%;background:#60a5fa;flex-shrink:0;"></div><span style="font-size:.9rem;">Business case with ROI estimates for top initiatives</span></div>
-          <div style="display:flex;align-items:center;gap:12px;"><div style="width:8px;height:8px;border-radius:50%;background:#c490c4;flex-shrink:0;"></div><span style="font-size:.9rem;">Implementation roadmap with quick wins identified</span></div>
-          <div style="display:flex;align-items:center;gap:12px;"><div style="width:8px;height:8px;border-radius:50%;background:#fbbf24;flex-shrink:0;"></div><span style="font-size:.9rem;">Executive-ready report (Word, Excel, and PDF)</span></div>
-          <div style="display:flex;align-items:center;gap:12px;"><div style="width:8px;height:8px;border-radius:50%;background:#fb923c;flex-shrink:0;"></div><span style="font-size:.9rem;">Clear next steps with owners and timelines</span></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <div style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:24px;">
+        <div style="font-size:.7rem; text-transform:uppercase; color:var(--ms-blue); font-weight:700; letter-spacing:1px; margin-bottom:14px;">What You Walk Away With</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;"><div style="width:6px; height:6px; border-radius:50%; background:#4ade80; flex-shrink:0;"></div><span style="font-size:.85rem;">Prioritized list of AI opportunities ranked by impact</span></div>
+          <div style="display:flex; align-items:center; gap:10px;"><div style="width:6px; height:6px; border-radius:50%; background:#60a5fa; flex-shrink:0;"></div><span style="font-size:.85rem;">Business case with ROI estimates for top initiatives</span></div>
+          <div style="display:flex; align-items:center; gap:10px;"><div style="width:6px; height:6px; border-radius:50%; background:#c490c4; flex-shrink:0;"></div><span style="font-size:.85rem;">Implementation roadmap with quick wins identified</span></div>
+          <div style="display:flex; align-items:center; gap:10px;"><div style="width:6px; height:6px; border-radius:50%; background:#fbbf24; flex-shrink:0;"></div><span style="font-size:.85rem;">Executive-ready report (Word, Excel, and PDF)</span></div>
+          <div style="display:flex; align-items:center; gap:10px;"><div style="width:6px; height:6px; border-radius:50%; background:#fb923c; flex-shrink:0;"></div><span style="font-size:.85rem;">Clear next steps with owners and timelines</span></div>
         </div>
       </div>
-      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px;width:100%;text-align:center;">
-        <div style="font-size:.65rem;text-transform:uppercase;color:var(--muted);letter-spacing:1px;margin-bottom:8px;">Powered By</div>
-        <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;">
-          <span style="font-size:.85rem;font-weight:600;color:rgba(255,255,255,.7);">Microsoft Copilot</span>
-          <span style="font-size:.85rem;font-weight:600;color:rgba(255,255,255,.7);">Azure AI</span>
-          <span style="font-size:.85rem;font-weight:600;color:rgba(255,255,255,.7);">GitHub Models</span>
+      <div style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:24px;">
+        <div style="font-size:.7rem; text-transform:uppercase; color:var(--ms-blue); font-weight:700; letter-spacing:1px; margin-bottom:14px;">How We Work</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;"><div style="width:6px; height:6px; border-radius:50%; background:#60a5fa; flex-shrink:0;"></div><span style="font-size:.85rem;">Interactive workshop — everyone participates</span></div>
+          <div style="display:flex; align-items:center; gap:10px;"><div style="width:6px; height:6px; border-radius:50%; background:#60a5fa; flex-shrink:0;"></div><span style="font-size:.85rem;">Rapid prototyping using internal tooling</span></div>
+          <div style="display:flex; align-items:center; gap:10px;"><div style="width:6px; height:6px; border-radius:50%; background:#60a5fa; flex-shrink:0;"></div><span style="font-size:.85rem;">Business-first — we start with your problems, not our products</span></div>
+          <div style="display:flex; align-items:center; gap:10px;"><div style="width:6px; height:6px; border-radius:50%; background:#60a5fa; flex-shrink:0;"></div><span style="font-size:.85rem;">Everything stays on your device — no data leaves the room</span></div>
+          <div style="display:flex; align-items:center; gap:10px;"><div style="width:6px; height:6px; border-radius:50%; background:#60a5fa; flex-shrink:0;"></div><span style="font-size:.85rem;">Real deliverables — not a pitch deck</span></div>
         </div>
       </div>
     </div>

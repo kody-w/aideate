@@ -3299,7 +3299,12 @@ function expandIdeaCard(ideaId) {
       '<div class="ex-close" onclick="closeExpandedCard()">✕</div>' +
       '<div class="ex-dept '+getDeptClass(idea.dept)+'">'+escHtml(idea.dept)+'</div>' +
       '<div class="ex-name">'+escHtml(idea.name)+'</div>' +
-      '<div style="font-size:.75rem;color:var(--muted);margin-bottom:16px;">Submitted by '+escHtml(idea.submitter || 'Facilitator')+'</div>' +
+      '<div style="font-size:.75rem;color:var(--muted);margin-bottom:16px;">Submitted by ' +
+        '<select id="ex-submitter-'+idea.id+'" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:.75rem;padding:2px 8px;cursor:pointer;">' +
+          '<option value="Facilitator"'+((!idea.submitter||idea.submitter==='Facilitator')?' selected':'')+'>Facilitator</option>' +
+          state.participants.map(function(p) { return '<option value="'+escAttr(p.name)+'"'+(idea.submitter===p.name?' selected':'')+'>'+escHtml(p.name)+'</option>'; }).join('') +
+        '</select>' +
+      '</div>' +
       '<div class="ex-fields" style="grid-template-columns:1fr;">' +
         '<div class="ef" style="grid-column:1/-1;"><label>Describe the Challenge</label>' +
           '<textarea id="ex-desc-'+idea.id+'" placeholder="As a [role], I [current pain point]. I need [desired outcome] so that [business value]." rows="5" style="font-size:.95rem;line-height:1.6;">'+escHtml(idea.desc||'')+'</textarea>' +
@@ -3319,6 +3324,8 @@ function saveExpandedCard(ideaId) {
   if (!idea) return;
   var descEl = document.getElementById('ex-desc-' + ideaId);
   if (descEl) idea.desc = descEl.value;
+  var subEl = document.getElementById('ex-submitter-' + ideaId);
+  if (subEl) idea.submitter = subEl.value;
   autosave();
   renderIdeas();
   const msg = document.getElementById('exSavedMsg');

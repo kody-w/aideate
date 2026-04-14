@@ -289,48 +289,49 @@
   .idea-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,120,212,.2); border-color: rgba(0,120,212,.4); }
   .idea-card .dept {
     position: absolute; top: 14px; left: 14px;
-    font-size: .65rem; padding: 3px 10px; border-radius: 10px; font-weight: 700;
+    font-size: clamp(.8rem, 1.2vw, 1rem); padding: 5px 14px; border-radius: 10px; font-weight: 700;
     text-transform: uppercase; letter-spacing: .5px;
   }
   .idea-card .name {
-    font-weight: 800; font-size: clamp(1.1rem, 2.2vw, 1.8rem);
-    line-height: 1.2; padding: 0 8px;
+    font-weight: 800; font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+    line-height: 1.25; padding: 0 8px;
     background: linear-gradient(135deg, #fff, rgba(255,255,255,.8));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
   .idea-card .card-hint {
     position: absolute; bottom: 10px; right: 14px;
-    font-size: .6rem; color: var(--muted); opacity: .4;
+    font-size: .8rem; color: var(--muted); opacity: .4;
   }
   .idea-card .front-status {
     position: absolute; top: 14px; right: 14px;
-    font-size: .55rem; padding: 2px 8px; border-radius: 8px; font-weight: 700;
+    font-size: clamp(.75rem, 1.1vw, .95rem); padding: 4px 12px; border-radius: 8px; font-weight: 700;
   }
   .idea-card .front-status.complete { background: rgba(16,124,16,.2); color: #4ade80; }
   .idea-card .front-status.partial { background: rgba(251,191,36,.15); color: #fbbf24; }
   .idea-card .front-status.empty { background: rgba(148,163,184,.1); color: var(--muted); }
   .idea-card .card-details {
-    width: 100%; text-align: left; font-size: .65rem; line-height: 1.4;
-    color: rgba(255,255,255,.55); margin-top: 8px; flex: 1; overflow-y: auto;
+    width: 100%; text-align: left; font-size: clamp(.95rem, 1.4vw, 1.15rem); line-height: 1.5;
+    color: rgba(255,255,255,.65); margin-top: 12px; flex: 1; overflow-y: auto;
   }
   .idea-card .card-details .detail-row {
-    margin-bottom: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
   }
   .idea-card .card-details .detail-label {
-    color: rgba(255,255,255,.35); text-transform: uppercase; font-size: .55rem; font-weight: 700; letter-spacing: .3px;
+    color: rgba(255,255,255,.4); text-transform: uppercase; font-size: clamp(.7rem, 1vw, .85rem); font-weight: 700; letter-spacing: .3px;
   }
 
   /* Expanded card overlay — full-screen detail form */
   .idea-expand-overlay {
     position: absolute; inset: 0; z-index: 10;
     background: rgba(10,15,30,.92); backdrop-filter: blur(12px);
-    display: flex; align-items: stretch; justify-content: stretch;
-    padding: 16px; animation: fadeIn .3s ease; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px; animation: fadeIn .3s ease; overflow: hidden;
   }
   .idea-expand-card {
     background: linear-gradient(135deg, var(--card), rgba(22,33,62,.98));
     border: 2px solid var(--border); border-radius: 20px;
-    padding: 32px 44px; width: 100%; display: flex; flex-direction: column;
+    padding: 32px 44px; width: 100%; max-width: 700px; max-height: 90%;
+    display: flex; flex-direction: column;
     animation: cardIn .4s ease; position: relative;
     transition: box-shadow .4s; overflow-y: auto;
   }
@@ -430,37 +431,37 @@
   }
   .vote-card.drag-over { border-color: var(--ms-blue); box-shadow: 0 0 24px rgba(0,120,212,.4); transform: scale(1.02); }
   .vote-card .vote-count {
-    position: absolute; top: -12px; right: 16px; background: var(--ms-blue); color: #fff;
-    width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(0,120,212,.4); transition: all .3s;
+    position: absolute; top: -14px; right: 16px; background: var(--ms-blue); color: #fff;
+    width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1.3rem; box-shadow: 0 4px 12px rgba(0,120,212,.4); transition: all .3s;
   }
   .vote-card .vote-count.has-votes { background: #4ade80; box-shadow: 0 0 16px rgba(74,222,128,.4); }
   .vote-card .dept {
-    font-size: .6rem; padding: 2px 8px; border-radius: 8px; font-weight: 700;
+    font-size: clamp(.8rem, 1.2vw, 1rem); padding: 4px 12px; border-radius: 8px; font-weight: 700;
     text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px;
   }
   .vote-card .name {
-    font-weight: 800; font-size: clamp(.85rem, 1.5vw, 1.2rem); line-height: 1.2;
+    font-weight: 800; font-size: clamp(1.3rem, 2.4vw, 2rem); line-height: 1.25;
     background: linear-gradient(135deg, #fff, rgba(255,255,255,.8));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
   .vote-card .card-details {
-    width: 100%; text-align: left; font-size: .65rem; line-height: 1.4;
-    color: rgba(255,255,255,.6); margin-bottom: 4px; flex: 1; overflow-y: auto;
+    width: 100%; text-align: left; font-size: clamp(.9rem, 1.3vw, 1.1rem); line-height: 1.5;
+    color: rgba(255,255,255,.65); margin-bottom: 4px; flex: 1; overflow-y: auto;
   }
   .vote-card .card-details .detail-row {
-    margin-bottom: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
   }
   .vote-card .card-details .detail-label {
-    color: rgba(255,255,255,.4); text-transform: uppercase; font-size: .55rem; font-weight: 700; letter-spacing: .3px;
+    color: rgba(255,255,255,.45); text-transform: uppercase; font-size: clamp(.7rem, 1vw, .85rem); font-weight: 700; letter-spacing: .3px;
   }
   .vote-card .voter-stack {
     display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: auto; padding-top: 10px;
   }
   .vote-card .voter-chip {
-    width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: .6rem; font-weight: 700; border: 2px solid rgba(0,0,0,.3);
+    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: .7rem; font-weight: 700; border: 2px solid rgba(0,0,0,.3);
     animation: chipDrop .4s ease; cursor: pointer; transition: all .2s; position: relative;
   }
   .vote-card .voter-chip:hover { transform: scale(1.15); z-index: 2; }
@@ -472,7 +473,7 @@
   @keyframes chipDrop { from { opacity: 0; transform: scale(.3) translateY(-20px); } to { opacity: 1; transform: none; } }
 
   .vote-card .drop-hint {
-    font-size: .6rem; color: var(--muted); opacity: .35; margin-top: auto; padding-top: 8px;
+    font-size: .8rem; color: var(--muted); opacity: .35; margin-top: auto; padding-top: 8px;
   }
 
   /* Participant dock at bottom of vote slide */
@@ -483,24 +484,24 @@
     backdrop-filter: blur(8px);
   }
   .voter-dock .dock-label {
-    font-size: .7rem; color: var(--muted); font-weight: 600; white-space: nowrap;
+    font-size: .85rem; color: var(--muted); font-weight: 600; white-space: nowrap;
     text-transform: uppercase; letter-spacing: .5px; margin-right: 4px;
   }
   .voter-token {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--card); border: 2px solid var(--border); border-radius: 20px;
-    padding: 6px 14px 6px 6px; cursor: grab; user-select: none;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card); border: 2px solid var(--border); border-radius: 24px;
+    padding: 8px 16px 8px 8px; cursor: grab; user-select: none;
     transition: all .2s; white-space: nowrap; flex-shrink: 0;
   }
   .voter-token:active { cursor: grabbing; }
   .voter-token:hover { border-color: var(--ms-blue); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,120,212,.3); }
   .voter-token.dragging { opacity: .5; transform: scale(.9); }
   .voter-token .token-avatar {
-    width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: .6rem; font-weight: 700; flex-shrink: 0;
+    width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; font-weight: 700; flex-shrink: 0;
   }
-  .voter-token .token-name { font-size: .75rem; font-weight: 600; }
-  .voter-token .token-votes { font-size: .6rem; color: var(--muted); margin-left: 2px; }
+  .voter-token .token-name { font-size: .9rem; font-weight: 600; }
+  .voter-token .token-votes { font-size: .75rem; color: var(--muted); margin-left: 2px; }
   .voter-token.spent { opacity: .45; cursor: default; border-style: dashed; }
   .voter-token.spent:hover { transform: none; box-shadow: none; border-color: var(--border); }
 
@@ -3374,7 +3375,7 @@ function renderIdeas() {
       return '<div class="idea-card" onclick="expandIdeaCard('+i.id+')">' +
         '<div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div>' +
         '<span class="front-status" style="background:rgba(255,255,255,.06);color:var(--muted);">'+escHtml(i.submitter||'Facilitator')+'</span>' +
-        '<div class="name" style="'+(i.desc ? 'font-size:clamp(.85rem,1.5vw,1.2rem);' : '')+'">'+escHtml(i.name)+'</div>' +
+        '<div class="name">'+escHtml(i.name)+'</div>' +
         descHtml +
         '<div class="card-hint">click to expand</div>' +
       '</div>';

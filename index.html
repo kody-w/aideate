@@ -37,14 +37,21 @@
   }
   .slide.active { display: flex; }
   .slide-number {
-    position: absolute; bottom: 24px; right: 36px; font-size: 13px; opacity: .35; font-weight: 600; letter-spacing: 1px;
+    position: absolute; bottom: 24px; right: 36px; font-size: 13px; opacity: 0; font-weight: 600; letter-spacing: 1px;
+    transition: opacity .3s ease;
   }
 
   /* Progress bar */
   .progress-bar {
     position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, var(--ms-blue), var(--ms-purple));
-    z-index: 200; transition: width .4s ease;
+    z-index: 200; transition: width .4s ease, opacity .3s ease; opacity: 0;
   }
+
+  /* Show chrome on mouse proximity */
+  body.chrome-visible .progress-bar { opacity: 1; }
+  body.chrome-visible .top-bar { opacity: 1; transform: translateY(0); }
+  body.chrome-visible .slide-number { opacity: .35; }
+  body.chrome-visible .drawer-fab { opacity: .5; }
 
   /* Controls hint */
   .key-hint {
@@ -232,6 +239,7 @@
     background: linear-gradient(90deg, var(--ms-blue), var(--ms-purple));
     padding: 16px 40px; display: flex; align-items: center; gap: 20px;
     flex-shrink: 0; width: 100%;
+    opacity: 0; transform: translateY(-100%); transition: opacity .3s ease, transform .3s ease;
   }
   .top-bar .logo { font-size: 1.4rem; font-weight: 800; }
   .top-bar .logo span { opacity: .7; font-weight: 400; font-size: 1rem; margin-left: 8px; }
@@ -720,12 +728,11 @@
     background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.1);
     color: var(--muted); cursor: pointer;
     backdrop-filter: blur(8px); transition: all .3s;
-    opacity: .3; display: flex; align-items: center; justify-content: center;
+    opacity: 0; display: flex; align-items: center; justify-content: center;
     font-size: 1.2rem;
   }
-  .drawer-fab:hover { opacity: .8; border-color: var(--ms-blue); }
-  .drawer-fab.active { opacity: 1; background: var(--ms-blue); color: #fff; border-color: var(--ms-blue); }
-  body.fab-hidden .drawer-fab:not(.active) { opacity: 0; pointer-events: none; }
+  .drawer-fab:hover { opacity: .8 !important; border-color: var(--ms-blue); }
+  .drawer-fab.active { opacity: 1 !important; background: var(--ms-blue); color: #fff; border-color: var(--ms-blue); }
 
   .drawer-overlay {
     position: fixed; inset: 0; z-index: 600;
@@ -1107,7 +1114,7 @@
 </div>
 
 <!-- ════════════════════════════════════════════ -->
-<!-- SLIDE 3: We Came Prepared                   -->
+<!-- SLIDE 3: Starting Ideas                     -->
 <!-- ════════════════════════════════════════════ -->
 <div class="slide content-slide bg-gradient-3" id="slide-3">
   <div class="ms-slide-header">
@@ -1115,16 +1122,16 @@
     <div class="ms-header-title">AI Acceleration Workshop</div>
   </div>
   <div style="text-align:center; max-width:900px;">
-    <div class="tag" style="background:rgba(251,146,60,.15); color:#fb923c; border:1px solid rgba(251,146,60,.25);">Discovery → Action</div>
-    <h2>We Came Prepared</h2>
+    <div class="tag" style="background:rgba(0,120,212,.15); color:var(--ms-blue); border:1px solid rgba(0,120,212,.25);">Starting Point</div>
+    <h2>AI Use Cases to Explore</h2>
     <p class="subtitle" id="preparedSubtitle" style="margin: 0 auto 16px;">
-      From our discovery sessions, we've identified business challenges and workflow bottlenecks where AI can deliver measurable impact.
+      Here are some challenges to get us started. We'll add more during the ideation phase.
     </p>
     <div id="preparedCards">
       <div class="prepared-placeholder">
-        <div style="margin-bottom:12px;">Load a template or import a project file to populate the challenge menu</div>
-        <button onclick="openDrawer()" style="background:rgba(251,146,60,.2); color:#fb923c; border:1px solid rgba(251,146,60,.35); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">
-          ⚙ Open Controls to Load Data
+        <div style="margin-bottom:12px;">No use cases loaded yet — add them in the ideation phase or load a template from the controls</div>
+        <button onclick="openDrawer()" style="background:rgba(0,120,212,.2); color:var(--ms-blue); border:1px solid rgba(0,120,212,.35); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">
+          ⚙ Open Controls
         </button>
       </div>
     </div>
@@ -1759,6 +1766,8 @@ function openDrawer() {
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
   document.getElementById('drawerFab').classList.add('active');
+  document.body.classList.add('chrome-visible');
+  if (chromeTimer) clearTimeout(chromeTimer);
   updateDrawerContext();
 }
 
@@ -1767,6 +1776,7 @@ function closeDrawer() {
   document.getElementById('drawer').classList.remove('open');
   document.getElementById('drawerOverlay').classList.remove('open');
   document.getElementById('drawerFab').classList.remove('active');
+  hideChrome();
 }
 
 function updateDrawerContext() {
@@ -1782,14 +1792,22 @@ function updateDrawerContext() {
   });
 }
 
-// Auto-hide FAB on live slides after inactivity
-document.addEventListener('mousemove', () => {
-  document.body.classList.remove('fab-hidden');
-  if (fabHideTimer) clearTimeout(fabHideTimer);
-  if (currentSlideEl && currentSlideEl.classList.contains('live-slide') && !drawerOpen) {
-    fabHideTimer = setTimeout(() => {
-      document.body.classList.add('fab-hidden');
-    }, 3000);
+// Auto-hide all presenter chrome (top bar, slide number, FAB, progress bar)
+// Show on mouse move near top/bottom edges, hide after 2s of inactivity
+let chromeTimer = null;
+function showChrome() {
+  document.body.classList.add('chrome-visible');
+  if (chromeTimer) clearTimeout(chromeTimer);
+  chromeTimer = setTimeout(hideChrome, 2000);
+}
+function hideChrome() {
+  if (drawerOpen) return;
+  document.body.classList.remove('chrome-visible');
+}
+document.addEventListener('mousemove', (e) => {
+  const h = window.innerHeight;
+  if (e.clientY < 80 || e.clientY > h - 80) {
+    showChrome();
   }
 });
 
@@ -3126,7 +3144,7 @@ function renderIntroSlide() {
 function renderPreparedSlide() {
   const container = document.getElementById('preparedCards');
   if (state.ideas.length === 0) {
-    container.innerHTML = '<div class="prepared-placeholder"><div style="margin-bottom:12px;">💡 Load a template or import a project to populate the challenge menu</div><button onclick="openDrawer()" style="background:rgba(251,146,60,.25); color:#fb923c; border:1px solid rgba(251,146,60,.4); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">⚙️ Open Controls</button></div>';
+    container.innerHTML = '<div class="prepared-placeholder"><div style="margin-bottom:12px;">No use cases loaded yet — add them in the ideation phase or load a template from the controls</div><button onclick="openDrawer()" style="background:rgba(0,120,212,.2); color:var(--ms-blue); border:1px solid rgba(0,120,212,.35); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">⚙ Open Controls</button></div>';
     return;
   }
   container.innerHTML = '<div class="usecase-menu">' + state.ideas.map((idea, i) =>

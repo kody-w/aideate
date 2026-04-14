@@ -71,6 +71,8 @@
   }
   body.chrome-visible .export-btn { opacity: .4; pointer-events: auto; }
   body.chrome-visible .export-btn:hover { opacity: 1; color: var(--text); border-color: var(--ms-blue); }
+  body.chrome-visible .eval-strip { opacity: 1; transform: translateY(0); }
+  body.chrome-visible .phase-footer { opacity: 1; transform: translateY(0); }
 
   /* Transitions */
   .slide { animation: fadeIn .5s ease; }
@@ -281,7 +283,7 @@
     flex: 1 1 300px; min-width: 240px; max-width: 100%;
     background: linear-gradient(135deg, var(--card), rgba(22,33,62,.95));
     border: 2px solid var(--border); border-radius: 12px;
-    display: flex; flex-direction: column; align-items: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center; padding: 32px 16px 24px; position: relative;
     cursor: pointer; animation: cardIn .4s ease;
     transition: transform .3s, box-shadow .3s, border-color .3s;
@@ -507,12 +509,12 @@
 
   /* Prioritize / Results */
   .priority-container { flex: 1; padding: 24px 40px; overflow-y: auto; }
-  .podium { display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-bottom: 32px; height: 260px; }
-  .podium-item { display: flex; flex-direction: column; align-items: center; transition: all .6s; }
-  .podium-item .rank { font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; }
-  .podium-item .p-name { font-weight: 700; font-size: 1rem; text-align: center; max-width: 200px; margin-bottom: 8px; }
-  .podium-item .p-votes { font-size: .85rem; color: var(--muted); margin-bottom: 12px; }
-  .podium-bar { width: 140px; border-radius: 12px 12px 0 0; transition: height .8s ease; }
+  .podium { display: flex; justify-content: center; align-items: flex-end; gap: 12px; margin-bottom: 32px; height: 260px; }
+  .podium-item { display: flex; flex-direction: column; align-items: center; transition: all .6s; width: 180px; flex-shrink: 0; }
+  .podium-item .rank { font-size: 2.5rem; font-weight: 800; margin-bottom: 4px; }
+  .podium-item .p-name { font-weight: 700; font-size: .85rem; text-align: center; width: 100%; margin-bottom: 4px; line-height: 1.25; word-wrap: break-word; overflow-wrap: break-word; }
+  .podium-item .p-votes { font-size: .75rem; color: var(--muted); margin-bottom: 8px; }
+  .podium-bar { width: 100%; border-radius: 12px 12px 0 0; transition: height .8s ease; }
   .podium-1 .podium-bar { background: linear-gradient(180deg, #fbbf24, #f59e0b); }
   .podium-2 .podium-bar { background: linear-gradient(180deg, #94a3b8, #64748b); }
   .podium-3 .podium-bar { background: linear-gradient(180deg, #cd7f32, #a0522d); }
@@ -612,6 +614,8 @@
     background: rgba(0,0,0,.3); border-top: 1px solid var(--border);
     padding: 12px 40px; display: flex; gap: 10px; flex-shrink: 0;
     overflow-x: auto; backdrop-filter: blur(8px); align-items: stretch;
+    opacity: 0; transform: translateY(100%); transition: opacity .3s ease, transform .3s ease;
+    position: relative; z-index: 5;
   }
   .eval-strip-card {
     background: var(--card); border: 2px solid var(--border); border-radius: 10px;
@@ -737,6 +741,7 @@
     background: var(--card); border-top: 1px solid var(--border);
     padding: 12px 40px; display: flex; align-items: center; gap: 16px;
     font-size: .8rem; color: var(--muted); flex-shrink: 0; width: 100%;
+    opacity: 0; transform: translateY(100%); transition: opacity .3s ease, transform .3s ease;
   }
   .phase-footer .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
@@ -3295,13 +3300,24 @@ function expandIdeaCard(ideaId) {
   const overlay = document.createElement('div');
   overlay.className = 'idea-expand-overlay';
   overlay.onclick = function(e) { if (e.target === overlay) closeExpandedCard(); };
+  var deptOptions = state.departments.map(function(d) {
+    return '<option value="'+escAttr(d)+'"'+(idea.dept===d?' selected':'')+'>'+escHtml(d)+'</option>';
+  }).join('');
   overlay.innerHTML =
     '<div class="idea-expand-card" style="max-width:700px;">' +
       '<div class="ex-close" onclick="closeExpandedCard()">✕</div>' +
-      '<div class="ex-dept '+getDeptClass(idea.dept)+'">'+escHtml(idea.dept)+'</div>' +
-      '<div class="ex-name">'+escHtml(idea.name)+'</div>' +
-      '<div style="font-size:.75rem;color:var(--muted);margin-bottom:16px;">Submitted by ' +
-        '<select id="ex-submitter-'+idea.id+'" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:.75rem;padding:2px 8px;cursor:pointer;">' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">' +
+        '<select id="ex-dept-'+idea.id+'" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:var(--text);font-size:.8rem;padding:4px 10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;">' +
+          deptOptions +
+        '</select>' +
+      '</div>' +
+      '<div class="ex-fields" style="grid-template-columns:1fr;">' +
+        '<div class="ef" style="grid-column:1/-1;margin-bottom:8px;"><label>Challenge Name</label>' +
+          '<input type="text" id="ex-name-'+idea.id+'" value="'+escAttr(idea.name)+'" style="font-size:1.3rem;font-weight:800;padding:8px 12px;" />' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:.8rem;color:var(--muted);margin-bottom:16px;">Submitted by ' +
+        '<select id="ex-submitter-'+idea.id+'" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-size:.8rem;padding:3px 8px;cursor:pointer;">' +
           '<option value="Facilitator"'+((!idea.submitter||idea.submitter==='Facilitator')?' selected':'')+'>Facilitator</option>' +
           state.participants.map(function(p) { return '<option value="'+escAttr(p.name)+'"'+(idea.submitter===p.name?' selected':'')+'>'+escHtml(p.name)+'</option>'; }).join('') +
         '</select>' +
@@ -3323,6 +3339,10 @@ function expandIdeaCard(ideaId) {
 function saveExpandedCard(ideaId) {
   const idea = state.ideas.find(i => i.id === ideaId);
   if (!idea) return;
+  var nameEl = document.getElementById('ex-name-' + ideaId);
+  if (nameEl && nameEl.value.trim()) idea.name = nameEl.value.trim();
+  var deptEl = document.getElementById('ex-dept-' + ideaId);
+  if (deptEl) idea.dept = deptEl.value;
   var descEl = document.getElementById('ex-desc-' + ideaId);
   if (descEl) idea.desc = descEl.value;
   var subEl = document.getElementById('ex-submitter-' + ideaId);

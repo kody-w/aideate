@@ -512,7 +512,7 @@
 
   /* Prioritize / Results */
   .priority-container { flex: 1; padding: 24px 40px; overflow-y: auto; }
-  .podium { display: flex; justify-content: center; align-items: flex-end; gap: 12px; margin-bottom: 32px; height: 260px; }
+  .podium { display: flex; justify-content: center; align-items: flex-end; gap: 12px; margin-bottom: 32px; min-height: 260px; overflow: visible; padding-top: 80px; }
   .podium-item { display: flex; flex-direction: column; align-items: center; transition: all .6s; width: 180px; flex-shrink: 0; }
   .podium-item .rank { font-size: 2.5rem; font-weight: 800; margin-bottom: 4px; }
   .podium-item .p-name { font-weight: 700; font-size: .85rem; text-align: center; width: 100%; margin-bottom: 4px; line-height: 1.25; word-wrap: break-word; overflow-wrap: break-word; }
@@ -3525,10 +3525,13 @@ function onVoteCardDrop(e) {
     return;
   }
 
-  // Rule: no voting on your own idea
+  // Rule: allow 1 self-vote, but not all votes on your own ideas
   if (idea.submitter && idea.submitter === voter) {
-    showVoteToast('Can\'t vote for your own idea — vote for someone else\'s!');
-    return;
+    const selfVotes = state.ideas.filter(i => i.submitter === voter && (i.voters || []).includes(voter)).length;
+    if (selfVotes >= 1) {
+      showVoteToast(voter + ' already used their self-vote — vote for someone else\'s idea');
+      return;
+    }
   }
 
   idea.votes = (idea.votes || 0) + 1;
@@ -3597,16 +3600,22 @@ function renderMatrix() {
 function renderPriority() {
   const sorted = [...state.ideas].sort((a, b) => (b.votes || 0) - (a.votes || 0));
   const totalVotes = sorted.reduce((s, i) => s + (i.votes || 0), 0);
-  const top3 = sorted.slice(0, 3);
+  const top3 = sorted.slice(0, 3).filter(i => (i.votes || 0) > 0);
   const podium = document.getElementById('podium');
-  const order = [1, 0, 2];
   const rankHeights = [220, 160, 120];
   const medals = ['🥇', '🥈', '🥉'];
-  podium.innerHTML = order.map(rankIdx => {
-    const idea = top3[rankIdx];
-    if (!idea) return '';
-    return '<div class="podium-item podium-'+(rankIdx+1)+'"><div class="rank">'+medals[rankIdx]+'</div><div class="p-name">'+escHtml(idea.name)+'</div><div class="p-votes">'+(idea.votes||0)+' vote'+((idea.votes||0)!==1?'s':'')+'</div><div class="podium-bar" style="height:'+rankHeights[rankIdx]+'px"></div></div>';
-  }).join('');
+  if (top3.length === 0) {
+    podium.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;"><div style="font-size:3rem;margin-bottom:12px;">🗳️</div><p>No votes yet — results will appear after voting</p></div>';
+  } else if (top3.length === 1) {
+    podium.innerHTML = '<div class="podium-item podium-1"><div class="rank">'+medals[0]+'</div><div class="p-name">'+escHtml(top3[0].name)+'</div><div class="p-votes">'+top3[0].votes+' vote'+(top3[0].votes!==1?'s':'')+'</div><div class="podium-bar" style="height:'+rankHeights[0]+'px"></div></div>';
+  } else {
+    var order = top3.length >= 3 ? [1, 0, 2] : [1, 0];
+    podium.innerHTML = order.map(rankIdx => {
+      const idea = top3[rankIdx];
+      if (!idea) return '';
+      return '<div class="podium-item podium-'+(rankIdx+1)+'"><div class="rank">'+medals[rankIdx]+'</div><div class="p-name">'+escHtml(idea.name)+'</div><div class="p-votes">'+(idea.votes||0)+' vote'+((idea.votes||0)!==1?'s':'')+'</div><div class="podium-bar" style="height:'+rankHeights[rankIdx]+'px"></div></div>';
+    }).join('');
+  }
   document.getElementById('resultsBody').innerHTML = sorted.map((idea, i) =>
     '<tr><td style="font-size:1.1rem;width:40px;">'+(i<3?medals[i]:i+1)+'</td><td>'+escHtml(idea.name)+'</td><td><span class="dept '+getDeptClass(idea.dept)+'" style="font-size:.7rem;padding:3px 10px;border-radius:8px;">'+escHtml(idea.dept)+'</span></td><td style="font-weight:700;font-size:1.1rem;">'+(idea.votes||0)+'</td><td>'+(totalVotes>0?Math.round((idea.votes||0)/totalVotes*100):0)+'%</td><td><span class="eval-status-badge '+(idea.evaluation?'done':'pending')+'">'+(idea.evaluation?'✓ Evaluated':'Pending')+'</span></td></tr>'
   ).join('');

@@ -1521,7 +1521,7 @@
       <button class="btn-orange" onclick="generateReport()">🖨️ PDF</button>
     </div>
     <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
-      <button class="btn-sm" style="background:var(--border);color:var(--muted);" onclick="clearAutosave()">🗑️ Clear Cache</button>
+      <button class="btn-sm" style="background:#d13438;color:#fff;" onclick="clearAutosave()">🗑️ New Workshop</button>
       <button class="btn-sm" style="background:var(--border);color:var(--text);" onclick="downloadAppZip()">📥 Download .zip</button>
     </div>
   </div>
@@ -1629,8 +1629,17 @@ function restoreAutosave() {
 }
 
 function clearAutosave() {
+  if (!confirm('Clear all workshop data? Make sure you\'ve exported first — this cannot be undone.')) return;
   localStorage.removeItem(AUTOSAVE_KEY);
-  log('Autosave cleared');
+  state.sessionId = generateSessionId();
+  state.workshopName = ''; state.companyName = ''; state.phase = 'ideate';
+  state.companyProfile = { industry: '', country: '', employeeCount: '', annualRevenue: '', businessGoals: '' };
+  state.participants = []; state.ideas = []; state.timerSeconds = 0;
+  state.demoSlides = {}; state.departments = ['Sales','Marketing','Finance','HR','IT','Operations','Customer Service','Legal'];
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  renderAll();
+  showSlide(document.getElementById('slide-1'));
+  log('Workshop cleared — starting fresh');
 }
 
 // ══════════════════════════════════════════════

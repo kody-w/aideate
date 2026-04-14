@@ -3105,8 +3105,9 @@ function crc32(data) {
 function renderWelcomeSlide() {
   const title = document.getElementById('welcomeTitle');
   const company = document.getElementById('welcomeCompany');
-  if (state.workshopName) title.innerHTML = 'Welcome to<br>' + escHtml(state.workshopName);
-  else title.innerHTML = 'Welcome to Your<br>AI Workshop';
+  if (state.workshopName && state.companyName) title.innerHTML = escHtml(state.companyName) + '<br>AIdeation Workshop';
+  else if (state.workshopName) title.innerHTML = escHtml(state.workshopName);
+  else title.innerHTML = 'AI Use Case<br>Ideation Workshop';
   company.textContent = state.companyName || '';
   const dur = state.workshopDuration || 90;
   document.getElementById('welcomeDurationText').textContent = 'Over the next ' + dur + ' minutes, we\u2019ll identify, prioritize, and build the business case for business challenges where AI can drive the most impact.';
@@ -3599,12 +3600,12 @@ function renderPriority() {
   const top3 = sorted.slice(0, 3);
   const podium = document.getElementById('podium');
   const order = [1, 0, 2];
-  const heights = [160, 220, 120];
+  const rankHeights = [220, 160, 120];
   const medals = ['🥇', '🥈', '🥉'];
-  podium.innerHTML = order.map(idx => {
-    const idea = top3[idx];
+  podium.innerHTML = order.map(rankIdx => {
+    const idea = top3[rankIdx];
     if (!idea) return '';
-    return '<div class="podium-item podium-'+(idx+1)+'"><div class="rank">'+medals[idx]+'</div><div class="p-name">'+escHtml(idea.name)+'</div><div class="p-votes">'+(idea.votes||0)+' vote'+((idea.votes||0)!==1?'s':'')+'</div><div class="podium-bar" style="height:'+heights[idx]+'px"></div></div>';
+    return '<div class="podium-item podium-'+(rankIdx+1)+'"><div class="rank">'+medals[rankIdx]+'</div><div class="p-name">'+escHtml(idea.name)+'</div><div class="p-votes">'+(idea.votes||0)+' vote'+((idea.votes||0)!==1?'s':'')+'</div><div class="podium-bar" style="height:'+rankHeights[rankIdx]+'px"></div></div>';
   }).join('');
   document.getElementById('resultsBody').innerHTML = sorted.map((idea, i) =>
     '<tr><td style="font-size:1.1rem;width:40px;">'+(i<3?medals[i]:i+1)+'</td><td>'+escHtml(idea.name)+'</td><td><span class="dept '+getDeptClass(idea.dept)+'" style="font-size:.7rem;padding:3px 10px;border-radius:8px;">'+escHtml(idea.dept)+'</span></td><td style="font-weight:700;font-size:1.1rem;">'+(idea.votes||0)+'</td><td>'+(totalVotes>0?Math.round((idea.votes||0)/totalVotes*100):0)+'%</td><td><span class="eval-status-badge '+(idea.evaluation?'done':'pending')+'">'+(idea.evaluation?'✓ Evaluated':'Pending')+'</span></td></tr>'

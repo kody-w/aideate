@@ -1253,35 +1253,11 @@
     <div class="add-idea-card">
       <div class="ex-close" onclick="hideAddIdeaPopup()">✕</div>
       <h2>💡 Add Business Challenge</h2>
-      <div class="form-grid">
-        <div class="form-section">Challenge Details</div>
-        <div class="form-field" title="Example: &quot;Manual sales call prep takes 45 min per account&quot; or &quot;Customer onboarding requires 12 handoffs across 3 teams&quot;"><label>Challenge Name</label><input type="text" id="popupIdeaName" placeholder="e.g. Manual sales call prep takes 45 min per account" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitIdeaFromPopup();}"></div>
-        <div class="form-field" title="Example: Sales, Operations, Finance — which team owns this process?"><label>Department</label><select id="popupIdeaDept"></select></div>
-        <div class="form-field" title="Example: &quot;Sarah Chen&quot; — who raised this challenge?"><label>Submitted By</label><input type="text" id="popupIdeaSubmitter" placeholder="Name"></div>
-        <div class="form-field full" title="Example: &quot;Reps spend 45 min before each call manually searching CRM, LinkedIn, and recent emails to build a briefing. Often they miss key details and the call goes poorly.&quot;"><label>Description</label><textarea id="popupIdeaDesc" placeholder="Describe the business problem. What's broken, slow, or painful today?" rows="2"></textarea></div>
-        <div class="form-section">Current State</div>
-        <div class="form-field" title="Example: 50 — the number of sales reps who do this task regularly"><label>👥 People Involved</label><input type="number" min="0" id="popupPeople" placeholder="# of people doing this task" oninput="calcTimeSavingsPopup()"></div>
-        <div class="form-field" title="Example: 20 — each rep preps for about 20 calls per week"><label>🔄 Frequency (tasks/week)</label><input type="number" min="0" id="popupFrequency" placeholder="Tasks per week" oninput="calcTimeSavingsPopup()"></div>
-        <div class="form-field" title="Example: 45 — each call prep session takes about 45 minutes"><label>⏱️ Time Per Task (min)</label><input type="number" min="0" id="popupTime" placeholder="Minutes per task" oninput="calcTimeSavingsPopup()"></div>
-        <div class="form-field" title="Example: &quot;Salesforce CRM, LinkedIn Sales Navigator, Outlook, SharePoint&quot;"><label>🔧 Systems & Tools</label><input id="popupSystems" placeholder="Apps, databases, platforms"></div>
-        <div class="form-field" title="Example: &quot;1) Open CRM record 2) Search LinkedIn for updates 3) Check recent emails 4) Review past meeting notes 5) Write briefing doc 6) Share with manager&quot;"><label>📝 Current Process</label><textarea id="popupProcess" placeholder="Workflow step by step" rows="2"></textarea></div>
-        <div class="form-field" title="Example: &quot;Reps often miss recent news about the account. No single view of the customer. Inconsistent prep quality across the team. Junior reps don't know what to look for.&quot;"><label>⚠️ Pain Points</label><textarea id="popupPain" placeholder="Bottlenecks, errors, delays" rows="2"></textarea></div>
-        <div class="form-section">AI Solution & Impact</div>
-        <div class="form-field" title="Example: &quot;An AI agent that automatically pulls CRM data, recent emails, LinkedIn updates, and news to generate a one-page call briefing with talking points and risk flags.&quot;"><label>🤖 Ideal AI Solution</label><textarea id="popupSolution" placeholder="How could AI address this challenge?" rows="2"></textarea></div>
-        <div class="form-field" title="Example: &quot;Salesforce API, Microsoft Graph (email/calendar), LinkedIn API, company news feeds&quot;"><label>🗄️ Data Sources</label><input id="popupData" placeholder="Data/APIs/systems needed"></div>
-        <div class="form-field" title="Auto-calculated from People × Frequency × Time Per Task"><label>⚡ Time Savings (auto)</label><input id="popupSavings" readonly style="background:rgba(0,120,212,.12);color:#60a5fa;font-weight:600;cursor:default;" placeholder="Auto-calculated"></div>
-        <div class="form-field" title="Example: &quot;Reduce prep time by 80%, improve win rate by 15%, faster ramp for new hires&quot;"><label>📈 Business Impact</label><input id="popupImpact" placeholder="Revenue, cost reduction, quality"></div>
-        <div class="form-field" title="Example: &quot;750 hrs/week saved across sales org. Higher quality customer conversations. Consistent prep standard across all reps.&quot;"><label>✅ Expected Benefits</label><textarea id="popupBenefits" placeholder="Concrete, measurable benefits" rows="2"></textarea></div>
-        <div class="form-field" title="Example: &quot;Directly supports Q3 goal to increase pipeline velocity by 20% and CEO's mandate to be an AI-first sales org.&quot;"><label>🎯 Strategic Alignment</label><textarea id="popupAlignment" placeholder="How does this align with business priorities?" rows="2"></textarea></div>
-        <div class="form-section">Scoring & Feasibility</div>
-        <div class="form-field" title="Low = uses existing APIs and data. Medium = some integration work needed. High = requires new infrastructure or data pipelines."><label>⚙️ Complexity</label><select id="popupComplexity"><option value="">Select...</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
-        <div class="form-field" title="Quick Win = can demo in weeks. Standard = 3-6 month project. Strategic = multi-quarter initiative."><label>🗓️ Timeline</label><select id="popupTimeline"><option value="">Select...</option><option value="quick-win">Quick Win (1-2 months)</option><option value="standard">Standard (3-6 months)</option><option value="strategic">Strategic (6+ months)</option></select></div>
-        <div class="form-field" title="Green = data is clean and accessible today. Amber = data exists but needs cleanup or permissions. Red = data doesn't exist or major quality issues."><label>🟢 Data Readiness</label><select id="popupDataReady"><option value="">Select...</option><option value="green">Green — Data ready</option><option value="amber">Amber — Some gaps</option><option value="red">Red — Significant work needed</option></select></div>
-        <div class="form-section">Ownership & Risk</div>
-        <div class="form-field" title="Example: &quot;VP of Sales (sponsor), Sales Ops (data owner), IT (integration), Sales Enablement (rollout)&quot;"><label>👤 Stakeholders</label><input id="popupStakeholders" placeholder="Sponsors, beneficiaries"></div>
-        <div class="form-field" title="Example: &quot;Maria Lopez, VP of Sales&quot; — who has budget authority and will champion this?"><label>🏢 Executive Sponsor</label><input id="popupSponsor" placeholder="Sponsor name and title"></div>
-        <div class="form-field" title="Example: &quot;Reduce avg call prep from 45 min to 10 min within 90 days. Achieve 80% rep adoption. Improve win rate by 10%.&quot;"><label>📏 Success Criteria</label><textarea id="popupKpis" placeholder="Measurable KPIs and success metrics" rows="2"></textarea></div>
-        <div class="form-field" title="Example: &quot;CRM data quality is inconsistent. Need IT approval for API access. Change management — reps may resist new workflow.&quot;"><label>🚧 Risks & Blockers</label><textarea id="popupRisks" placeholder="Data quality, compliance, blockers" rows="2"></textarea></div>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="form-field" style="grid-column:1/-1;" title="Example: &quot;Manual sales call prep takes 45 min per account&quot; or &quot;Customer onboarding requires 12 handoffs across 3 teams&quot;"><label>Challenge Name</label><input type="text" id="popupIdeaName" placeholder="e.g. Manual sales call prep takes 45 min per account" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitIdeaFromPopup();}"></div>
+        <div class="form-field" title="Which team owns this process?"><label>Department</label><select id="popupIdeaDept"></select></div>
+        <div class="form-field" title="Who raised this challenge?"><label>Submitted By</label><input type="text" id="popupIdeaSubmitter" placeholder="Name"></div>
+        <div class="form-field full" title="Example: &quot;As a sales rep, I spend 45 min before each call manually searching CRM, LinkedIn, and emails to build a briefing. I often miss key details and the call goes poorly. I need a way to get a complete account snapshot in minutes so I can focus on the conversation.&quot;"><label>Describe the Challenge</label><textarea id="popupIdeaDesc" placeholder="As a [role], I [current pain point]. I need [desired outcome] so that [business value]." rows="4"></textarea></div>
       </div>
       <div class="form-actions">
         <button class="btn-cancel" onclick="hideAddIdeaPopup()">Cancel</button>
@@ -2085,24 +2061,9 @@ function showAddIdeaPopup() {
 
 function hideAddIdeaPopup() {
   document.getElementById('addIdeaOverlay').classList.remove('open');
-  ['popupIdeaName','popupIdeaDesc','popupIdeaSubmitter','popupPeople','popupFrequency',
-   'popupTime','popupSystems','popupProcess','popupPain','popupSolution','popupData',
-   'popupSavings','popupImpact','popupBenefits','popupAlignment','popupStakeholders',
-   'popupSponsor','popupKpis','popupRisks'].forEach(id => {
+  ['popupIdeaName','popupIdeaDesc','popupIdeaSubmitter'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
-  ['popupComplexity','popupTimeline','popupDataReady'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.selectedIndex = 0;
-  });
-}
-
-function calcTimeSavingsPopup() {
-  var people = parseFloat(document.getElementById('popupPeople')?.value) || 0;
-  var freq = parseFloat(document.getElementById('popupFrequency')?.value) || 0;
-  var mins = parseFloat(document.getElementById('popupTime')?.value) || 0;
-  var hrs = people * freq * (mins / 60);
-  var el = document.getElementById('popupSavings');
-  if (el) el.value = hrs > 0 ? hrs.toFixed(1) + ' hrs/week' : '';
 }
 
 function submitIdeaFromPopup() {
@@ -2111,32 +2072,7 @@ function submitIdeaFromPopup() {
   const desc = document.getElementById('popupIdeaDesc').value.trim();
   const submitter = document.getElementById('popupIdeaSubmitter').value.trim();
   if (!name) { document.getElementById('popupIdeaName').focus(); return; }
-  const pg = (id) => document.getElementById(id)?.value || '';
-  const evaluation = {
-    peopleInvolved: pg('popupPeople'),
-    processFrequency: pg('popupFrequency'),
-    timePerOccurrence: pg('popupTime'),
-    systemsTools: pg('popupSystems'),
-    currentProcess: pg('popupProcess'),
-    painPoints: pg('popupPain'),
-    idealSolution: pg('popupSolution'),
-    dataSources: pg('popupData'),
-    estimatedTimeSavings: pg('popupSavings'),
-    businessImpact: pg('popupImpact'),
-    expectedBenefits: pg('popupBenefits'),
-    strategicAlignment: pg('popupAlignment'),
-    complexity: pg('popupComplexity'),
-    implementationTimeline: pg('popupTimeline'),
-    dataReadiness: pg('popupDataReady'),
-    stakeholders: pg('popupStakeholders'),
-    sponsorName: pg('popupSponsor'),
-    successCriteria: pg('popupKpis'),
-    risks: pg('popupRisks'),
-    evaluatedAt: new Date().toISOString()
-  };
-  // Only attach evaluation if any field was filled
-  const hasEval = Object.values(evaluation).some(v => v && v !== '' && v !== evaluation.evaluatedAt);
-  state.ideas.push({ id: Date.now(), name, dept, desc, submitter: submitter || 'Facilitator', votes: 0, voters: [], ...(hasEval ? { evaluation } : {}) });
+  state.ideas.push({ id: Date.now(), name, dept, desc, submitter: submitter || 'Facilitator', votes: 0, voters: [] });
   hideAddIdeaPopup();
   renderPanelIdeaList();
   renderIdeas();

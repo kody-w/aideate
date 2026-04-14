@@ -1197,18 +1197,15 @@
       <div class="tag" style="background:rgba(16,124,16,.15); color:#4ade80; border:1px solid rgba(16,124,16,.25);">Ready to Begin</div>
       <h2 style="font-size:2.2rem;">Let's Get Started</h2>
       <p style="font-size:1rem;color:var(--muted);line-height:1.7;">I'll be driving the workshop on screen. Call out your ideas, votes, and input — I'll capture everything live.</p>
-      <div style="padding:16px;background:rgba(0,120,212,.08);border:1px solid rgba(0,120,212,.2);border-radius:12px;margin-top:8px;">
-        <p style="font-size:.9rem;line-height:1.6;">Your ideas matter most. Any pre-loaded scenarios are just a starting point — add, modify, or replace anything.</p>
-      </div>
     </div>
     <div class="col-visual">
       <div class="action-box" style="text-align:left;margin:0;width:100%;border-radius:12px;">
         <h3 style="font-size:1rem;">How This Works</h3>
         <ol class="step-list">
-          <li><span class="num">1</span> <span>We may have pre-loaded challenges from discovery sessions as a starting point</span></li>
-          <li><span class="num">2</span> <span><strong>Add more ideas</strong> — call them out and I'll type them in</span></li>
-          <li><span class="num">3</span> <span><strong>Vote</strong> — tell me your top picks</span></li>
-          <li><span class="num">4</span> <span><strong>Define &amp; Prioritize</strong> — we'll build the business case and walk out with a roadmap</span></li>
+          <li><span class="num">1</span> <span><strong>Ideate</strong> — call out your biggest business challenges and I'll capture them</span></li>
+          <li><span class="num">2</span> <span><strong>Vote</strong> — tell me your top picks</span></li>
+          <li><span class="num">3</span> <span><strong>Define</strong> — we deep-dive on the top-voted challenges</span></li>
+          <li><span class="num">4</span> <span><strong>Prioritize</strong> — we build the business case and walk out with a roadmap</span></li>
         </ol>
       </div>
     </div>
@@ -1663,15 +1660,7 @@ function restoreAutosave() {
 function clearAutosave() {
   if (!confirm('Clear all workshop data? Make sure you\'ve exported first — this cannot be undone.')) return;
   localStorage.removeItem(AUTOSAVE_KEY);
-  state.sessionId = generateSessionId();
-  state.workshopName = ''; state.companyName = ''; state.phase = 'ideate';
-  state.companyProfile = { industry: '', country: '', employeeCount: '', annualRevenue: '', businessGoals: '' };
-  state.participants = []; state.ideas = []; state.timerSeconds = 0;
-  state.demoSlides = {}; state.departments = ['Sales','Marketing','Finance','HR','IT','Operations','Customer Service','Legal'];
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  renderAll();
-  showSlide(document.getElementById('slide-1'));
-  log('Workshop cleared — starting fresh');
+  location.reload();
 }
 
 // ══════════════════════════════════════════════

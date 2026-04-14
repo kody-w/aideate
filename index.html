@@ -300,6 +300,9 @@
     background: linear-gradient(135deg, #fff, rgba(255,255,255,.8));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
+  .idea-card .card-center {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;
+  }
   .idea-card .card-hint {
     position: absolute; bottom: 10px; right: 14px;
     font-size: .8rem; color: var(--muted); opacity: .4;
@@ -313,7 +316,7 @@
   .idea-card .front-status.empty { background: rgba(148,163,184,.1); color: var(--muted); }
   .idea-card .card-details {
     width: 100%; text-align: left; font-size: clamp(.95rem, 1.4vw, 1.15rem); line-height: 1.5;
-    color: rgba(255,255,255,.65); margin-top: 12px; flex: 1; overflow-y: auto;
+    color: rgba(255,255,255,.65); margin-top: 12px; overflow-y: auto;
   }
   .idea-card .card-details .detail-row {
     margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
@@ -533,53 +536,50 @@
 
   /* Showcase: the focused/winner card fills the main area */
   .eval-showcase {
-    flex: 1; display: flex; align-items: flex-start; justify-content: center;
-    padding: 24px 48px; overflow-y: auto;
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+    padding: 0 48px;
   }
-  .showcase-card {
-    background: linear-gradient(135deg, var(--card), rgba(22,33,62,.95));
-    border: 2px solid var(--border); border-radius: 20px;
-    padding: 36px 44px; max-width: 1100px; width: 100%;
-    animation: cardIn .5s ease;
-    transition: transform .4s ease, box-shadow .4s ease;
-    position: relative;
+  .showcase-header {
+    display: flex; align-items: flex-start; gap: 16px; padding: 20px 0 16px;
+    flex-shrink: 0; position: relative;
   }
-  .showcase-card:hover {
-    transform: perspective(1000px) rotateY(-2deg) rotateX(1deg) scale(1.01);
-    box-shadow: 0 20px 60px rgba(0,120,212,.2), 0 0 40px rgba(116,39,116,.1);
+  .showcase-header .sc-rank { font-size: 2rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,.3)); }
+  .showcase-header .sc-info { flex: 1; }
+  .showcase-header .sc-dept {
+    font-size: .75rem; padding: 4px 14px; border-radius: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px; display: inline-block; margin-bottom: 6px;
   }
-  .showcase-card .sc-rank {
-    position: absolute; top: -20px; left: 36px;
-    font-size: 2.2rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,.3));
-  }
-  .showcase-card .sc-votes {
-    position: absolute; top: 16px; right: 24px;
-    background: var(--ms-blue); color: #fff; font-weight: 800; font-size: 1.1rem;
-    padding: 6px 16px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,120,212,.4);
-  }
-  .showcase-card .sc-dept {
-    font-size: .7rem; padding: 4px 14px; border-radius: 12px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .5px; display: inline-block; margin-bottom: 12px;
-  }
-  .showcase-card .sc-name {
-    font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; line-height: 1.15;
+  .showcase-header .sc-name {
+    font-size: clamp(1.4rem, 2.8vw, 2.2rem); font-weight: 800; line-height: 1.15;
     background: linear-gradient(135deg, #fff, rgba(255,255,255,.8));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
   }
-  .showcase-card .sc-desc {
-    font-size: 1rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; max-width: 800px;
+  .showcase-header .sc-desc {
+    font-size: .95rem; color: var(--muted); line-height: 1.5; max-width: 800px;
+  }
+  .showcase-header .sc-votes {
+    background: var(--ms-blue); color: #fff; font-weight: 800; font-size: 1rem;
+    padding: 6px 16px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,120,212,.4);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .showcase-card {
+    flex: 1; overflow-y: auto;
+    background: linear-gradient(135deg, var(--card), rgba(22,33,62,.95));
+    border: 2px solid var(--border); border-radius: 16px;
+    padding: 20px 28px; margin-bottom: 8px;
+    animation: cardIn .5s ease; position: relative;
   }
   .showcase-card .sc-grid {
     display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
   }
   .showcase-card .sc-field {
-    background: var(--dark); border: 1px solid var(--border); border-radius: 10px; padding: 12px;
-    transition: border-color .3s, transform .3s;
+    background: var(--dark); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+    transition: border-color .3s;
   }
   .showcase-card .sc-field:hover { border-color: rgba(0,120,212,.3); }
   .showcase-card .sc-field label {
-    font-size: .58rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+    font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
     display: flex; align-items: center; gap: 5px; margin-bottom: 4px;
   }
   .showcase-card .sc-field .val { font-size: .85rem; line-height: 1.5; min-height: 1.2em; }
@@ -591,18 +591,18 @@
   .showcase-card .sc-field .val.editable:focus {
     outline: none; border-color: var(--ms-blue); background: rgba(0,120,212,.08);
   }
-  .showcase-card .sc-field textarea.val.editable { min-height: 42px; }
+  .showcase-card .sc-field textarea.val.editable { min-height: 36px; }
   .showcase-card .sc-field select.val.editable { cursor: pointer; }
   .showcase-card .sc-field .val.editable[readonly] {
     background: rgba(0,120,212,.08); color: #60a5fa; font-weight: 600; cursor: default;
   }
   .showcase-card .sc-section-label {
     grid-column: 1 / -1; font-size: .6rem; font-weight: 700; color: var(--ms-blue);
-    text-transform: uppercase; letter-spacing: 1px; padding-top: 8px;
-    border-top: 1px solid var(--border); margin-top: 4px;
+    text-transform: uppercase; letter-spacing: 1px; padding-top: 6px;
+    border-top: 1px solid var(--border); margin-top: 2px;
   }
   .showcase-card .sc-meta {
-    display: flex; gap: 20px; align-items: center; margin-top: 16px; padding-top: 12px;
+    display: flex; gap: 20px; align-items: center; margin-top: 12px; padding-top: 10px;
     border-top: 1px solid var(--border);
   }
   .showcase-card .sc-stat { text-align: center; }
@@ -3395,8 +3395,10 @@ function renderIdeas() {
       return '<div class="idea-card" onclick="expandIdeaCard('+i.id+')">' +
         '<div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div>' +
         '<span class="front-status" style="background:rgba(255,255,255,.06);color:var(--muted);">'+escHtml(i.submitter||'Facilitator')+'</span>' +
-        '<div class="name">'+escHtml(i.name)+'</div>' +
-        descHtml +
+        '<div class="card-center">' +
+          '<div class="name">'+escHtml(i.name)+'</div>' +
+          descHtml +
+        '</div>' +
         '<div class="card-hint">click to expand</div>' +
       '</div>';
     }).join('');
@@ -3696,12 +3698,16 @@ function renderEvaluation() {
   }
 
   showcase.innerHTML =
-    '<div class="showcase-card">' +
+    '<div class="showcase-header">' +
       '<div class="sc-rank">' + (medals[focusRank] || '#' + (focusRank + 1)) + '</div>' +
+      '<div class="sc-info">' +
+        '<div class="sc-dept ' + getDeptClass(focusedIdea.dept) + '">' + escHtml(focusedIdea.dept) + '</div>' +
+        '<div class="sc-name">' + escHtml(focusedIdea.name) + '</div>' +
+        (focusedIdea.desc ? '<div class="sc-desc">' + escHtml(focusedIdea.desc) + '</div>' : '') +
+      '</div>' +
       '<div class="sc-votes">🗳️ ' + (focusedIdea.votes || 0) + ' vote' + ((focusedIdea.votes || 0) !== 1 ? 's' : '') + '</div>' +
-      '<div class="sc-dept ' + getDeptClass(focusedIdea.dept) + '">' + escHtml(focusedIdea.dept) + '</div>' +
-      '<div class="sc-name">' + escHtml(focusedIdea.name) + '</div>' +
-      (focusedIdea.desc ? '<div class="sc-desc">' + escHtml(focusedIdea.desc) + '</div>' : '') +
+    '</div>' +
+    '<div class="showcase-card">' +
       '<div class="sc-grid">' + fieldsHtml + '</div>' + metaHtml +
       (ev.aiGenerated ? '<div style="margin-top:8px;font-size:.6rem;color:var(--muted);text-align:right;">✨ AI-assisted</div>' : '') +
     '</div>';

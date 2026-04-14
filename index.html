@@ -1114,7 +1114,7 @@
 </div>
 
 <!-- ════════════════════════════════════════════ -->
-<!-- SLIDE 3: Starting Ideas                     -->
+<!-- SLIDE 3: Your Business First                -->
 <!-- ════════════════════════════════════════════ -->
 <div class="slide content-slide bg-gradient-3" id="slide-3">
   <div class="ms-slide-header">
@@ -1122,14 +1122,31 @@
     <div class="ms-header-title">AI Acceleration Workshop</div>
   </div>
   <div style="text-align:center; max-width:900px;">
-    <div class="tag" style="background:rgba(0,120,212,.15); color:var(--ms-blue); border:1px solid rgba(0,120,212,.25);">Starting Point</div>
-    <h2>AI Use Cases to Explore</h2>
-    <p class="subtitle" id="preparedSubtitle" style="margin: 0 auto 16px;">
-      Here are some challenges to get us started. We'll add more during the ideation phase.
+    <div class="tag" style="background:rgba(0,120,212,.15); color:var(--ms-blue); border:1px solid rgba(0,120,212,.25);">Your Business First</div>
+    <h2>What Are Your Biggest Challenges Today?</h2>
+    <p class="subtitle" id="preparedSubtitle" style="margin: 0 auto 24px;">
+      We start with your business problems — not the technology. Together we'll identify the challenges that matter most, prioritize them, and then show you exactly how AI can solve them for your business.
     </p>
+    <div style="display:flex; gap:20px; justify-content:center; margin-bottom:28px; flex-wrap:wrap; max-width:800px; margin-left:auto; margin-right:auto;">
+      <div style="flex:1; min-width:200px; background:rgba(0,120,212,.1); border:1px solid rgba(0,120,212,.2); border-radius:10px; padding:18px; text-align:left;">
+        <div style="font-size:1.4rem; margin-bottom:6px;">1.</div>
+        <div style="font-weight:700; font-size:.95rem; margin-bottom:4px;">Identify</div>
+        <div style="font-size:.8rem; color:var(--muted);">Surface the business challenges and workflow bottlenecks across your teams</div>
+      </div>
+      <div style="flex:1; min-width:200px; background:rgba(116,39,116,.1); border:1px solid rgba(116,39,116,.2); border-radius:10px; padding:18px; text-align:left;">
+        <div style="font-size:1.4rem; margin-bottom:6px;">2.</div>
+        <div style="font-weight:700; font-size:.95rem; margin-bottom:4px;">Prioritize</div>
+        <div style="font-size:.8rem; color:var(--muted);">Vote and evaluate to focus on the problems with the greatest impact</div>
+      </div>
+      <div style="flex:1; min-width:200px; background:rgba(16,124,16,.1); border:1px solid rgba(16,124,16,.2); border-radius:10px; padding:18px; text-align:left;">
+        <div style="font-size:1.4rem; margin-bottom:6px;">3.</div>
+        <div style="font-weight:700; font-size:.95rem; margin-bottom:4px;">Solve</div>
+        <div style="font-size:.8rem; color:var(--muted);">Map AI solutions to your top priorities and walk out with a clear roadmap</div>
+      </div>
+    </div>
     <div id="preparedCards">
       <div class="prepared-placeholder">
-        <div style="margin-bottom:12px;">No use cases loaded yet — add them in the ideation phase or load a template from the controls</div>
+        <div style="margin-bottom:12px;">Use cases will appear here as we add them during the workshop</div>
         <button onclick="openDrawer()" style="background:rgba(0,120,212,.2); color:var(--ms-blue); border:1px solid rgba(0,120,212,.35); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">
           ⚙ Open Controls
         </button>
@@ -3144,7 +3161,7 @@ function renderIntroSlide() {
 function renderPreparedSlide() {
   const container = document.getElementById('preparedCards');
   if (state.ideas.length === 0) {
-    container.innerHTML = '<div class="prepared-placeholder"><div style="margin-bottom:12px;">No use cases loaded yet — add them in the ideation phase or load a template from the controls</div><button onclick="openDrawer()" style="background:rgba(0,120,212,.2); color:var(--ms-blue); border:1px solid rgba(0,120,212,.35); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">⚙ Open Controls</button></div>';
+    container.innerHTML = '<div class="prepared-placeholder"><div style="margin-bottom:12px;">Use cases will appear here as we add them during the workshop</div><button onclick="openDrawer()" style="background:rgba(0,120,212,.2); color:var(--ms-blue); border:1px solid rgba(0,120,212,.35); padding:8px 20px; border-radius:6px; cursor:pointer; font-size:.85rem;">⚙ Open Controls</button></div>';
     return;
   }
   container.innerHTML = '<div class="usecase-menu">' + state.ideas.map((idea, i) =>

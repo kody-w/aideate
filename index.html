@@ -281,8 +281,8 @@
     flex: 1 1 300px; min-width: 240px; max-width: 100%;
     background: linear-gradient(135deg, var(--card), rgba(22,33,62,.95));
     border: 2px solid var(--border); border-radius: 12px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 24px; position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; padding: 32px 16px 24px; position: relative;
     cursor: pointer; animation: cardIn .4s ease;
     transition: transform .3s, box-shadow .3s, border-color .3s;
   }
@@ -309,6 +309,16 @@
   .idea-card .front-status.complete { background: rgba(16,124,16,.2); color: #4ade80; }
   .idea-card .front-status.partial { background: rgba(251,191,36,.15); color: #fbbf24; }
   .idea-card .front-status.empty { background: rgba(148,163,184,.1); color: var(--muted); }
+  .idea-card .card-details {
+    width: 100%; text-align: left; font-size: .65rem; line-height: 1.4;
+    color: rgba(255,255,255,.55); margin-top: 8px; flex: 1; overflow-y: auto;
+  }
+  .idea-card .card-details .detail-row {
+    margin-bottom: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .idea-card .card-details .detail-label {
+    color: rgba(255,255,255,.35); text-transform: uppercase; font-size: .55rem; font-weight: 700; letter-spacing: .3px;
+  }
 
   /* Expanded card overlay — full-screen detail form */
   .idea-expand-overlay {
@@ -851,6 +861,13 @@
     min-width: 24px; text-align: center; font-weight: 800; font-size: .9rem;
     color: var(--ms-blue); background: rgba(0,120,212,.1); border-radius: 5px; padding: 1px 4px;
   }
+  .score-desc {
+    font-size: .72rem; color: var(--ms-blue); font-weight: 600; min-height: 1.2em;
+    padding: 3px 0; opacity: 0; transition: opacity .3s ease;
+    width: 100%;
+  }
+  .score-desc.score-flash { animation: scoreFlash 2.5s ease forwards; }
+  @keyframes scoreFlash { 0% { opacity: 0; } 10% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: .6; } }
   .drawer .eval-form .eval-section-label {
     font-size: .65rem; font-weight: 700; color: var(--text); text-transform: uppercase;
     letter-spacing: .5px; margin: 10px 0 4px; padding-bottom: 3px;
@@ -2335,7 +2352,8 @@ function renderWizardStep() {
       html += '<select id="wiz-' + f.key + '">' + f.options.map(function(o) { return '<option value="' + o.v + '"' + (val==o.v?' selected':'') + '>' + o.l + '</option>'; }).join('') + '</select>';
     } else if (f.type === 'range') {
       var rv = val || 5;
-      html += '<div style="display:flex;align-items:center;gap:10px;"><input type="range" id="wiz-' + f.key + '" min="' + (f.min||1) + '" max="' + (f.max||10) + '" value="' + rv + '" oninput="this.nextElementSibling.textContent=this.value" style="flex:1;accent-color:var(--ms-blue);"><span style="font-weight:700;font-size:1.1rem;min-width:24px;text-align:center;">' + rv + '</span><span style="font-size:.7rem;color:var(--muted);">/10</span></div>';
+      var scoreType = f.key === 'impactScore' ? 'impact' : 'readiness';
+      html += '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><input type="range" id="wiz-' + f.key + '" min="' + (f.min||1) + '" max="' + (f.max||10) + '" value="' + rv + '" oninput="showScoreLabel(this,\'' + scoreType + '\')" style="flex:1;min-width:120px;accent-color:var(--ms-blue);"><span style="font-weight:700;font-size:1.1rem;min-width:24px;text-align:center;">' + rv + '</span><span style="font-size:.7rem;color:var(--muted);">/ 10</span></div>';
     } else {
       html += '<input type="' + (f.type||'text') + '" id="wiz-' + f.key + '" placeholder="' + (f.placeholder||'') + '" value="' + escAttr(val || '') + '"' + (f.readonly?' readonly':'') + '>';
     }
@@ -2457,8 +2475,8 @@ function renderEvalForm(idea) {
     '<div class="eval-field"><label>Stakeholders</label><textarea id="ev-stakeholders-' + id + '" placeholder="Who benefits? Who sponsors?">' + escHtml(ev.stakeholders || '') + '</textarea></div>' +
     '<div class="eval-field"><label>Executive Sponsor</label><input id="ev-sponsor-' + id + '" placeholder="Sponsor name and title" value="' + escAttr(ev.sponsorName || '') + '"></div>' +
     '<div class="eval-section-label">Scoring & Risk</div>' +
-    '<div class="eval-field"><label>Impact Score</label><div class="score-row"><input type="range" id="ev-impactScore-' + id + '" min="1" max="10" value="' + (ev.impactScore || 5) + '" oninput="this.nextElementSibling.textContent=this.value"><span class="score-val">' + (ev.impactScore || 5) + '</span><span style="font-size:.6rem;color:var(--muted);">1-10</span></div></div>' +
-    '<div class="eval-field"><label>Readiness Score</label><div class="score-row"><input type="range" id="ev-readinessScore-' + id + '" min="1" max="10" value="' + (ev.readinessScore || 5) + '" oninput="this.nextElementSibling.textContent=this.value"><span class="score-val">' + (ev.readinessScore || 5) + '</span><span style="font-size:.6rem;color:var(--muted);">1-10</span></div></div>' +
+    '<div class="eval-field"><label>Impact Score</label><div class="score-row" style="flex-wrap:wrap;"><input type="range" id="ev-impactScore-' + id + '" min="1" max="10" value="' + (ev.impactScore || 5) + '" oninput="showScoreLabel(this,\'impact\')" style="flex:1;min-width:100px;"><span class="score-val">' + (ev.impactScore || 5) + '</span><span style="font-size:.6rem;color:var(--muted);">/ 10</span></div></div>' +
+    '<div class="eval-field"><label>Readiness Score</label><div class="score-row" style="flex-wrap:wrap;"><input type="range" id="ev-readinessScore-' + id + '" min="1" max="10" value="' + (ev.readinessScore || 5) + '" oninput="showScoreLabel(this,\'readiness\')" style="flex:1;min-width:100px;"><span class="score-val">' + (ev.readinessScore || 5) + '</span><span style="font-size:.6rem;color:var(--muted);">/ 10</span></div></div>' +
     '<div class="eval-field"><label>Complexity</label><select id="ev-complexity-' + id + '"><option value=""' + (!ev.complexity ? ' selected' : '') + '>Select...</option><option value="low"' + (ev.complexity === 'low' ? ' selected' : '') + '>Low</option><option value="medium"' + (ev.complexity === 'medium' ? ' selected' : '') + '>Medium</option><option value="high"' + (ev.complexity === 'high' ? ' selected' : '') + '>High</option></select></div>' +
     '<div class="eval-field"><label>Timeline</label><select id="ev-timeline-' + id + '"><option value=""' + (!ev.implementationTimeline ? ' selected' : '') + '>Select...</option><option value="quick-win"' + (ev.implementationTimeline === 'quick-win' ? ' selected' : '') + '>Quick Win (1-2 mo)</option><option value="standard"' + (ev.implementationTimeline === 'standard' ? ' selected' : '') + '>Standard (3-6 mo)</option><option value="strategic"' + (ev.implementationTimeline === 'strategic' ? ' selected' : '') + '>Strategic (6+ mo)</option></select></div>' +
     '<div class="eval-field"><label>Data Readiness</label><select id="ev-dataReady-' + id + '"><option value=""' + (!ev.dataReadiness ? ' selected' : '') + '>Select...</option><option value="green"' + (ev.dataReadiness === 'green' ? ' selected' : '') + '>Green</option><option value="amber"' + (ev.dataReadiness === 'amber' ? ' selected' : '') + '>Amber</option><option value="red"' + (ev.dataReadiness === 'red' ? ' selected' : '') + '>Red</option></select></div>' +
@@ -3205,6 +3223,50 @@ function renderParticipants() {
   });
 }
 
+// Score slider descriptions
+const IMPACT_LABELS = {
+  1: 'Negligible — no measurable business change',
+  2: 'Minimal — marginal improvement to one task',
+  3: 'Low — small efficiency gain for a few people',
+  4: 'Moderate — noticeable improvement for one team',
+  5: 'Meaningful — clear ROI for one department',
+  6: 'Significant — measurable gains across multiple teams',
+  7: 'High — major cost savings or revenue impact',
+  8: 'Very High — transforms a core business process',
+  9: 'Critical — competitive advantage, company-wide impact',
+  10: 'Transformational — game-changing strategic value'
+};
+const READINESS_LABELS = {
+  1: 'Not ready — no data, no infrastructure, no sponsor',
+  2: 'Very early — concept only, major gaps everywhere',
+  3: 'Early — some data exists but significant work needed',
+  4: 'Developing — data partially available, team identified',
+  5: 'Moderate — data accessible, some integration needed',
+  6: 'Good — data clean, team capable, path clear',
+  7: 'Strong — infrastructure ready, quick pilot possible',
+  8: 'Very strong — proven tech, experienced team, data ready',
+  9: 'Near-ready — minimal effort to launch, strong sponsor',
+  10: 'Ready now — everything in place, just needs approval'
+};
+function showScoreLabel(input, type) {
+  var val = parseInt(input.value);
+  var labels = type === 'impact' ? IMPACT_LABELS : READINESS_LABELS;
+  var text = labels[val] || '';
+  input.nextElementSibling.textContent = val;
+  // Find or create the description element
+  var parent = input.closest('.score-row') || input.closest('div');
+  var desc = parent.querySelector('.score-desc');
+  if (!desc) {
+    desc = document.createElement('div');
+    desc.className = 'score-desc';
+    parent.appendChild(desc);
+  }
+  desc.textContent = text;
+  desc.classList.remove('score-flash');
+  void desc.offsetWidth; // force reflow
+  desc.classList.add('score-flash');
+}
+
 function calcTimeSavings(ideaId, pfx) {
   var pe, fe, te, se;
   if (pfx === 'ev') { pe='ev-people-'; fe='ev-frequency-'; te='ev-timePerOcc-'; se='ev-timeSaved-'; }
@@ -3297,8 +3359,8 @@ function expandIdeaCard(ideaId) {
         '<div class="ef"><label>✅ Expected Benefits</label><textarea id="ex-benefits-'+idea.id+'" placeholder="Concrete, measurable benefits (2-4 bullets)">'+escHtml(ev.expectedBenefits||'')+'</textarea></div>' +
         '<div class="ef"><label>🎯 Strategic Alignment</label><textarea id="ex-alignment-'+idea.id+'" placeholder="How does this align with business priorities?">'+escHtml(ev.strategicAlignment||'')+'</textarea></div>' +
         '<div class="ex-section">Scoring &amp; Feasibility</div>' +
-        '<div class="ef"><label>💥 Impact Score</label><div style="display:flex;align-items:center;gap:10px;"><input type="range" id="ex-impactScore-'+idea.id+'" min="1" max="10" value="'+(ev.impactScore||5)+'" oninput="this.nextElementSibling.textContent=this.value" style="flex:1;"><span style="font-weight:700;font-size:1.1rem;min-width:24px;text-align:center;">'+(ev.impactScore||5)+'</span><span style="font-size:.7rem;color:var(--muted);">/10</span></div></div>' +
-        '<div class="ef"><label>🔋 Readiness Score</label><div style="display:flex;align-items:center;gap:10px;"><input type="range" id="ex-readinessScore-'+idea.id+'" min="1" max="10" value="'+(ev.readinessScore||5)+'" oninput="this.nextElementSibling.textContent=this.value" style="flex:1;"><span style="font-weight:700;font-size:1.1rem;min-width:24px;text-align:center;">'+(ev.readinessScore||5)+'</span><span style="font-size:.7rem;color:var(--muted);">/10</span></div></div>' +
+        '<div class="ef"><label>💥 Impact Score</label><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><input type="range" id="ex-impactScore-'+idea.id+'" min="1" max="10" value="'+(ev.impactScore||5)+'" oninput="showScoreLabel(this,\'impact\')" style="flex:1;min-width:120px;"><span style="font-weight:700;font-size:1.1rem;min-width:24px;text-align:center;">'+(ev.impactScore||5)+'</span><span style="font-size:.7rem;color:var(--muted);">/ 10</span></div></div>' +
+        '<div class="ef"><label>🔋 Readiness Score</label><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><input type="range" id="ex-readinessScore-'+idea.id+'" min="1" max="10" value="'+(ev.readinessScore||5)+'" oninput="showScoreLabel(this,\'readiness\')" style="flex:1;min-width:120px;"><span style="font-weight:700;font-size:1.1rem;min-width:24px;text-align:center;">'+(ev.readinessScore||5)+'</span><span style="font-size:.7rem;color:var(--muted);">/ 10</span></div></div>' +
         '<div class="ef"><label>⚙️ Complexity</label><select id="ex-complexity-'+idea.id+'"><option value="">Select...</option><option value="low"'+(ev.complexity==='low'?' selected':'')+'>Low</option><option value="medium"'+(ev.complexity==='medium'?' selected':'')+'>Medium</option><option value="high"'+(ev.complexity==='high'?' selected':'')+'>High</option></select></div>' +
         '<div class="ef"><label>🗓️ Implementation Timeline</label><select id="ex-timeline-'+idea.id+'"><option value="">Select...</option><option value="quick-win"'+(ev.implementationTimeline==='quick-win'?' selected':'')+'>Quick Win (1-2 months)</option><option value="standard"'+(ev.implementationTimeline==='standard'?' selected':'')+'>Standard (3-6 months)</option><option value="strategic"'+(ev.implementationTimeline==='strategic'?' selected':'')+'>Strategic (6+ months)</option></select></div>' +
         '<div class="ef"><label>🟢 Data Readiness</label><select id="ex-dataReady-'+idea.id+'"><option value="">Select...</option><option value="green"'+(ev.dataReadiness==='green'?' selected':'')+'>Green — Data ready</option><option value="amber"'+(ev.dataReadiness==='amber'?' selected':'')+'>Amber — Some gaps</option><option value="red"'+(ev.dataReadiness==='red'?' selected':'')+'>Red — Significant work needed</option></select></div>' +
@@ -3393,10 +3455,24 @@ function renderIdeas() {
       const comp = getCardCompleteness(i);
       const statusClass = comp.pct === 100 ? 'complete' : comp.pct > 0 ? 'partial' : 'empty';
       const statusLabel = comp.pct === 100 ? '&#10003; Ready' : comp.filled + '/' + comp.total;
+      var details = [];
+      if (i.desc) details.push({ label: 'Description', text: i.desc });
+      var ev = i.evaluation || {};
+      if (ev.currentProcess) details.push({ label: 'Process', text: ev.currentProcess });
+      if (ev.painPoints) details.push({ label: 'Pain Points', text: ev.painPoints });
+      if (ev.idealSolution) details.push({ label: 'AI Solution', text: ev.idealSolution });
+      if (ev.estimatedTimeSavings) details.push({ label: 'Time Savings', text: ev.estimatedTimeSavings });
+      if (ev.businessImpact) details.push({ label: 'Impact', text: ev.businessImpact });
+      var detailsHtml = details.length > 0
+        ? '<div class="card-details">' + details.map(function(d) {
+            return '<div class="detail-row"><span class="detail-label">'+d.label+':</span> '+escHtml(d.text)+'</div>';
+          }).join('') + '</div>'
+        : '';
       return '<div class="idea-card" onclick="expandIdeaCard('+i.id+')">' +
         '<div class="dept '+getDeptClass(i.dept)+'">'+escHtml(i.dept)+'</div>' +
         '<span class="front-status '+statusClass+'">'+statusLabel+'</span>' +
-        '<div class="name">'+escHtml(i.name)+'</div>' +
+        '<div class="name" style="'+(details.length > 0 ? 'font-size:clamp(.85rem,1.5vw,1.2rem);' : '')+'">'+escHtml(i.name)+'</div>' +
+        detailsHtml +
         '<div class="card-hint">click to open</div>' +
       '</div>';
     }).join('');

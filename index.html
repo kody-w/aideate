@@ -2272,9 +2272,7 @@ const WIZARD_STEPS = [
     { key: 'successCriteria', label: 'Success Criteria', type: 'textarea', placeholder: 'How will we measure success? List specific KPIs.' },
     { key: 'risks', label: 'Risks & Blockers', type: 'textarea', placeholder: 'Data quality issues, compliance, dependencies, mitigation strategies' }
   ]},
-  { title: '10. Summary & ROI', fields: [
-    { key: 'implementationCost', label: 'Implementation Cost ($)', type: 'number', placeholder: 'Total estimated cost' },
-    { key: 'annualBenefit', label: 'Annual Benefit ($)', type: 'number', placeholder: 'Yearly savings or revenue impact' },
+  { title: '10. Summary', fields: [
     { key: '_summary', label: '', type: 'summary' }
   ]}
 ];
@@ -2411,17 +2409,7 @@ function completeWizard() {
   saveWizardStepData();
   var idea = state.ideas.find(function(i) { return i.id === wizardIdeaId; });
   if (idea && idea.evaluation) {
-    // Calculate and store ROI
     var ev = idea.evaluation;
-    var ic = parseFloat(ev.implementationCost) || 0;
-    var ab = parseFloat(ev.annualBenefit) || 0;
-    if (ic > 0 && ab > 0) {
-      var h = parseInt(ev.timeHorizon) || 3, dr = (parseFloat(ev.discountRate) || 10) / 100;
-      var npv = -ic; for (var y = 1; y <= h; y++) npv += ab / Math.pow(1 + dr, y);
-      ev.roiPercent = (((ab * h - ic) / ic) * 100).toFixed(1);
-      ev.npvValue = npv.toFixed(0);
-      ev.paybackMonths = (ic / (ab / 12)).toFixed(1);
-    }
     // Calculate time savings
     var ppl = parseFloat(ev.peopleInvolved) || 0;
     var freq = parseFloat(ev.processFrequency) || 0;
@@ -3325,13 +3313,6 @@ function expandIdeaCard(ideaId) {
         '<div class="ef"><label>⚙️ Complexity</label><select id="ex-complexity-'+idea.id+'"><option value="">Select...</option><option value="low"'+(ev.complexity==='low'?' selected':'')+'>Low</option><option value="medium"'+(ev.complexity==='medium'?' selected':'')+'>Medium</option><option value="high"'+(ev.complexity==='high'?' selected':'')+'>High</option></select></div>' +
         '<div class="ef"><label>🗓️ Implementation Timeline</label><select id="ex-timeline-'+idea.id+'"><option value="">Select...</option><option value="quick-win"'+(ev.implementationTimeline==='quick-win'?' selected':'')+'>Quick Win (1-2 months)</option><option value="standard"'+(ev.implementationTimeline==='standard'?' selected':'')+'>Standard (3-6 months)</option><option value="strategic"'+(ev.implementationTimeline==='strategic'?' selected':'')+'>Strategic (6+ months)</option></select></div>' +
         '<div class="ef"><label>🟢 Data Readiness</label><select id="ex-dataReady-'+idea.id+'"><option value="">Select...</option><option value="green"'+(ev.dataReadiness==='green'?' selected':'')+'>Green — Data ready</option><option value="amber"'+(ev.dataReadiness==='amber'?' selected':'')+'>Amber — Some gaps</option><option value="red"'+(ev.dataReadiness==='red'?' selected':'')+'>Red — Significant work needed</option></select></div>' +
-        '<div class="ex-section">ROI Calculator</div>' +
-        '<div class="ef"><label>💰 Implementation Cost ($)</label><input type="number" min="0" id="ex-implCost-'+idea.id+'" placeholder="Total cost to implement" value="'+escAttr(ev.implementationCost||'')+'" oninput="calculateROI('+idea.id+',\'ex\')"></div>' +
-        '<div class="ef"><label>💵 Annual Benefit ($)</label><input type="number" min="0" id="ex-annualBen-'+idea.id+'" placeholder="Yearly savings/revenue" value="'+escAttr(ev.annualBenefit||'')+'" oninput="calculateROI('+idea.id+',\'ex\')"></div>' +
-        '<div class="ef"><label>📅 Time Horizon (years)</label><input type="number" min="1" max="10" id="ex-horizon-'+idea.id+'" placeholder="3" value="'+(ev.timeHorizon||3)+'" oninput="calculateROI('+idea.id+',\'ex\')"></div>' +
-        '<div class="ef"><label>📉 Discount Rate (%)</label><input type="number" min="0" max="50" step="0.5" id="ex-discount-'+idea.id+'" placeholder="10" value="'+(ev.discountRate||10)+'" oninput="calculateROI('+idea.id+',\'ex\')"></div>' +
-        '<div class="ef"><label>⚠️ Risk Factor (%)</label><input type="number" min="0" max="100" step="5" id="ex-riskFactor-'+idea.id+'" placeholder="20" value="'+(ev.riskFactor||20)+'" oninput="calculateROI('+idea.id+',\'ex\')"></div>' +
-        '<div class="ef" style="grid-column:1/-1;"><div id="ex-roiResults-'+idea.id+'" style="display:flex;gap:16px;flex-wrap:wrap;"></div></div>' +
         '<div class="ex-section">Ownership &amp; Risk</div>' +
         '<div class="ef"><label>👤 Stakeholders</label><input id="ex-stakeholders-'+idea.id+'" placeholder="Sponsors, beneficiaries" value="'+escAttr(ev.stakeholders||'')+'"></div>' +
         '<div class="ef"><label>🏢 Executive Sponsor</label><input id="ex-sponsor-'+idea.id+'" placeholder="Sponsor name and title" value="'+escAttr(ev.sponsorName||'')+'"></div>' +
@@ -3346,7 +3327,6 @@ function expandIdeaCard(ideaId) {
     '</div>';
   grid.appendChild(overlay);
   calcTimeSavings(idea.id, 'ex');
-  calculateROI(idea.id, 'ex');
 }
 
 function saveExpandedCard(ideaId) {
@@ -3376,26 +3356,8 @@ function saveExpandedCard(ideaId) {
     sponsorName: g('sponsor'),
     successCriteria: g('kpis'),
     risks: g('risks'),
-    implementationCost: g('implCost'),
-    annualBenefit: g('annualBen'),
-    timeHorizon: parseInt(g('horizon')) || 3,
-    discountRate: parseFloat(g('discount')) || 10,
-    riskFactor: parseFloat(g('riskFactor')) || 20,
-    roiPercent: '',
-    npvValue: '',
-    paybackMonths: '',
     evaluatedAt: new Date().toISOString()
   };
-  // Calculate and store ROI values
-  var ic = parseFloat(idea.evaluation.implementationCost) || 0;
-  var ab = parseFloat(idea.evaluation.annualBenefit) || 0;
-  if (ic > 0 && ab > 0) {
-    var h = idea.evaluation.timeHorizon, dr = idea.evaluation.discountRate / 100, rf = idea.evaluation.riskFactor / 100;
-    var npv = -ic; for (var y = 1; y <= h; y++) npv += ab / Math.pow(1 + dr, y);
-    idea.evaluation.roiPercent = (((ab * h - ic) / ic) * 100).toFixed(1);
-    idea.evaluation.npvValue = npv.toFixed(0);
-    idea.evaluation.paybackMonths = (ic / (ab / 12)).toFixed(1);
-  }
   autosave();
   renderIdeas(); // updates status badges
   const msg = document.getElementById('exSavedMsg');

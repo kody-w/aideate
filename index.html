@@ -574,13 +574,25 @@
     background: var(--dark); border: 1px solid var(--border); border-radius: 10px; padding: 12px;
     transition: border-color .3s, transform .3s;
   }
-  .showcase-card .sc-field:hover { border-color: rgba(0,120,212,.3); transform: translateY(-2px); }
+  .showcase-card .sc-field:hover { border-color: rgba(0,120,212,.3); }
   .showcase-card .sc-field label {
     font-size: .58rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
     display: flex; align-items: center; gap: 5px; margin-bottom: 4px;
   }
   .showcase-card .sc-field .val { font-size: .85rem; line-height: 1.5; min-height: 1.2em; }
-  .showcase-card .sc-field .val:empty::after { content: 'Pending...'; color: var(--muted); font-style: italic; }
+  .showcase-card .sc-field .val.editable {
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 6px;
+    padding: 6px 8px; width: 100%; color: var(--text); font-size: .82rem; font-family: inherit;
+    transition: border-color .2s, background .2s; resize: vertical;
+  }
+  .showcase-card .sc-field .val.editable:focus {
+    outline: none; border-color: var(--ms-blue); background: rgba(0,120,212,.08);
+  }
+  .showcase-card .sc-field textarea.val.editable { min-height: 42px; }
+  .showcase-card .sc-field select.val.editable { cursor: pointer; }
+  .showcase-card .sc-field .val.editable[readonly] {
+    background: rgba(0,120,212,.08); color: #60a5fa; font-weight: 600; cursor: default;
+  }
   .showcase-card .sc-section-label {
     grid-column: 1 / -1; font-size: .6rem; font-weight: 700; color: var(--ms-blue);
     text-transform: uppercase; letter-spacing: 1px; padding-top: 8px;
@@ -3656,42 +3668,53 @@ function renderEvaluation() {
 
   if (label) label.textContent = 'Evaluating: ' + focusedIdea.name + ' (#' + (focusRank + 1) + ')';
 
-  // Build showcase card
+  // Build showcase card — editable fields
+  var fid = focusedIdea.id;
   const sections = [
     { title: 'Current State', fields: [
-      { label: 'People Involved', val: ev.peopleInvolved, icon: '👥' },
-      { label: 'Process Frequency', val: ev.processFrequency, icon: '🔄' },
-      { label: 'Time Per Task', val: ev.timePerOccurrence, icon: '⏱️' },
-      { label: 'Systems & Tools', val: ev.systemsTools, icon: '🔧' }
+      { label: 'People Involved', key: 'peopleInvolved', type: 'number', placeholder: '# of people', icon: '👥' },
+      { label: 'Process Frequency', key: 'processFrequency', type: 'number', placeholder: 'Tasks per week', icon: '🔄' },
+      { label: 'Time Per Task', key: 'timePerOccurrence', type: 'number', placeholder: 'Minutes per task', icon: '⏱️' },
+      { label: 'Systems & Tools', key: 'systemsTools', placeholder: 'Apps, databases, platforms', icon: '🔧' }
     ]},
     { title: 'Problem & Opportunity', fields: [
-      { label: 'Current Process', val: ev.currentProcess, icon: '📝' },
-      { label: 'Pain Points', val: ev.painPoints, icon: '⚠️' },
-      { label: 'Data Sources', val: ev.dataSources, icon: '🗄️' }
+      { label: 'Current Process', key: 'currentProcess', type: 'textarea', placeholder: 'Workflow step by step', icon: '📝' },
+      { label: 'Pain Points', key: 'painPoints', type: 'textarea', placeholder: 'Bottlenecks, errors, delays', icon: '⚠️' },
+      { label: 'Data Sources', key: 'dataSources', placeholder: 'Data/APIs/systems needed', icon: '🗄️' }
     ]},
     { title: 'AI Solution & Impact', fields: [
-      { label: 'Ideal AI Solution', val: ev.idealSolution, icon: '🤖' },
-      { label: 'Time Savings', val: ev.estimatedTimeSavings, icon: '⚡' },
-      { label: 'Business Impact', val: ev.businessImpact, icon: '📈' },
-      { label: 'Expected Benefits', val: ev.expectedBenefits, icon: '✅' },
-      { label: 'Strategic Alignment', val: ev.strategicAlignment, icon: '🎯' }
+      { label: 'Ideal AI Solution', key: 'idealSolution', type: 'textarea', placeholder: 'How could AI address this?', icon: '🤖' },
+      { label: 'Time Savings', key: 'estimatedTimeSavings', placeholder: 'Auto-calculated or manual', icon: '⚡', readonly: true },
+      { label: 'Business Impact', key: 'businessImpact', placeholder: 'Revenue, cost reduction, quality', icon: '📈' },
+      { label: 'Expected Benefits', key: 'expectedBenefits', type: 'textarea', placeholder: 'Concrete, measurable benefits', icon: '✅' },
+      { label: 'Strategic Alignment', key: 'strategicAlignment', type: 'textarea', placeholder: 'How does this align with priorities?', icon: '🎯' }
     ]},
     { title: 'Ownership & Feasibility', fields: [
-      { label: 'Stakeholders', val: ev.stakeholders, icon: '👤' },
-      { label: 'Executive Sponsor', val: ev.sponsorName, icon: '🏢' },
-      { label: 'Complexity', val: ev.complexity ? ev.complexity.charAt(0).toUpperCase() + ev.complexity.slice(1) : '', icon: '⚙️' },
-      { label: 'Timeline', val: {'quick-win':'Quick Win','standard':'Standard','strategic':'Strategic'}[ev.implementationTimeline] || '', icon: '🗓️' },
-      { label: 'Data Readiness', val: {'green':'Green','amber':'Amber','red':'Red'}[ev.dataReadiness] || '', icon: '🟢' },
-      { label: 'Success Criteria', val: ev.successCriteria, icon: '📏' },
-      { label: 'Risks & Blockers', val: ev.risks, icon: '🚧' }
+      { label: 'Stakeholders', key: 'stakeholders', placeholder: 'Sponsors, beneficiaries', icon: '👤' },
+      { label: 'Executive Sponsor', key: 'sponsorName', placeholder: 'Sponsor name and title', icon: '🏢' },
+      { label: 'Complexity', key: 'complexity', type: 'select', options: [{v:'',l:'Select...'},{v:'low',l:'Low'},{v:'medium',l:'Medium'},{v:'high',l:'High'}], icon: '⚙️' },
+      { label: 'Timeline', key: 'implementationTimeline', type: 'select', options: [{v:'',l:'Select...'},{v:'quick-win',l:'Quick Win'},{v:'standard',l:'Standard'},{v:'strategic',l:'Strategic'}], icon: '🗓️' },
+      { label: 'Data Readiness', key: 'dataReadiness', type: 'select', options: [{v:'',l:'Select...'},{v:'green',l:'Green'},{v:'amber',l:'Amber'},{v:'red',l:'Red'}], icon: '🟢' },
+      { label: 'Success Criteria', key: 'successCriteria', type: 'textarea', placeholder: 'Measurable KPIs', icon: '📏' },
+      { label: 'Risks & Blockers', key: 'risks', type: 'textarea', placeholder: 'Data quality, compliance, blockers', icon: '🚧' }
     ]}
   ];
 
   const fieldsHtml = sections.map(s =>
     '<div class="sc-section-label">' + s.title + '</div>' +
-    s.fields.map(f =>
-      '<div class="sc-field"><label>' + f.icon + ' ' + f.label + '</label><div class="val">' + (f.val ? escHtml(f.val) : '') + '</div></div>'
-    ).join('')
+    s.fields.map(f => {
+      var val = ev[f.key] || '';
+      var inputHtml;
+      if (f.type === 'select') {
+        inputHtml = '<select class="val editable" onchange="saveShowcaseField('+fid+',\''+f.key+'\',this.value)">' +
+          f.options.map(o => '<option value="'+o.v+'"'+(val===o.v?' selected':'')+'>'+o.l+'</option>').join('') + '</select>';
+      } else if (f.type === 'textarea') {
+        inputHtml = '<textarea class="val editable" placeholder="'+escAttr(f.placeholder||'')+'" onchange="saveShowcaseField('+fid+',\''+f.key+'\',this.value)"'+(f.readonly?' readonly':'')+'>'+escHtml(val)+'</textarea>';
+      } else {
+        inputHtml = '<input class="val editable" type="'+(f.type||'text')+'" placeholder="'+escAttr(f.placeholder||'')+'" value="'+escAttr(val)+'" onchange="saveShowcaseField('+fid+',\''+f.key+'\',this.value)"'+(f.readonly?' readonly':'')+'>';
+      }
+      return '<div class="sc-field"><label>' + f.icon + ' ' + f.label + '</label>' + inputHtml + '</div>';
+    }).join('')
   ).join('');
 
   // Score/complexity bar if evaluated
@@ -3713,9 +3736,7 @@ function renderEvaluation() {
       '<div class="sc-dept ' + getDeptClass(focusedIdea.dept) + '">' + escHtml(focusedIdea.dept) + '</div>' +
       '<div class="sc-name">' + escHtml(focusedIdea.name) + '</div>' +
       (focusedIdea.desc ? '<div class="sc-desc">' + escHtml(focusedIdea.desc) + '</div>' : '') +
-      (hasEval
-        ? '<div class="sc-grid">' + fieldsHtml + '</div>' + metaHtml
-        : '<div style="text-align:center;padding:24px;color:var(--muted);"><p style="font-size:1rem;">Details pending — flip this card in the Ideate phase or use the drawer (G) to fill in evaluation</p></div>') +
+      '<div class="sc-grid">' + fieldsHtml + '</div>' + metaHtml +
       (ev.aiGenerated ? '<div style="margin-top:8px;font-size:.6rem;color:var(--muted);text-align:right;">✨ AI-assisted</div>' : '') +
     '</div>';
 
@@ -3730,6 +3751,33 @@ function renderEvaluation() {
       '<span class="strip-badge eval-status-badge ' + (hasE ? 'done' : 'pending') + '">' + (hasE ? '✓' : '...') + '</span>' +
     '</div>';
   }).join('');
+}
+
+function saveShowcaseField(ideaId, key, value) {
+  var idea = state.ideas.find(function(i) { return i.id === ideaId; });
+  if (!idea) return;
+  if (!idea.evaluation) idea.evaluation = {};
+  idea.evaluation[key] = value;
+  idea.evaluation.evaluatedAt = new Date().toISOString();
+  // Recalculate time savings if people/frequency/time changed
+  if (key === 'peopleInvolved' || key === 'processFrequency' || key === 'timePerOccurrence') {
+    var ev = idea.evaluation;
+    var ppl = parseFloat(ev.peopleInvolved) || 0;
+    var freq = parseFloat(ev.processFrequency) || 0;
+    var mins = parseFloat(ev.timePerOccurrence) || 0;
+    var hrs = ppl * freq * (mins / 60);
+    ev.estimatedTimeSavings = hrs > 0 ? hrs.toFixed(1) + ' hrs/week' : '';
+    // Update the time savings field on screen without full re-render
+    var showcase = document.getElementById('evalShowcase');
+    if (showcase) {
+      var tsFields = showcase.querySelectorAll('input.editable[readonly]');
+      tsFields.forEach(function(el) { if (el.placeholder.includes('Auto')) el.value = ev.estimatedTimeSavings; });
+    }
+  }
+  autosave();
+  renderPanelIdeaList();
+  renderIdeas();
+  renderPriority();
 }
 
 // ══════════════════════════════════════════════

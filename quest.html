@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIdeate Workshop — Training Quest</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#eaecf0;--bg2:#f4f5f7;--blue:#0969da;--green:#1a7f37;--orange:#bf8700;--red:#cf222e;--text:#24292f;--text-muted:#57606a;--border:#c5ccd6;--panel-w:460px;--top-bar:52px}
+  html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#dfe2e6 0%,var(--bg) 100%);color:var(--text)}
+  .top-bar{position:fixed;top:0;left:0;right:0;height:var(--top-bar);background:rgba(234,236,240,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;z-index:100}
+  .top-bar .title{font-size:15px;font-weight:600;white-space:nowrap}.top-bar .title span{color:var(--blue)}
+  .progress-wrap{flex:1;max-width:420px;margin:0 auto;display:flex;align-items:center;gap:10px}
+  .progress-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+  .progress-label{font-size:13px;color:var(--text-muted);min-width:90px;text-align:right}
+  .btn-reset{background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap;transition:all .2s}.btn-reset:hover{border-color:var(--red);color:var(--red)}
+  .quest-map{position:fixed;top:var(--top-bar);left:0;right:0;bottom:0;overflow:hidden}
+  .quest-map svg.path-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .phase-label{position:absolute;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--text-muted);opacity:.55;pointer-events:none}
+  .phase-label.p1{top:82px;left:1%}.phase-label.p2{top:82px;left:23.2%}.phase-label.p3{top:82px;left:45.4%}.phase-label.p4{top:82px;left:67.7%}
+  .phase-divider{position:absolute;top:var(--top-bar);bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--border) 15%,var(--border) 85%,transparent);opacity:.6;pointer-events:none}
+  .phase-divider.d1{left:22.2%}.phase-divider.d2{left:44.4%}.phase-divider.d3{left:66.7%}
+  .node{position:absolute;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .35s cubic-bezier(.4,0,.2,1);z-index:10;transform:translate(-50%,-50%)}
+  .node .ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--border);transition:all .35s}
+  .node .inner{width:100%;height:100%;border-radius:50%;background:#f0f1f3;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;z-index:1;transition:all .35s;border:2px solid var(--border)}
+  .node.active .ring{border-color:var(--blue);box-shadow:0 0 20px rgba(88,166,255,.35);animation:pulse-ring 2s infinite}
+  .node.active .inner{border-color:var(--blue);background:rgba(88,166,255,.1);transform:scale(1.12)}.node.active .lock{display:none}
+  .node.complete .ring{border-color:var(--green);box-shadow:0 0 12px rgba(63,185,80,.25)}
+  .node.complete .inner{border-color:var(--green);background:rgba(63,185,80,.15)}.node.complete .lock{display:none}
+  .node:hover{transform:translate(-50%,-50%) scale(1.1)}
+  .node .label{position:absolute;top:calc(100% + 10px);white-space:nowrap;font-size:11px;font-weight:600;color:var(--text-muted);text-align:center;pointer-events:none;transition:color .3s}
+  .node.active .label{color:var(--blue)}.node.complete .label{color:var(--green)}
+  @keyframes pulse-ring{0%,100%{box-shadow:0 0 20px rgba(88,166,255,.25)}50%{box-shadow:0 0 32px rgba(88,166,255,.5)}}
+  .check-icon{display:none}.node.complete .check-icon{display:block}.node.complete .emoji{display:none}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.2);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}.overlay.open{opacity:1;pointer-events:auto}
+  .panel{position:fixed;top:0;right:0;bottom:0;width:var(--panel-w);max-width:92vw;background:#f0f1f3;border-left:1px solid var(--border);z-index:210;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow-y:auto;box-shadow:-4px 0 24px rgba(0,0,0,.08)}.panel.open{transform:translateX(0)}
+  .panel-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px}
+  .panel-header .emoji-big{font-size:32px;line-height:1}.panel-header .meta{flex:1}.panel-header .meta h2{font-size:18px;font-weight:700;margin-bottom:4px}.panel-header .meta .time{font-size:12px;color:var(--text-muted)}
+  .panel-close{background:none;border:none;color:var(--text-muted);font-size:22px;cursor:pointer;padding:4px;line-height:1}.panel-close:hover{color:var(--text)}
+  .panel-body{flex:1;padding:20px 24px;display:flex;flex-direction:column;gap:16px}.panel-body .desc{font-size:14px;line-height:1.55;color:var(--text)}
+  .copy-block{position:relative;background:#e4e6ea;border:1px solid var(--border);border-radius:8px;padding:12px 44px 12px 14px;font-family:'Cascadia Code','Fira Code',monospace;font-size:12.5px;line-height:1.5;color:var(--text);white-space:pre-wrap;word-break:break-word}
+  .copy-btn{position:absolute;top:8px;right:8px;background:#d5d8dd;border:none;color:var(--text-muted);width:30px;height:30px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}.copy-btn:hover{background:var(--blue);color:#fff}.copy-btn.copied{background:var(--green);color:#fff}
+  .toggle-done{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:8px;border:2px solid var(--border);background:transparent;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);transition:all .25s;width:100%}
+  .toggle-done .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .25s;flex-shrink:0}
+  .toggle-done.checked{border-color:var(--green);background:rgba(63,185,80,.08)}.toggle-done.checked .dot{background:var(--green);border-color:var(--green)}
+  .substeps{list-style:none;padding:0;display:flex;flex-direction:column;gap:6px}
+  .substeps li{font-size:13px;color:var(--text-muted);padding-left:20px;position:relative;line-height:1.5}
+  .substeps li::before{content:'';position:absolute;left:2px;top:7px;width:8px;height:8px;border-radius:50%;border:2px solid var(--border)}
+  .stuck-toggle{background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;padding:4px 0;display:flex;align-items:center;gap:6px}.stuck-toggle:hover{text-decoration:underline}
+  .stuck-content{max-height:0;overflow:hidden;transition:max-height .3s;font-size:13px;color:var(--text-muted);line-height:1.6}.stuck-content.open{max-height:500px}.stuck-content p{margin-top:8px}
+  .copy-group{display:flex;flex-direction:column;gap:8px}
+  .particle{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:999}
+  .confetti{position:fixed;width:10px;height:16px;pointer-events:none;z-index:999;border-radius:2px}
+  .rocket-anim{position:fixed;font-size:40px;z-index:999;pointer-events:none}
+  .banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:rgba(240,241,243,.97);border:2px solid var(--green);border-radius:16px;padding:32px 56px;text-align:center;z-index:999;transition:transform .5s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 12px 48px rgba(0,0,0,.15)}.banner.show{transform:translate(-50%,-50%) scale(1)}.banner h1{font-size:28px;margin-bottom:8px}.banner p{color:var(--text-muted);font-size:15px}
+  .panel::-webkit-scrollbar{width:6px}.panel::-webkit-scrollbar-track{background:transparent}.panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  .credit{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--text-muted);opacity:.6;pointer-events:none;letter-spacing:.3px;z-index:5}
+  @media(max-width:768px){
+    html,body{overflow:auto;height:auto}
+    .top-bar{padding:0 12px;height:48px}
+    .top-bar .title{font-size:13px}
+    .progress-wrap{max-width:none;gap:6px}
+    .progress-label{min-width:60px;font-size:12px}
+    .btn-reset{padding:4px 8px;font-size:11px}
+    :root{--top-bar:48px}
+    .quest-map,.phase-label,.phase-divider,.path-svg{display:none!important}
+    #mobileList{display:flex;flex-direction:column;padding:60px 16px 80px;gap:0}
+    .m-phase-header{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);padding:20px 0 10px;opacity:.7}
+    .m-phase-header:first-child{padding-top:0}
+    .m-item{display:flex;align-items:center;gap:14px;padding:14px 0;position:relative;cursor:pointer}
+    .m-item::before{content:'';position:absolute;left:24px;top:0;bottom:0;width:2px;background:var(--border);z-index:0}
+    .m-item:last-child::before{bottom:50%}
+    .m-phase-header+.m-item::before{top:50%}
+    .m-node{width:48px;height:48px;border-radius:50%;background:#f0f1f3;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;position:relative;z-index:1;transition:all .3s}
+    .m-item.complete .m-node{border-color:var(--green);background:rgba(63,185,80,.15)}
+    .m-item.active .m-node{border-color:var(--blue);background:rgba(88,166,255,.1);box-shadow:0 0 12px rgba(88,166,255,.3)}
+    .m-item.locked .m-node{opacity:.5}
+    .m-text{flex:1;min-width:0}
+    .m-text .m-title{font-size:15px;font-weight:600;color:var(--text)}
+    .m-item.complete .m-title{color:var(--green)}
+    .m-item.active .m-title{color:var(--blue)}
+    .m-item.locked .m-title{color:var(--text-muted)}
+    .m-text .m-time{font-size:12px;color:var(--text-muted)}
+    .m-check{color:var(--green);font-size:18px;flex-shrink:0;opacity:0;transition:opacity .3s}
+    .m-item.complete .m-check{opacity:1}
+    .panel{width:100%;max-width:100%;border-left:none;border-radius:16px 16px 0 0;top:auto;bottom:0;max-height:85vh;transform:translateY(100%);box-shadow:0 -4px 24px rgba(0,0,0,.12)}.panel.open{transform:translateY(0)}
+    .panel-header{padding:16px}.panel-body{padding:16px;gap:12px}
+    .banner{padding:20px 24px}.banner h1{font-size:22px}.banner p{font-size:13px}
+    .credit{position:relative;padding:20px 0;text-align:center;opacity:.6}
+  }
+  @media(min-width:769px){
+    #mobileList{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <div class="title"><span>AIdeate Workshop</span> — Training Quest</div>
+  <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div><div class="progress-label" id="progressLabel">0 of 18</div></div>
+  <button class="btn-reset" onclick="resetProgress()">Reset Progress</button>
+</div>
+<div class="phase-label p1">🚀 Setup</div>
+<div class="phase-label p2">🏢 Workshop Prep</div>
+<div class="phase-label p3">💡 Ideation</div>
+<div class="phase-label p4">📊 Evaluate & Export</div>
+<div class="phase-divider d1"></div><div class="phase-divider d2"></div><div class="phase-divider d3"></div>
+<div class="quest-map" id="questMap"><svg class="path-svg" id="pathSvg" preserveAspectRatio="none"></svg></div>
+<div id="mobileList"></div>
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel"><div class="panel-header"><div class="emoji-big" id="panelEmoji"></div><div class="meta"><h2 id="panelTitle"></h2><div class="time" id="panelTime"></div></div><button class="panel-close" onclick="closePanel()">✕</button></div><div class="panel-body" id="panelBody"></div></div>
+<div class="banner" id="banner"><h1>🏆 Quest Complete!</h1><p>You are now an AI Workshop Facilitator.<br>Go run your first customer workshop.</p></div>
+<div class="credit">AIdeate Workshop — Training Quest · Built with 🔥 by BlazingBeard</div>
+<script>
+const CHECKPOINTS = [
+  {
+    "id": "ai-launch",
+    "phase": 1,
+    "emoji": "🚀",
+    "title": "Launch AIdeate",
+    "time": "3 min",
+    "desc": "AIdeate runs as a local static site — no build step, no npm, no server framework. Clone the repo and start the built-in HTTP server. It opens two browser tabs: the full-screen presenter deck and the control panel.",
+    "toggle": "AIdeate is running locally ✓",
+    "copies": [
+      {
+        "label": "Clone & start",
+        "text": "git clone https://github.com/kody-w/aideate.git\ncd aideate\n./start.sh"
+      },
+      {
+        "label": "Custom port",
+        "text": "./start.sh 9000"
+      },
+      {
+        "label": "Manual start",
+        "text": "python3 -m http.server 8765"
+      }
+    ],
+    "substeps": [
+      "Clone the repo or download the .zip",
+      "Run ./start.sh (or python3 -m http.server)",
+      "Verify both tabs open: presenter + control panel"
+    ],
+    "stuck": "Requires Python 3. On Windows, use 'python -m http.server 8765'. The file:// protocol works for basic functionality but HTTP is recommended for BroadcastChannel sync between tabs.",
+    "learn": "Local-first architecture, zero-dependency static HTML"
+  },
+  {
+    "id": "ai-navigate",
+    "phase": 1,
+    "emoji": "🎯",
+    "title": "Navigate the Deck",
+    "time": "3 min",
+    "desc": "AIdeate is a 14-slide Microsoft-branded presentation deck. Arrow keys navigate between slides. The deck is designed to be shared via screen share — it IS the workshop. Walk through all 14 slides to see the flow: Welcome → Agenda → About → Intros → Discussion → Demos → Transition → Ideation → Voting → Evaluation → Results.",
+    "toggle": "I've seen all the slides ✓",
+    "copies": [
+      {
+        "label": "Keyboard shortcuts",
+        "text": "→ or ↓    Next slide\n← or ↑    Previous slide\nG         Toggle control drawer\nEscape    Close drawer / overlays\nF         Toggle fullscreen\n+         Quick-add idea (on ideation slide)"
+      }
+    ],
+    "substeps": [
+      "Use → to advance through all slides",
+      "Notice the 4 phases: Ideate → Vote → Evaluate → Results",
+      "Try F for fullscreen mode"
+    ],
+    "stuck": "Arrow keys only work when no input field is focused. Click on the slide background first if keys aren't responding. The slide deck auto-numbers in the bottom-right corner.",
+    "learn": "14-slide deck structure, keyboard navigation, 4 workshop phases"
+  },
+  {
+    "id": "ai-drawer",
+    "phase": 1,
+    "emoji": "⚙️",
+    "title": "The Control Drawer",
+    "time": "3 min",
+    "desc": "All operator controls live in a slide-out drawer. Click the ⚙ gear icon (bottom-right FAB) or press G to open it. The drawer is context-aware — it shows different sections depending on which slide you're on. Check 'All' at the top to see every section at once.",
+    "toggle": "I understand the drawer ✓",
+    "copies": [
+      {
+        "label": "Key sections",
+        "text": "🏢 Workshop Setup    — name, company, duration\n🏢 Company Profile   — industry, employees, revenue, goals\n📍 Phase Control     — switch between ideate/vote/evaluate/results\n👥 Participants      — add names and titles\n⏱️ Timer            — countdown for activities\n💡 Ideas             — add/manage challenges\n✨ Paste from Chat   — AI-powered idea extraction\n🗳️ Vote Control     — manage voting rounds\n📋 Evaluate          — score ideas\n💾 Import / Export   — JSON, Word, Excel, PDF"
+      }
+    ],
+    "substeps": [
+      "Press G to open the drawer",
+      "Navigate to different slides — watch sections appear/hide",
+      "Check the 'All' checkbox to reveal every section"
+    ],
+    "stuck": "The gear FAB auto-hides after a few seconds of inactivity. Move your mouse to make it reappear. The drawer is 380px wide and slides from the right edge.",
+    "learn": "Context-aware drawer, FAB button, section visibility rules"
+  },
+  {
+    "id": "ai-autosave",
+    "phase": 1,
+    "emoji": "💾",
+    "title": "Auto-Save & State",
+    "time": "2 min",
+    "desc": "Everything auto-saves to localStorage under the key 'aideate_autosave'. Every field change, every idea, every vote — all persisted instantly. Reload the page and your workshop is still there. Use '🗑️ New Workshop' in the Import/Export section to clear and start fresh.",
+    "toggle": "I understand persistence ✓",
+    "copies": [
+      {
+        "label": "Check localStorage",
+        "text": "// Open browser DevTools → Console\nJSON.parse(localStorage.getItem('aideate_autosave'))"
+      },
+      {
+        "label": "Manual clear",
+        "text": "localStorage.removeItem('aideate_autosave')"
+      }
+    ],
+    "stuck": "If your workshop data disappears, check that you're on the same origin (localhost:8765). Different ports = different localStorage. The '🗑️ New Workshop' button asks for confirmation before clearing.",
+    "learn": "localStorage persistence, autosave key, clearing state"
+  },
+  {
+    "id": "ai-workshop-setup",
+    "phase": 2,
+    "emoji": "📝",
+    "title": "Create Your Workshop",
+    "time": "3 min",
+    "desc": "Open the drawer (G) and find the 🏢 Workshop Setup section. Enter the workshop name, company name, and select the duration (60/75/90 min). These values update the title slide in real time — the Welcome slide shows the company name and duration.",
+    "toggle": "Workshop info configured ✓",
+    "copies": [
+      {
+        "label": "Example setup",
+        "text": "Workshop: Q2 AI Acceleration Workshop\nCompany:  Contoso Ltd\nDuration: 90 min"
+      }
+    ],
+    "substeps": [
+      "Open drawer → Workshop Setup",
+      "Enter a workshop name",
+      "Enter the customer company name",
+      "Select the duration — watch slide 1 update live"
+    ],
+    "stuck": "Navigate to slide 1 first to see the Workshop Setup section (it's context-aware). Or check the 'All' checkbox to always show it.",
+    "learn": "Real-time slide updates, workshop metadata"
+  },
+  {
+    "id": "ai-company-profile",
+    "phase": 2,
+    "emoji": "🏢",
+    "title": "Company Profile",
+    "time": "3 min",
+    "desc": "Below Workshop Setup, fill in the Company Profile: industry (dropdown), country, number of employees, annual revenue, and key business goals. This data feeds into AI prompts and the exported reports — it gives the AI context about who the customer is.",
+    "toggle": "Company profile complete ✓",
+    "copies": [
+      {
+        "label": "Example profile",
+        "text": "Industry:   Manufacturing\nCountry:    United States\nEmployees:  5,000\nRevenue:    $500M\nGoals:      Reduce operational costs 15%, \n            expand into Asia-Pacific market, \n            modernize legacy ERP systems"
+      }
+    ],
+    "substeps": [
+      "Select an industry from the dropdown",
+      "Enter country, employee count, and revenue",
+      "Write 2-3 key business goals in the textarea"
+    ],
+    "stuck": "The industry dropdown has 12 options including Healthcare, Financial Services, Manufacturing, Retail & CPG, and more. Business goals should be strategic priorities — they help the AI tailor its evaluation of ideas.",
+    "learn": "Company context feeds AI prompts and report generation"
+  },
+  {
+    "id": "ai-participants",
+    "phase": 2,
+    "emoji": "👥",
+    "title": "Add Participants",
+    "time": "3 min",
+    "desc": "Find the 👥 Participants section in the drawer. Type a name and title, then press Enter or click +. Each participant gets auto-generated initials and a color avatar. Participants appear on the Intros slide and are used during the voting phase to track who voted for what.",
+    "toggle": "Participants added ✓",
+    "copies": [
+      {
+        "label": "Example participants",
+        "text": "Sarah Chen     — VP of Operations\nMarcus Johnson — IT Director\nPreeti Sharma  — Head of Customer Success\nDavid Kim      — CFO"
+      }
+    ],
+    "substeps": [
+      "Open drawer → Participants section",
+      "Add 3-4 participants with names and titles",
+      "Navigate to the Intros slide — see their cards appear",
+      "Note the auto-generated initials and avatar colors"
+    ],
+    "stuck": "The Participants section appears on the Intros slide and most live slides. If you don't see it, check 'All' in the drawer header. Each participant needs at least a name — title is optional but recommended.",
+    "learn": "Participant management, auto-generated avatars, voting identity"
+  },
+  {
+    "id": "ai-templates",
+    "phase": 2,
+    "emoji": "📂",
+    "title": "Load a Template",
+    "time": "3 min",
+    "desc": "Jump-start ideation with pre-built industry challenge templates. In the drawer's 📂 Templates section, pick an industry (Healthcare, Financial Services, Manufacturing, etc.) and click Load. Templates add 6-8 common AI challenges specific to that industry. You can edit, delete, or add more.",
+    "toggle": "Template loaded ✓",
+    "copies": [
+      {
+        "label": "Available templates",
+        "text": "Cross-Industry    General / Cross-Industry\nCommercial        B2B Sales, B2C Sales, Retail & CPG,\n                  Professional Services, Software & Digital\nIndustry          Healthcare, Financial Services, \n                  Manufacturing, Energy & Utilities\nPublic Sector     Federal Government, State & Local Gov\nBack Office       Human Resources, IT Management"
+      }
+    ],
+    "substeps": [
+      "Navigate to the Ideation slide (slide 9)",
+      "Open drawer → Templates section",
+      "Select an industry and click Load",
+      "See the pre-built challenges appear on the ideation board"
+    ],
+    "stuck": "Templates only appear when you're on slides where ideation is active (slide 3 or 9). Templates ADD to existing ideas — they don't replace them. Delete unwanted ideas individually from the Ideas section.",
+    "learn": "14 industry templates, jump-starting workshops, pre-built challenges"
+  },
+  {
+    "id": "ai-add-ideas",
+    "phase": 3,
+    "emoji": "💡",
+    "title": "Capture Ideas Manually",
+    "time": "5 min",
+    "desc": "Navigate to the Ideation slide (slide 9). Add ideas two ways: press + on your keyboard for a quick-add popup, or use the 💡 Ideas section in the drawer. Each idea needs a challenge name, department, optional description, and optional submitter. Ideas appear as cards on the ideation board in real time.",
+    "toggle": "Ideas captured ✓",
+    "copies": [
+      {
+        "label": "Quick-add shortcut",
+        "text": "Press + on the Ideation slide\n→ Opens the quick-add popup\n→ Type a challenge name and press Enter\n→ Select department, add description\n→ Click Submit"
+      },
+      {
+        "label": "Example challenges",
+        "text": "\"Manual sales call prep takes 45 min per account\"\n\"Customer onboarding requires 12 handoffs across 3 teams\"\n\"Weekly status reports take 4 hours to compile manually\""
+      }
+    ],
+    "substeps": [
+      "Navigate to slide 9 (Ideation board)",
+      "Press + to open the quick-add popup",
+      "Add 2-3 ideas with names and departments",
+      "See them appear as cards on the board"
+    ],
+    "stuck": "The + shortcut only works on the Ideation slide (slide 9). You can also add ideas from the drawer's Ideas section. Department is a dropdown populated from a default list. Click a card to expand it and see full details.",
+    "learn": "Quick-add popup, idea cards, challenge naming patterns"
+  },
+  {
+    "id": "ai-format",
+    "phase": 3,
+    "emoji": "✨",
+    "title": "Format with AI",
+    "time": "5 min",
+    "desc": "The ✨ Paste from Chat section uses GitHub Models API to extract structured ideas from rough text. Paste messy chat logs, meeting notes, or spoken ideas — AI formats them into clean challenge names with department, description, and submitter. Requires a GitHub Personal Access Token with Models API access.",
+    "toggle": "AI formatting working ✓",
+    "copies": [
+      {
+        "label": "Get a GitHub PAT",
+        "text": "1. Go to https://github.com/settings/tokens\n2. Generate new token (classic)\n3. No special scopes needed — just Models API access\n4. AIdeate will prompt for the token on first use"
+      },
+      {
+        "label": "Example paste",
+        "text": "Sarah: we spend hours manually compiling \nproject status reports every week, pulling \ndata from 6 different systems"
+      }
+    ],
+    "substeps": [
+      "Open drawer → ✨ Paste from Chat section",
+      "Paste rough text into the textarea",
+      "Click ✨ Format — enter your GitHub PAT if prompted",
+      "Review the AI-extracted fields, edit if needed",
+      "Click ✓ Add to add it to the board"
+    ],
+    "stuck": "The token is stored in localStorage — you only enter it once. The AI calls GitHub Models API (models.inference.ai.azure.com). If the API is down, add ideas manually. The AI badge shows '✨ AI Formatted' on extracted ideas so the team can review.",
+    "learn": "GitHub Models API integration, AI-powered text extraction, token management"
+  },
+  {
+    "id": "ai-voting",
+    "phase": 3,
+    "emoji": "🗳️",
+    "title": "Run a Voting Round",
+    "time": "5 min",
+    "desc": "Navigate to the Voting slide (slide 10). In the drawer, find 🗳️ Vote Control. Set votes per person (default 2). Select a voter from the dropdown (auto-populated from participants), then click +/- on each idea to cast or remove votes. Rules: no voting on your own ideas, no duplicate votes, at least one vote must go to another team's idea.",
+    "toggle": "Voting round complete ✓",
+    "copies": [
+      {
+        "label": "Voting rules",
+        "text": "• Each person gets N votes (default: 2)\n• Cannot vote on ideas you submitted\n• Cannot vote for the same idea twice  \n• At least 1 vote must go to another team's idea\n• Votes tally live on the voting board"
+      }
+    ],
+    "substeps": [
+      "Navigate to slide 10 (Voting board)",
+      "Open drawer → Vote Control",
+      "Set votes per person (e.g. 2)",
+      "Select a voter name from the dropdown",
+      "Click + on ideas to cast their votes",
+      "Repeat for each participant"
+    ],
+    "stuck": "The voter dropdown pulls from your participant list. If it's empty, add participants first. Vote tallies update live on the voting board. Each idea shows a count and percentage. Switch to the Results phase to see ranked results.",
+    "learn": "Vote mechanics, fairness rules, live tallying"
+  },
+  {
+    "id": "ai-phase-control",
+    "phase": 3,
+    "emoji": "📍",
+    "title": "Phase Transitions",
+    "time": "2 min",
+    "desc": "The 📍 Phase Control section in the drawer switches the workshop between 4 phases: 💡 Ideate → 🗳️ Vote → 📋 Evaluate → 📊 Results. Each phase activates different slides and drawer sections. The phase pills at the top of live slides show which phases are complete.",
+    "toggle": "I understand phase flow ✓",
+    "copies": [
+      {
+        "label": "Phase flow",
+        "text": "💡 Ideate    → Slide 9: Capture challenges\n🗳️ Vote     → Slide 10: Cast votes\n📋 Evaluate  → Slide eval: Score & evaluate\n📊 Results   → Slide 11: Rankings & matrix"
+      }
+    ],
+    "substeps": [
+      "Open drawer → Phase Control (always visible)",
+      "Click each phase button and watch the UI change",
+      "Notice the phase pills on live slides update",
+      "End on 📊 Results to see the final rankings"
+    ],
+    "stuck": "Phase changes update the slide deck's top bar to show checkmarks for completed phases. You can go back and forth between phases anytime — nothing is locked. The phase control section is visible on all slides.",
+    "learn": "4-phase workshop flow, phase pills, non-destructive transitions"
+  },
+  {
+    "id": "ai-manual-eval",
+    "phase": 4,
+    "emoji": "📋",
+    "title": "Evaluate an Idea",
+    "time": "5 min",
+    "desc": "Switch to the Evaluate phase and navigate to the Evaluation slide. In the drawer, each idea has an expandable card. Click to expand and score Impact (1-5) and Feasibility (1-5). Add notes on the problem, proposed AI solution, affected people, and timeline. These scores drive the prioritization matrix.",
+    "toggle": "First idea evaluated ✓",
+    "copies": [
+      {
+        "label": "Evaluation fields",
+        "text": "Impact Score       1-5 (business value)\nFeasibility Score  1-5 (ease of implementation)\nProblem Statement  What's the pain point?\nAI Solution        How would AI help?\nAffected People    How many people impacted?\nTimeline           Quick Win / Medium / Long-term"
+      }
+    ],
+    "substeps": [
+      "Set phase to 📋 Evaluate in the drawer",
+      "Navigate to the Evaluation slide",
+      "Expand an idea card in the 📋 Evaluate drawer section",
+      "Score Impact (1-5) and Feasibility (1-5)",
+      "Fill in at least the problem statement and AI solution"
+    ],
+    "stuck": "The Evaluate section only appears on the Evaluation slide. Use the 'All' checkbox to see it on other slides. Each idea's evaluation is saved independently — you can evaluate them in any order.",
+    "learn": "Impact/Feasibility scoring, evaluation metadata, per-idea persistence"
+  },
+  {
+    "id": "ai-wizard",
+    "phase": 4,
+    "emoji": "🧙",
+    "title": "10-Step Define Wizard",
+    "time": "8 min",
+    "desc": "For a thorough evaluation, use the built-in wizard. It walks you through 10 guided steps: 1) Problem 2) Process 3) People 4) Pain Points 5) AI Solution 6) Impact 7) Scoring 8) Timeline 9) Ownership 10) Summary/ROI. Each step has focused inputs and auto-calculates time savings (People × Frequency × Time Per Task = hours/week).",
+    "toggle": "Wizard walkthrough complete ✓",
+    "copies": [
+      {
+        "label": "Wizard steps",
+        "text": "Step 1:  Problem      — What's broken?\nStep 2:  Process      — Current workflow\nStep 3:  People       — Who's affected?\nStep 4:  Pain Points  — Key frustrations\nStep 5:  AI Solution  — How AI helps\nStep 6:  Impact       — Expected benefit\nStep 7:  Scoring      — Impact & Feasibility (1-5)\nStep 8:  Timeline     — Quick Win / Medium / Long\nStep 9:  Ownership    — Who owns it?\nStep 10: Summary/ROI  — Business case review"
+      }
+    ],
+    "substeps": [
+      "Expand an idea in the Evaluate section",
+      "Click the wizard button to launch the guided walkthrough",
+      "Step through all 10 steps, filling in details",
+      "Notice the auto-calculated time savings",
+      "Finish on the Summary/ROI step"
+    ],
+    "stuck": "The wizard button appears when you expand an idea card in the Evaluate drawer section. The wizard is a modal overlay — Escape closes it. All data entered in the wizard saves back to the idea's evaluation fields.",
+    "learn": "Guided evaluation walkthrough, auto-calculated time savings, 10-step framework"
+  },
+  {
+    "id": "ai-roi",
+    "phase": 4,
+    "emoji": "💰",
+    "title": "ROI Calculator",
+    "time": "5 min",
+    "desc": "Each idea has a built-in financial model. Input implementation cost, estimated annual benefit, discount rate (default 10%), time horizon (years), and risk factor (0-1). The calculator auto-computes NPV (Net Present Value), ROI%, payback period, and risk-adjusted ROI. This data flows into the Word/Excel exports.",
+    "toggle": "ROI calculated for an idea ✓",
+    "copies": [
+      {
+        "label": "Example ROI inputs",
+        "text": "Implementation Cost:  $150,000\nAnnual Benefit:       $400,000\nDiscount Rate:        10%\nTime Horizon:         3 years\nRisk Factor:          0.7 (medium confidence)"
+      },
+      {
+        "label": "Outputs",
+        "text": "NPV:              Net Present Value over time horizon\nROI%:             (Total Benefit - Cost) / Cost × 100\nPayback Period:   Months until cost is recovered\nRisk-Adjusted ROI: ROI% × Risk Factor"
+      }
+    ],
+    "stuck": "ROI fields appear in the evaluation detail view for each idea. Risk factor is a confidence multiplier: 1.0 = certain, 0.5 = 50/50, 0.0 = very risky. Leave fields blank if the customer doesn't have exact numbers — estimates are fine.",
+    "learn": "NPV, ROI%, payback period, risk-adjusted ROI, financial modeling"
+  },
+  {
+    "id": "ai-matrix",
+    "phase": 4,
+    "emoji": "📊",
+    "title": "Prioritization Matrix",
+    "time": "3 min",
+    "desc": "Switch to the Results phase and navigate to slide 11. When 2+ ideas have Impact and Feasibility scores, a 2×2 scatter plot auto-renders. The quadrants: Quick Wins (high impact, high feasibility), Strategic Bets (high impact, low feasibility), Fill-ins (low impact, high feasibility), Deprioritize (low impact, low feasibility). This is the money slide.",
+    "toggle": "Matrix rendering ✓",
+    "copies": [
+      {
+        "label": "Quadrants",
+        "text": "┌────────────────┬────────────────┐\n│  Strategic Bets │   Quick Wins   │\n│  (High Impact,  │  (High Impact,  │\n│  Low Feasible)  │  High Feasible) │\n├────────────────┼────────────────┤\n│  Deprioritize  │    Fill-ins    │\n│  (Low Impact,   │  (Low Impact,   │\n│  Low Feasible)  │  High Feasible) │\n└────────────────┴────────────────┘"
+      }
+    ],
+    "substeps": [
+      "Ensure at least 2 ideas have Impact and Feasibility scores",
+      "Set phase to 📊 Results",
+      "Navigate to slide 11",
+      "See the 2×2 matrix auto-render with positioned dots",
+      "Review the ranked results table below the matrix"
+    ],
+    "stuck": "The matrix only appears when 2+ ideas have BOTH Impact and Feasibility scores set. If you don't see it, go back to Evaluate and score more ideas. The podium shows top 3 ranked ideas above the matrix.",
+    "learn": "2×2 prioritization, quadrant labels, data-driven visualization"
+  },
+  {
+    "id": "ai-export",
+    "phase": 4,
+    "emoji": "📄",
+    "title": "Export Reports",
+    "time": "5 min",
+    "desc": "The Results slide has 4 export buttons. Word (.docx) generates a full OOXML document with executive summary, ranked challenges, evaluations, and ROI data. Excel (.xlsx) creates a 5-sheet workbook (Summary, Challenges, Evaluations, Participants, Votes). PDF opens a print-ready report view. JSON exports the full workshop state for reimporting later.",
+    "toggle": "Reports exported ✓",
+    "copies": [
+      {
+        "label": "Export options",
+        "text": "📄 Word (.docx)   — Full executive report\n📊 Excel (.xlsx)  — 5-sheet data workbook\n🖨️ PDF            — Print-ready view (browser print)\n💾 JSON           — Full state for reimport"
+      },
+      {
+        "label": "Excel sheets",
+        "text": "Sheet 1: Summary       — Workshop metadata\nSheet 2: Challenges    — All ideas with details\nSheet 3: Evaluations   — Scores, ROI, wizard data\nSheet 4: Participants  — Names, titles, initials\nSheet 5: Votes         — Full voting record"
+      }
+    ],
+    "substeps": [
+      "Navigate to slide 11 (Results)",
+      "Click 📄 Download Word (.docx) — open and review",
+      "Click 📊 Download Excel (.xlsx) — check all 5 sheets",
+      "Click 💾 Export JSON — save for backup or reimport",
+      "Try 📥 Import with the JSON to verify round-trip"
+    ],
+    "stuck": "Word and Excel are generated entirely client-side using vanilla JS (no libraries). The DOCX uses OOXML format. The XLSX uses the same buildZip/crc32 functions. All exports include the company profile, participants, and full evaluation data.",
+    "learn": "Client-side document generation, multi-sheet Excel, OOXML, JSON round-trip"
+  },
+  {
+    "id": "ai-capstone",
+    "phase": 4,
+    "emoji": "🏆",
+    "title": "Run a Mock Workshop",
+    "time": "15 min",
+    "desc": "Your final challenge: run a complete end-to-end mock workshop. Create a workshop for a fictional company, add 4 participants, load an industry template, add 2 custom ideas, run voting for all participants, evaluate the top 3 ideas with the wizard, calculate ROI for the #1 idea, and export the Word report. This is the real deal — you're ready to facilitate.",
+    "toggle": "Quest complete — I am a Workshop Facilitator 🏆",
+    "copies": [
+      {
+        "label": "Capstone checklist",
+        "text": "1. Create workshop: \"AI Innovation Sprint — Contoso\"\n2. Set company profile (Manufacturing, 5000 employees)\n3. Add 4 participants with names and titles\n4. Load the Manufacturing template\n5. Add 2 custom ideas from scratch\n6. Run voting — all 4 participants cast 2 votes each\n7. Switch to Evaluate — open the Define Wizard for top 3\n8. Calculate ROI for the #1 ranked idea\n9. Switch to Results — review the 2×2 matrix\n10. Export the Word report — your deliverable is ready"
+      },
+      {
+        "label": "Sample JSON",
+        "text": "Check the samples/ folder for example workshops:\n  samples/contoso-workshop.json\n  samples/example-workshop.json\n\nImport these to see a fully populated workshop."
+      }
+    ],
+    "substeps": [
+      "Set up workshop + company profile + participants",
+      "Load template + add custom ideas (8-10 total)",
+      "Run full voting round for all participants",
+      "Evaluate top 3 ideas with the 10-step wizard",
+      "Calculate ROI for the winner",
+      "Export the Word report — open it and review"
+    ],
+    "stuck": "Import samples/contoso-workshop.json to see what a fully completed workshop looks like. The Word export is the primary customer deliverable — make sure it includes the executive summary, ranked challenges, and ROI data.",
+    "learn": "End-to-end facilitation flow, deliverable generation, customer-ready output"
+  }
+];
+
+const POSITIONS = [
+  {"x": 4.7,  "y": 16.0},
+  {"x": 17.5, "y": 38.0},
+  {"x": 4.7,  "y": 60.0},
+  {"x": 17.5, "y": 82.0},
+  {"x": 27.0, "y": 16.0},
+  {"x": 39.7, "y": 38.0},
+  {"x": 27.0, "y": 60.0},
+  {"x": 39.7, "y": 82.0},
+  {"x": 49.2, "y": 16.0},
+  {"x": 61.9, "y": 38.0},
+  {"x": 49.2, "y": 60.0},
+  {"x": 61.9, "y": 82.0},
+  {"x": 73.1, "y": 16.0},
+  {"x": 93.6, "y": 29.2},
+  {"x": 73.1, "y": 42.4},
+  {"x": 93.6, "y": 55.6},
+  {"x": 73.1, "y": 68.8},
+  {"x": 93.6, "y": 82.0}
+];
+
+const STORAGE_KEY = 'quest-' + btoa('AIdeate Workshop').slice(0,12);
+const PHASE_LABELS = ["\ud83d\ude80 Setup", "\ud83c\udfe2 Workshop Prep", "\ud83d\udca1 Ideation", "\ud83d\udcca Evaluate & Export"];
+let state = loadState();
+
+function isMobile(){return window.innerWidth<=768}
+function loadState(){try{const s=localStorage.getItem(STORAGE_KEY);if(s)return JSON.parse(s)}catch(e){}return{completed:{}}}
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function isComplete(id){return !!state.completed[id]}
+function completedCount(){return CHECKPOINTS.filter(c=>isComplete(c.id)).length}
+function render(){renderPath();renderNodes();updateProgress()}
+function updateProgress(){const n=completedCount(),t=CHECKPOINTS.length,p=Math.round(n/t*100);document.getElementById('progressFill').style.width=p+'%';document.getElementById('progressLabel').textContent=n+' of '+t}
+function getActiveIndex(){for(let i=0;i<CHECKPOINTS.length;i++){if(!isComplete(CHECKPOINTS[i].id))return i}return CHECKPOINTS.length}
+
+function renderPath(){
+  if(isMobile()){document.getElementById('pathSvg').innerHTML='';return}
+  const svg=document.getElementById('pathSvg'),w=window.innerWidth,h=window.innerHeight-52;
+  svg.setAttribute('viewBox','0 0 '+w+' '+h);let html='';
+  const pts=POSITIONS.map(p=>({x:p.x/100*w,y:p.y/100*h}));
+  const ai=getActiveIndex();
+  for(let i=0;i<pts.length-1;i++){
+    const a=pts[i],b=pts[i+1],cx1=a.x+(b.x-a.x)*.6,cy1=a.y,cx2=a.x+(b.x-a.x)*.4,cy2=b.y;
+    const d='M'+a.x+','+a.y+' C'+cx1+','+cy1+' '+cx2+','+cy2+' '+b.x+','+b.y;
+    const done=isComplete(CHECKPOINTS[i].id)&&isComplete(CHECKPOINTS[i+1].id);
+    const partial=isComplete(CHECKPOINTS[i].id)&&!isComplete(CHECKPOINTS[i+1].id);
+    const active=i===ai-1||i===ai;
+    if(done)html+='<path d="'+d+'" fill="none" stroke="var(--green)" stroke-width="3" stroke-opacity=".5"/>';
+    else if(partial||active)html+='<path d="'+d+'" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-opacity=".4" stroke-dasharray="8 6"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.5s" repeatCount="indefinite"/></path>';
+    else html+='<path d="'+d+'" fill="none" stroke="var(--border)" stroke-width="2" stroke-dasharray="6 8" stroke-opacity=".5"/>';
+  }
+  svg.innerHTML=html;
+}
+
+function renderNodes(){
+  if(isMobile()){renderMobileList();return}
+  document.querySelectorAll('.node').forEach(n=>n.remove());
+  const map=document.getElementById('questMap'),ai=getActiveIndex();
+  CHECKPOINTS.forEach((cp,i)=>{
+    const pos=POSITIONS[i];if(!pos)return;
+    const node=document.createElement('div');
+    node.className='node';
+    if(isComplete(cp.id))node.classList.add('complete');
+    else if(i===ai)node.classList.add('active');
+    node.style.left=pos.x+'%';node.style.top='calc('+pos.y+'% + 0px)';
+    const isLocked=i>ai&&!isComplete(cp.id);
+    node.innerHTML='<div class="ring"></div><div class="inner"><span class="emoji">'+(isLocked?'🔒':cp.emoji)+'</span><svg class="check-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="4 12 10 18 20 6"/></svg>'+(isLocked?'<span class="lock"></span>':'')+'</div><div class="label">'+cp.title+'</div>';
+    node.addEventListener('click',()=>openPanel(i));
+    map.appendChild(node);
+  });
+}
+
+function renderMobileList(){
+  const list=document.getElementById('mobileList');list.innerHTML='';
+  const ai=getActiveIndex();let lastPhase=0;
+  CHECKPOINTS.forEach((cp,i)=>{
+    if(cp.phase!==lastPhase){
+      lastPhase=cp.phase;
+      const hdr=document.createElement('div');hdr.className='m-phase-header';
+      hdr.textContent=PHASE_LABELS[cp.phase-1]||'Phase '+cp.phase;
+      list.appendChild(hdr);
+    }
+    const item=document.createElement('div');item.className='m-item';
+    if(isComplete(cp.id))item.classList.add('complete');
+    else if(i===ai)item.classList.add('active');
+    else if(i>ai)item.classList.add('locked');
+    const isLocked=i>ai&&!isComplete(cp.id);
+    item.innerHTML='<div class="m-node">'+(isComplete(cp.id)?'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round"><polyline points="4 12 10 18 20 6"/></svg>':(isLocked?'🔒':cp.emoji))+'</div><div class="m-text"><div class="m-title">'+cp.title+'</div><div class="m-time">'+(cp.time?'⏱ '+cp.time:'')+'</div></div>';
+    item.addEventListener('click',()=>openPanel(i));
+    list.appendChild(item);
+  });
+}
+
+let currentPanel=-1;
+function openPanel(idx){
+  currentPanel=idx;const cp=CHECKPOINTS[idx];
+  document.getElementById('panelEmoji').textContent=cp.emoji;
+  document.getElementById('panelTitle').textContent=cp.title;
+  document.getElementById('panelTime').textContent=cp.time?'⏱ '+cp.time:'';
+  let html='<div class="desc">'+cp.desc+'</div>';
+  if(cp.substeps){html+='<ol class="substeps">';cp.substeps.forEach(s=>html+='<li>'+s+'</li>');html+='</ol>'}
+  if(cp.copies){
+    html+='<div class="copy-group">';
+    cp.copies.forEach(c=>{html+='<div><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">'+c.label+'</div><div class="copy-block"><span class="copy-text">'+escHtml(c.text)+'</span><button class="copy-btn" onclick="copyText(this,\''+escAttr(c.text)+'\')" title="Copy">📋</button></div></div>'});
+    html+='</div>';
+  }
+  if(cp.learn){html+='<div style="font-size:13px;color:var(--text-muted)">📚 <b>What you learn:</b> '+cp.learn+'</div>'}
+  const checked=isComplete(cp.id);
+  html+='<button class="toggle-done '+(checked?'checked':'')+'" onclick="toggleDone(\''+cp.id+'\',this)"><span class="dot">'+(checked?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="4 12 10 18 20 6"/></svg>':'')+'</span><span>'+(cp.toggle||'Done ✓')+'</span></button>';
+  if(cp.stuck){html+='<div><button class="stuck-toggle" onclick="this.nextElementSibling.classList.toggle(\'open\')">🆘 I\'m stuck</button><div class="stuck-content"><p>'+cp.stuck+'</p></div></div>'}
+  document.getElementById('panelBody').innerHTML=html;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('panel').classList.add('open');
+}
+
+function closePanel(){document.getElementById('overlay').classList.remove('open');document.getElementById('panel').classList.remove('open');currentPanel=-1}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escAttr(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+
+function copyText(btn,text){
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add('copied');btn.textContent='✓';
+    setTimeout(()=>{btn.classList.remove('copied');btn.textContent='📋'},1500);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;left:-9999px';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    btn.classList.add('copied');btn.textContent='✓';
+    setTimeout(()=>{btn.classList.remove('copied');btn.textContent='📋'},1500);
+  });
+}
+
+function toggleDone(id,btn){
+  if(isComplete(id)){delete state.completed[id];btn.classList.remove('checked');btn.querySelector('.dot').innerHTML=''}
+  else{state.completed[id]=true;btn.classList.add('checked');btn.querySelector('.dot').innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="4 12 10 18 20 6"/></svg>';celebrate(id)}
+  saveState();render();
+}
+
+function celebrate(id){
+  const idx=CHECKPOINTS.findIndex(c=>c.id===id);let x,y;
+  if(isMobile()){const items=document.querySelectorAll('.m-item');if(items[idx]){const r=items[idx].getBoundingClientRect();x=r.left+r.width/2;y=r.top+r.height/2}else return}
+  else{const pos=POSITIONS[idx];if(!pos)return;x=pos.x/100*window.innerWidth;y=pos.y/100*(window.innerHeight-52)+52}
+  spawnParticles(x,y,12);
+  for(let p=1;p<=4;p++){const phase=CHECKPOINTS.filter(c=>c.phase===p);if(phase.every(c=>isComplete(c.id))&&id===phase[phase.length-1].id)setTimeout(()=>rocketAnimation(),400)}
+  if(completedCount()===CHECKPOINTS.length)setTimeout(()=>{confettiExplosion();showBanner()},600);
+}
+
+function spawnParticles(cx,cy,count){
+  const colors=['#58a6ff','#3fb950','#d29922','#f778ba','#bc8cff'];
+  for(let i=0;i<count;i++){
+    const el=document.createElement('div');el.className='particle';
+    el.style.left=cx+'px';el.style.top=cy+'px';el.style.background=colors[i%colors.length];
+    document.body.appendChild(el);
+    const angle=Math.random()*Math.PI*2,dist=40+Math.random()*60,dx=Math.cos(angle)*dist,dy=Math.sin(angle)*dist;
+    el.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+dx+'px,'+dy+'px) scale(0)',opacity:0}],{duration:600+Math.random()*400,easing:'cubic-bezier(.4,0,.2,1)'}).onfinish=()=>el.remove();
+  }
+}
+
+function rocketAnimation(){
+  const el=document.createElement('div');el.className='rocket-anim';el.textContent='🚀';
+  el.style.left='-50px';el.style.bottom='60%';document.body.appendChild(el);
+  el.animate([{transform:'translate(0,0) rotate(-30deg)',opacity:1},{transform:'translate('+(window.innerWidth+100)+'px,-'+(window.innerHeight/2)+'px) rotate(-30deg)',opacity:.8}],{duration:1400,easing:'cubic-bezier(.25,.1,.25,1)'}).onfinish=()=>el.remove();
+}
+
+function confettiExplosion(){
+  const colors=['#58a6ff','#3fb950','#d29922','#f778ba','#bc8cff','#f85149','#fff'];
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');el.className='confetti';
+    el.style.background=colors[i%colors.length];el.style.left=Math.random()*window.innerWidth+'px';el.style.top='-20px';
+    el.style.width=(6+Math.random()*8)+'px';el.style.height=(10+Math.random()*12)+'px';
+    el.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(el);
+    const x=(Math.random()-.5)*200,spin=Math.random()*720-360;
+    el.animate([{transform:'translate(0,0) rotate(0deg)',opacity:1},{transform:'translate('+x+'px,'+(window.innerHeight+40)+'px) rotate('+spin+'deg)',opacity:.6}],{duration:2000+Math.random()*1500,easing:'cubic-bezier(.25,.1,.25,1)',delay:Math.random()*300}).onfinish=()=>el.remove();
+  }
+}
+
+function showBanner(){const b=document.getElementById('banner');b.classList.add('show');setTimeout(()=>b.classList.remove('show'),4000)}
+function resetProgress(){if(!confirm('Reset all progress? This cannot be undone.'))return;state={completed:{}};saveState();closePanel();render()}
+
+render();
+window.addEventListener('resize',()=>render());
+</script>
+</body>
+</html>

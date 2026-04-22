@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIdeate Quest — Test Suite</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f6f8fa; color: #1f2328; padding: 24px; }
+  h1 { font-size: 24px; margin-bottom: 8px; }
+  .summary { font-size: 14px; color: #59636e; margin-bottom: 20px; }
+  .summary .pass { color: #1a7f37; font-weight: 700; }
+  .summary .fail { color: #cf222e; font-weight: 700; }
+  .test-group { margin-bottom: 24px; }
+  .test-group h2 { font-size: 16px; font-weight: 600; color: #0969da; margin-bottom: 8px; border-bottom: 1px solid #d0d7de; padding-bottom: 4px; }
+  .test { padding: 6px 12px; font-size: 13px; border-radius: 6px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .test.pass { background: rgba(26,127,55,.08); color: #1a7f37; }
+  .test.fail { background: rgba(207,34,46,.08); color: #cf222e; }
+  .test.pending { background: rgba(130,80,223,.08); color: #8250df; }
+  .test .icon { font-size: 16px; flex-shrink: 0; }
+  .btn { padding: 10px 20px; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; background: #0969da; color: #fff; margin-bottom: 16px; }
+  .btn:hover { background: #0860ca; }
+  #iframe { display: none; }
+</style>
+</head>
+<body>
+<h1>🧪 AIdeate Quest — Test Suite</h1>
+<div class="summary" id="summary">Click "Run All Tests" to start.</div>
+<button class="btn" onclick="runAllTests()">Run All Tests</button>
+<div id="results"></div>
+<iframe id="iframe" src="quest.html" width="1200" height="800"></iframe>
+
+<script>
+const results = [];
+let doc, win;
+
+function assert(condition, name, group) {
+  results.push({ name, group, pass: !!condition });
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function runAllTests() {
+  results.length = 0;
+  document.getElementById('results').innerHTML = '<div class="test pending"><span class="icon">⏳</span> Loading quest.html in iframe...</div>';
+
+  const iframe = document.getElementById('iframe');
+  iframe.style.display = 'block';
+  iframe.src = 'quest.html?' + Date.now();
+
+  await new Promise(resolve => {
+    iframe.onload = resolve;
+    setTimeout(resolve, 5000);
+  });
+  await delay(500);
+
+  doc = iframe.contentDocument;
+  win = iframe.contentWindow;
+
+  // Clear any saved state for clean testing
+  try { win.localStorage.removeItem(win.STORAGE_KEY); } catch(e) {}
+  try { win.resetProgress && win.state && (win.state = {completed:{}}); } catch(e) {}
+
+  // Run test groups
+  testStructure();
+  testThemeSystem();
+  testThemeToggle();
+  testTypography();
+  testProgressBar();
+  testNodes();
+  testPanel();
+  testAnimations();
+  testAgentLibrary();
+  testMobileResponsive();
+  testInteractions();
+  testCelebrations();
+  testStateManagement();
+  testAccessibility();
+
+  renderResults();
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Structure
+// ═══════════════════════════════════════
+function testStructure() {
+  const G = 'Structure';
+  assert(doc.querySelector('.top-bar'), 'Top bar exists', G);
+  assert(doc.getElementById('questMap'), 'Quest map container exists', G);
+  assert(doc.getElementById('mobileList'), 'Mobile list container exists', G);
+  assert(doc.getElementById('overlay'), 'Overlay exists', G);
+  assert(doc.getElementById('panel'), 'Panel exists', G);
+  assert(doc.getElementById('banner'), 'Completion banner exists', G);
+
+  // Check CHECKPOINTS data
+  assert(win.CHECKPOINTS && win.CHECKPOINTS.length === 18, 'CHECKPOINTS has 18 items', G);
+  assert(win.POSITIONS && win.POSITIONS.length === 18, 'POSITIONS has 18 items', G);
+
+  // Verify all 4 phases exist
+  const phases = new Set(win.CHECKPOINTS.map(c => c.phase));
+  assert(phases.size === 4, 'All 4 phases present', G);
+
+  // Verify phase labels
+  const phaseLabels = doc.querySelectorAll('.phase-label');
+  assert(phaseLabels.length === 4, '4 phase labels rendered', G);
+
+  // Verify phase dividers
+  const dividers = doc.querySelectorAll('.phase-divider');
+  assert(dividers.length === 3, '3 phase dividers rendered', G);
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Theme System
+// ═══════════════════════════════════════
+function testThemeSystem() {
+  const G = 'Theme System';
+
+  // Check CSS variables exist in :root
+  const rootStyles = win.getComputedStyle(doc.documentElement);
+  assert(rootStyles.getPropertyValue('--bg').trim(), '--bg CSS variable defined', G);
+  assert(rootStyles.getPropertyValue('--surface').trim(), '--surface CSS variable defined', G);
+  assert(rootStyles.getPropertyValue('--accent').trim(), '--accent CSS variable defined', G);
+  assert(rootStyles.getPropertyValue('--text').trim(), '--text CSS variable defined', G);
+  assert(rootStyles.getPropertyValue('--text-dim').trim(), '--text-dim CSS variable defined', G);
+  assert(rootStyles.getPropertyValue('--green').trim(), '--green CSS variable defined', G);
+
+  // Check light theme styles exist in stylesheet
+  let hasLightTheme = false;
+  try {
+    for (const sheet of doc.styleSheets) {
+      for (const rule of sheet.cssRules) {
+        if (rule.selectorText && rule.selectorText.includes('[data-theme="light"]')) {
+          hasLightTheme = true;
+          break;
+        }
+      }
+    }
+  } catch(e) {}
+  assert(hasLightTheme, '[data-theme="light"] CSS rules exist', G);
+
+  // Check gradient variables
+  assert(rootStyles.getPropertyValue('--grad-1').trim(), '--grad-1 gradient variable defined', G);
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Theme Toggle
+// ═══════════════════════════════════════
+function testThemeToggle() {
+  const G = 'Theme Toggle';
+  const toggle = doc.querySelector('.theme-toggle');
+  assert(toggle, 'Theme toggle button exists', G);
+  assert(toggle && toggle.querySelector('.moon'), 'Moon icon exists', G);
+  assert(toggle && toggle.querySelector('.sun'), 'Sun icon exists', G);
+
+  // Test toggle functionality
+  if (win.toggleTheme) {
+    const before = doc.documentElement.getAttribute('data-theme');
+    win.toggleTheme();
+    const after = doc.documentElement.getAttribute('data-theme');
+    assert(before !== after, 'Theme toggle changes data-theme attribute', G);
+    // Toggle back
+    win.toggleTheme();
+  } else {
+    assert(false, 'toggleTheme function exists', G);
+  }
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Typography
+// ═══════════════════════════════════════
+function testTypography() {
+  const G = 'Typography';
+
+  // Top bar title should be larger
+  const title = doc.querySelector('.top-bar .title');
+  if (title) {
+    const fs = parseFloat(win.getComputedStyle(title).fontSize);
+    assert(fs >= 16, `Top bar title font-size >= 16px (got ${fs}px)`, G);
+  }
+
+  // Node labels should be readable from distance
+  // We'll check after opening a panel
+  const panelTitle = doc.getElementById('panelTitle');
+  assert(panelTitle, 'Panel title element exists', G);
+
+  // Check panel body font sizes are large enough
+  const panelBody = doc.getElementById('panelBody');
+  assert(panelBody, 'Panel body element exists', G);
+
+  // Check copy block font
+  const style = doc.querySelector('style');
+  if (style) {
+    const css = style.textContent;
+    assert(css.includes('font-size') && css.includes('.copy-block'), 'Copy block has font-size styling', G);
+  }
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Progress Bar
+// ═══════════════════════════════════════
+function testProgressBar() {
+  const G = 'Progress Bar';
+  const fill = doc.getElementById('progressFill');
+  assert(fill, 'Progress fill element exists', G);
+
+  const label = doc.getElementById('progressLabel');
+  assert(label, 'Progress label exists', G);
+  assert(label && label.textContent.includes('of 18'), 'Progress label shows "of 18"', G);
+
+  // Check for phase segment indicators
+  const segments = doc.querySelectorAll('.phase-segment');
+  assert(segments.length >= 4, `Phase segments exist (${segments.length} found)`, G);
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Nodes
+// ═══════════════════════════════════════
+function testNodes() {
+  const G = 'Nodes';
+
+  // Desktop: nodes should be rendered
+  const nodes = doc.querySelectorAll('.node');
+  // On desktop width (1200px iframe), nodes should exist
+  assert(nodes.length === 18, `18 nodes rendered (got ${nodes.length})`, G);
+
+  // First node should be active (nothing completed)
+  if (nodes.length > 0) {
+    assert(nodes[0].classList.contains('active'), 'First node is active', G);
+  }
+
+  // Check node size >= 64px
+  if (nodes.length > 0) {
+    const nodeStyle = win.getComputedStyle(nodes[0]);
+    const w = parseFloat(nodeStyle.width);
+    assert(w >= 64, `Node width >= 64px (got ${w}px)`, G);
+  }
+
+  // Check labels exist
+  const labels = doc.querySelectorAll('.node .label');
+  assert(labels.length === 18, `18 node labels exist (got ${labels.length})`, G);
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Panel
+// ═══════════════════════════════════════
+function testPanel() {
+  const G = 'Panel';
+
+  // Open panel for first checkpoint
+  if (win.openPanel) {
+    win.openPanel(0);
+    const panel = doc.getElementById('panel');
+    assert(panel && panel.classList.contains('open'), 'Panel opens on click', G);
+
+    const overlay = doc.getElementById('overlay');
+    assert(overlay && overlay.classList.contains('open'), 'Overlay opens with panel', G);
+
+    // Check panel content
+    const title = doc.getElementById('panelTitle');
+    assert(title && title.textContent === 'Launch AIdeate', 'Panel shows correct title', G);
+
+    const emoji = doc.getElementById('panelEmoji');
+    assert(emoji && emoji.textContent === '🚀', 'Panel shows correct emoji', G);
+
+    // Check for description
+    const desc = doc.querySelector('.panel-body .desc');
+    assert(desc && desc.textContent.length > 20, 'Panel has description text', G);
+
+    // Check for copy blocks
+    const copyBlocks = doc.querySelectorAll('.panel-body .copy-block');
+    assert(copyBlocks.length > 0, 'Panel has copy blocks', G);
+
+    // Check for substeps
+    const substeps = doc.querySelectorAll('.panel-body .substeps li');
+    assert(substeps.length > 0, 'Panel has substeps', G);
+
+    // Check for stuck section
+    const stuckToggle = doc.querySelector('.panel-body .stuck-toggle');
+    assert(stuckToggle, 'Panel has stuck toggle', G);
+
+    // Check for toggle done button
+    const toggleDone = doc.querySelector('.panel-body .toggle-done');
+    assert(toggleDone, 'Panel has toggle-done button', G);
+
+    // Check panel font sizes are screenshare-friendly
+    if (desc) {
+      const descFs = parseFloat(win.getComputedStyle(desc).fontSize);
+      assert(descFs >= 15, `Panel desc font-size >= 15px (got ${descFs}px)`, G);
+    }
+
+    // Close panel
+    win.closePanel();
+    assert(!panel.classList.contains('open'), 'Panel closes', G);
+  }
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Animations
+// ═══════════════════════════════════════
+function testAnimations() {
+  const G = 'Animations';
+
+  // Check fadeUp keyframe exists
+  const style = doc.querySelector('style');
+  const css = style ? style.textContent : '';
+  assert(css.includes('@keyframes fadeUp') || css.includes('@keyframes fade'), 'FadeUp animation keyframe exists', G);
+  assert(css.includes('pulse-ring'), 'Pulse ring animation exists', G);
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Agent Library (RAR Cards)
+// ═══════════════════════════════════════
+function testAgentLibrary() {
+  const G = 'Agent Library';
+
+  // Check that some checkpoints have rar_url fields
+  const withRar = win.CHECKPOINTS.filter(c => c.rar_url);
+  assert(withRar.length >= 3, `At least 3 checkpoints have agent library links (got ${withRar.length})`, G);
+
+  // Open a panel with a RAR card and verify it renders
+  const rarIdx = win.CHECKPOINTS.findIndex(c => c.rar_url);
+  if (rarIdx >= 0 && win.openPanel) {
+    win.openPanel(rarIdx);
+    const rarCard = doc.querySelector('.panel-body .rar-card');
+    assert(rarCard, 'RAR card renders in panel', G);
+    assert(rarCard && rarCard.getAttribute('href'), 'RAR card has href', G);
+
+    const rarName = doc.querySelector('.panel-body .rar-card-name');
+    assert(rarName && rarName.textContent.length > 0, 'RAR card has name text', G);
+
+    win.closePanel();
+  }
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Mobile Responsive
+// ═══════════════════════════════════════
+function testMobileResponsive() {
+  const G = 'Mobile Responsive';
+
+  // Check mobile CSS exists
+  const style = doc.querySelector('style');
+  const css = style ? style.textContent : '';
+  assert(css.includes('@media') && css.includes('768px'), 'Mobile breakpoint CSS exists', G);
+  assert(css.includes('.m-item'), 'Mobile list item styles exist', G);
+  assert(css.includes('.m-node'), 'Mobile node styles exist', G);
+  assert(css.includes('.m-phase-header'), 'Mobile phase header styles exist', G);
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Interactions
+// ═══════════════════════════════════════
+function testInteractions() {
+  const G = 'Interactions';
+
+  // Test copy function exists
+  assert(typeof win.copyText === 'function', 'copyText function exists', G);
+
+  // Test toggleDone function
+  assert(typeof win.toggleDone === 'function', 'toggleDone function exists', G);
+
+  // Test state management functions
+  assert(typeof win.saveState === 'function', 'saveState function exists', G);
+  assert(typeof win.loadState === 'function', 'loadState function exists', G);
+  assert(typeof win.render === 'function', 'render function exists', G);
+
+  // Test completing a checkpoint
+  if (win.openPanel) {
+    win.openPanel(0);
+    const btn = doc.querySelector('.panel-body .toggle-done');
+    if (btn) {
+      btn.click();
+      assert(win.state.completed['ai-launch'] === true, 'Checkpoint marked complete on click', G);
+      // Undo
+      btn.click();
+      assert(!win.state.completed['ai-launch'], 'Checkpoint unmarked on second click', G);
+    }
+    win.closePanel();
+  }
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Celebrations
+// ═══════════════════════════════════════
+function testCelebrations() {
+  const G = 'Celebrations';
+  assert(typeof win.celebrate === 'function', 'celebrate function exists', G);
+  assert(typeof win.spawnParticles === 'function', 'spawnParticles function exists', G);
+  assert(typeof win.rocketAnimation === 'function', 'rocketAnimation function exists', G);
+  assert(typeof win.confettiExplosion === 'function', 'confettiExplosion function exists', G);
+  assert(typeof win.showBanner === 'function', 'showBanner function exists', G);
+
+  // Test banner show/hide
+  const banner = doc.getElementById('banner');
+  assert(banner && !banner.classList.contains('show'), 'Banner starts hidden', G);
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: State Management
+// ═══════════════════════════════════════
+function testStateManagement() {
+  const G = 'State Management';
+
+  // Test reset
+  assert(typeof win.resetProgress === 'function', 'resetProgress function exists', G);
+
+  // Test STORAGE_KEY exists
+  assert(win.STORAGE_KEY && win.STORAGE_KEY.length > 0, 'STORAGE_KEY is defined', G);
+
+  // Test state object
+  assert(win.state && typeof win.state.completed === 'object', 'state.completed is an object', G);
+
+  // Test save/load round-trip
+  win.state.completed['test-item'] = true;
+  win.saveState();
+  const loaded = JSON.parse(win.localStorage.getItem(win.STORAGE_KEY));
+  assert(loaded && loaded.completed['test-item'] === true, 'State saves to localStorage', G);
+  delete win.state.completed['test-item'];
+  win.saveState();
+}
+
+// ═══════════════════════════════════════
+// TEST GROUP: Accessibility
+// ═══════════════════════════════════════
+function testAccessibility() {
+  const G = 'Accessibility';
+
+  // Theme toggle has aria-label
+  const themeToggle = doc.querySelector('.theme-toggle');
+  assert(themeToggle && themeToggle.getAttribute('aria-label'), 'Theme toggle has aria-label', G);
+
+  // Title element exists
+  assert(doc.title && doc.title.includes('AIdeate'), 'Page title includes AIdeate', G);
+
+  // Language attribute
+  assert(doc.documentElement.getAttribute('lang') === 'en', 'HTML lang="en" set', G);
+}
+
+// ═══════════════════════════════════════
+// RENDER RESULTS
+// ═══════════════════════════════════════
+function renderResults() {
+  const container = document.getElementById('results');
+  const groups = {};
+  results.forEach(r => {
+    if (!groups[r.group]) groups[r.group] = [];
+    groups[r.group].push(r);
+  });
+
+  const passed = results.filter(r => r.pass).length;
+  const failed = results.filter(r => !r.pass).length;
+  const total = results.length;
+
+  document.getElementById('summary').innerHTML =
+    `<span class="pass">✓ ${passed} passed</span> · <span class="fail">${failed > 0 ? '✗ ' + failed + ' failed' : '0 failed'}</span> · ${total} total`;
+
+  let html = '';
+  for (const [group, tests] of Object.entries(groups)) {
+    const gPass = tests.filter(t => t.pass).length;
+    html += `<div class="test-group"><h2>${group} (${gPass}/${tests.length})</h2>`;
+    tests.forEach(t => {
+      html += `<div class="test ${t.pass ? 'pass' : 'fail'}"><span class="icon">${t.pass ? '✓' : '✗'}</span>${t.name}</div>`;
+    });
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+</script>
+</body>
+</html>

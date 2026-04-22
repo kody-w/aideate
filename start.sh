@@ -1,14 +1,26 @@
 #!/bin/bash
-# Launch AIdeate Workshop locally
-# Serves files via HTTP (required for BroadcastChannel + iframes)
+# Launch AIdeate Workshop with audience voting
+# Serves files via server.py (HTTP + REST API for interactive voting)
 cd "$(dirname "$0")"
 PORT=${1:-8765}
-echo "🚀 AIdeate Workshop starting on http://localhost:$PORT"
-echo "   Control Panel: http://localhost:$PORT/control.html"
-echo "   Presenter:     http://localhost:$PORT/index.html"
+
+# Detect LAN IP
+LAN_IP=$(python3 -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(s.getsockname()[0]); s.close()" 2>/dev/null || echo "localhost")
+
 echo ""
-echo "   Press Ctrl+C to stop"
+echo "  🚀 AIdeate Workshop"
+echo "  ══════════════════════════════════════"
+echo "  Presenter:  http://localhost:$PORT/index.html"
+echo "  Join URL:   http://$LAN_IP:$PORT/join.html"
+echo "  ──────────────────────────────────────"
+echo "  📱 Share the join URL or QR code so"
+echo "     participants can vote from their phones."
+echo "  ══════════════════════════════════════"
+echo "  Press Ctrl+C to stop"
 echo ""
-open "http://localhost:$PORT/control.html"
-open "http://localhost:$PORT/index.html"
-python3 -m http.server $PORT
+
+# Open presenter in browser
+open "http://localhost:$PORT/index.html" 2>/dev/null || xdg-open "http://localhost:$PORT/index.html" 2>/dev/null || true
+
+# Launch server (with REST API for audience voting)
+python3 server.py $PORT

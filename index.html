@@ -1575,6 +1575,18 @@
     </div>
   </div>
 
+  <!-- AUDIENCE VOTING -->
+  <div class="drawer-section" data-context="all">
+    <h3>📱 Audience Voting <span class="badge" style="background:rgba(16,124,16,.2);color:var(--ms-green);" id="remoteCountBadge">0</span></h3>
+    <p style="font-size:.68rem;color:var(--muted);margin-bottom:8px;line-height:1.4;">Share the QR code so participants can vote from their phones. Requires server.py.</p>
+    <div id="qrSection">
+      <div id="qrStatus" style="font-size:.72rem;color:var(--muted);margin-bottom:6px;">Checking server...</div>
+      <canvas id="qrCanvas" width="200" height="200" style="display:none;border:8px solid #fff;border-radius:8px;margin:0 auto 8px;cursor:pointer;" onclick="showQRFullscreen()" title="Click to enlarge"></canvas>
+      <div id="joinUrlDisplay" style="display:none;font-size:.65rem;color:var(--muted);word-break:break-all;background:var(--bg);padding:6px 8px;border-radius:6px;margin-bottom:6px;cursor:pointer;" onclick="copyJoinUrl()" title="Click to copy"></div>
+      <div id="remoteParticipants" style="margin-top:6px;"></div>
+    </div>
+  </div>
+
   <!-- ACTIVITY LOG -->
   <div class="drawer-section" data-context="all">
     <h3 class="collapsible-header" onclick="toggleCollapsible(this)">📝 Activity Log <span class="arrow">▶</span></h3>
@@ -1652,6 +1664,7 @@ const AUTOSAVE_KEY = 'aideate_autosave';
 
 function autosave() {
   try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(state)); } catch(e) {}
+  syncToServer();
 }
 
 function restoreAutosave() {
@@ -3902,6 +3915,356 @@ function installPWA() {
     if (btn) btn.style.display = 'none';
   });
 }
+
+// ══════════════════════════════════════════════
+// AUDIENCE VOTING — Server Sync + QR Code
+// ══════════════════════════════════════════════
+let serverAvailable = false;
+let serverSyncTimer = null;
+let joinUrl = '';
+
+// Sync state to server (called on every autosave)
+function syncToServer() {
+  if (!serverAvailable) return;
+  fetch('/api/sync', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      sessionId: state.sessionId,
+      workshopName: state.workshopName,
+      companyName: state.companyName,
+      phase: state.phase,
+      ideas: state.ideas,
+      participants: state.participants,
+      votesPerPerson: state.votesPerPerson,
+      departments: state.departments
+    })
+  }).then(r => r.json()).then(data => {
+    if (data.ok) {
+      mergeRemoteData(data);
+    }
+  }).catch(() => {});
+}
+
+// Merge remote participants + votes into local state
+function mergeRemoteData(data) {
+  const remoteParts = data.remoteParticipants || [];
+  const remoteVotes = data.remoteVotes || [];
+
+  // Add remote participants to state if not already there
+  let newParts = 0;
+  for (const rp of remoteParts) {
+    if (!state.participants.find(p => p.name === rp.name)) {
+      state.participants.push({
+        id: rp.id,
+        name: rp.name,
+        title: rp.title || '',
+        initials: rp.initials || rp.name.slice(0,2).toUpperCase(),
+        remote: true
+      });
+      newParts++;
+    }
+  }
+
+  // Merge remote votes into ideas
+  let newVotes = 0;
+  for (const rv of remoteVotes) {
+    const idea = state.ideas.find(i => i.id === rv.ideaId);
+    if (idea) {
+      if (!(idea.voters || []).includes(rv.voterName)) {
+        idea.votes = (idea.votes || 0) + 1;
+        idea.voters = idea.voters || [];
+        idea.voters.push(rv.voterName);
+        newVotes++;
+      }
+    }
+  }
+
+  // Update UI if anything changed
+  if (newParts > 0 || newVotes > 0) {
+    if (newParts > 0) {
+      renderPanelParticipants();
+      renderParticipants();
+      renderIntroSlide();
+      updateVoterDatalist();
+    }
+    if (newVotes > 0) {
+      renderVotes();
+      renderPanelIdeaList();
+    }
+    try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(state)); } catch(e) {}
+    updateRemoteBadge(remoteParts.length);
+  }
+  updateRemoteBadge(remoteParts.length);
+}
+
+function updateRemoteBadge(count) {
+  const badge = document.getElementById('remoteCountBadge');
+  if (badge) badge.textContent = count;
+
+  const rpEl = document.getElementById('remoteParticipants');
+  if (!rpEl) return;
+  // Get remote participants from state
+  const remotes = state.participants.filter(p => p.remote);
+  if (remotes.length === 0) {
+    rpEl.innerHTML = '';
+    return;
+  }
+  rpEl.innerHTML = '<div style="font-size:.68rem;color:var(--muted);margin-bottom:4px;">📱 Remote participants:</div>' +
+    remotes.map(p => '<span style="display:inline-block;font-size:.65rem;background:rgba(16,124,16,.15);color:var(--ms-green);padding:2px 8px;border-radius:10px;margin:0 4px 4px 0;">' + escHtml(p.name) + '</span>').join('');
+}
+
+// Poll server for new remote votes every 3 seconds
+function pollServer() {
+  if (!serverAvailable) return;
+  fetch('/api/session').then(r => r.json()).then(data => {
+    // Merge any new remote votes
+    const remoteVotes = data.remoteVotes || [];
+    const remoteParts = data.remoteParticipants || [];
+    mergeRemoteData({remoteParticipants: remoteParts, remoteVotes: remoteVotes});
+  }).catch(() => {});
+}
+
+// Check if server.py is running and initialize QR code
+function initServerSync() {
+  fetch('/api/info').then(r => r.json()).then(info => {
+    serverAvailable = true;
+    joinUrl = 'http://' + info.ip + ':' + info.port + '/join.html?s=' + (state.sessionId || '');
+
+    // Generate QR code
+    const canvas = document.getElementById('qrCanvas');
+    if (canvas) {
+      generateQR(canvas, joinUrl);
+      canvas.style.display = 'block';
+    }
+
+    // Show join URL
+    const urlEl = document.getElementById('joinUrlDisplay');
+    if (urlEl) {
+      urlEl.textContent = '🔗 ' + joinUrl;
+      urlEl.style.display = '';
+    }
+
+    const statusEl = document.getElementById('qrStatus');
+    if (statusEl) statusEl.innerHTML = '<span style="color:var(--ms-green);">✓ Server running</span> — share the QR code!';
+
+    // Start polling for remote votes
+    syncToServer(); // initial push
+    serverSyncTimer = setInterval(pollServer, 3000);
+
+    log('📱 Audience voting enabled');
+  }).catch(() => {
+    serverAvailable = false;
+    const statusEl = document.getElementById('qrStatus');
+    if (statusEl) statusEl.innerHTML = 'Server not detected. Run <code style="font-size:.65rem;background:var(--bg);padding:1px 4px;border-radius:3px;">./start.sh</code> to enable audience voting.';
+  });
+}
+
+function copyJoinUrl() {
+  if (!joinUrl) return;
+  navigator.clipboard.writeText(joinUrl).then(() => {
+    const el = document.getElementById('joinUrlDisplay');
+    if (el) { const orig = el.textContent; el.textContent = '✓ Copied!'; setTimeout(() => el.textContent = orig, 1500); }
+  }).catch(() => {});
+}
+
+function showQRFullscreen() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;';
+  overlay.onclick = () => overlay.remove();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 400; canvas.height = 400;
+  canvas.style.cssText = 'border:16px solid #fff;border-radius:12px;';
+  generateQR(canvas, joinUrl);
+
+  const label = document.createElement('div');
+  label.style.cssText = 'color:#fff;font-size:18px;margin-top:16px;font-family:monospace;';
+  label.textContent = joinUrl;
+
+  const hint = document.createElement('div');
+  hint.style.cssText = 'color:rgba(255,255,255,.5);font-size:14px;margin-top:8px;';
+  hint.textContent = 'Scan to join • Click anywhere to close';
+
+  overlay.appendChild(canvas);
+  overlay.appendChild(label);
+  overlay.appendChild(hint);
+  document.body.appendChild(overlay);
+}
+
+// ══════════════════════════════════════════════
+// MINIMAL QR CODE GENERATOR (QR version 3, 29×29, ECC-L)
+// Generates URL-mode QR codes for short URLs (<77 chars)
+// ══════════════════════════════════════════════
+function generateQR(canvas, text) {
+  // Use a simple QR encoding approach
+  const modules = qrGenerate(text);
+  const size = modules.length;
+  const scale = Math.floor(canvas.width / (size + 8));
+  const offset = Math.floor((canvas.width - size * scale) / 2);
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#000000';
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      if (modules[y][x]) {
+        ctx.fillRect(offset + x * scale, offset + y * scale, scale, scale);
+      }
+    }
+  }
+}
+
+// QR Code generation — simplified for URL data, version 2-4, ECC-L
+function qrGenerate(text) {
+  // For simplicity, encode as byte mode QR
+  const data = [];
+  for (let i = 0; i < text.length; i++) data.push(text.charCodeAt(i));
+
+  // Determine version (1=21x21, 2=25x25, 3=29x29, 4=33x33)
+  let version, size;
+  if (data.length <= 17) { version = 1; size = 21; }
+  else if (data.length <= 32) { version = 2; size = 25; }
+  else if (data.length <= 53) { version = 3; size = 29; }
+  else if (data.length <= 78) { version = 4; size = 33; }
+  else if (data.length <= 106) { version = 5; size = 37; }
+  else if (data.length <= 134) { version = 6; size = 41; }
+  else { version = 7; size = 45; }
+
+  // Create module grid
+  const grid = Array.from({length: size}, () => Array(size).fill(null));
+  const reserved = Array.from({length: size}, () => Array(size).fill(false));
+
+  // Place finder patterns
+  function placeFinder(r, c) {
+    for (let dy = -1; dy <= 7; dy++) {
+      for (let dx = -1; dx <= 7; dx++) {
+        const y = r + dy, x = c + dx;
+        if (y < 0 || y >= size || x < 0 || x >= size) continue;
+        const outer = dy === -1 || dy === 7 || dx === -1 || dx === 7;
+        const ring = dy === 0 || dy === 6 || dx === 0 || dx === 6;
+        const inner = dy >= 2 && dy <= 4 && dx >= 2 && dx <= 4;
+        grid[y][x] = !outer && (ring || inner);
+        reserved[y][x] = true;
+      }
+    }
+  }
+  placeFinder(0, 0);
+  placeFinder(0, size - 7);
+  placeFinder(size - 7, 0);
+
+  // Timing patterns
+  for (let i = 8; i < size - 8; i++) {
+    grid[6][i] = i % 2 === 0; reserved[6][i] = true;
+    grid[i][6] = i % 2 === 0; reserved[i][6] = true;
+  }
+
+  // Alignment pattern (version >= 2)
+  if (version >= 2) {
+    const alignPos = [6, size - 7];
+    // For versions 2-6 there's typically one alignment at a computed position
+    const positions = version === 2 ? [6, 18] :
+                      version === 3 ? [6, 22] :
+                      version === 4 ? [6, 26] :
+                      version === 5 ? [6, 30] :
+                      version === 6 ? [6, 34] :
+                      [6, 22, 38];
+    for (const ay of positions) {
+      for (const ax of positions) {
+        if (reserved[ay] && reserved[ay][ax]) continue;
+        for (let dy = -2; dy <= 2; dy++) {
+          for (let dx = -2; dx <= 2; dx++) {
+            const y = ay + dy, x = ax + dx;
+            if (y < 0 || y >= size || x < 0 || x >= size) continue;
+            if (reserved[y][x]) continue;
+            grid[y][x] = Math.abs(dy) === 2 || Math.abs(dx) === 2 || (dy === 0 && dx === 0);
+            reserved[y][x] = true;
+          }
+        }
+      }
+    }
+  }
+
+  // Dark module
+  grid[size - 8][8] = true; reserved[size - 8][8] = true;
+
+  // Reserve format info areas
+  for (let i = 0; i < 9; i++) {
+    if (i < size) { reserved[8][i] = true; reserved[i][8] = true; }
+    if (size - 1 - i >= 0 && size - 1 - i < size) { reserved[8][size - 1 - i + (i < 1 ? 0 : 0)] = true; }
+  }
+  for (let i = 0; i < 8; i++) {
+    if (size - 8 + i < size) reserved[size - 8 + i][8] = true;
+    reserved[8][size - 8 + i] = true;
+  }
+
+  // Encode data bits (byte mode, ECC-L)
+  // Mode indicator: 0100 (byte), char count (8 bits for v1-9)
+  let bits = '0100';
+  let countBits = version <= 9 ? 8 : 16;
+  bits += data.length.toString(2).padStart(countBits, '0');
+  for (const b of data) bits += b.toString(2).padStart(8, '0');
+  bits += '0000'; // terminator
+
+  // Pad to 8-bit boundary
+  while (bits.length % 8 !== 0) bits += '0';
+
+  // Data capacity (ECC-L, bytes): v1=19, v2=34, v3=55, v4=80, v5=108, v6=136, v7=156
+  const capacities = {1:19, 2:34, 3:55, 4:80, 5:108, 6:136, 7:156};
+  const totalBytes = capacities[version] || 55;
+
+  // Pad with 0xEC, 0x11
+  while (bits.length < totalBytes * 8) {
+    bits += ((bits.length / 8) % 2 === 0) ? '11101100' : '00010001';
+  }
+  bits = bits.slice(0, totalBytes * 8);
+
+  // Place data bits in zigzag pattern
+  let bitIdx = 0;
+  for (let right = size - 1; right >= 1; right -= 2) {
+    if (right === 6) right = 5; // skip timing column
+    for (let vert = 0; vert < size; vert++) {
+      for (let j = 0; j < 2; j++) {
+        const x = right - j;
+        const upward = ((size - 1 - right) >> 1) % 2 === 0;
+        const y = upward ? size - 1 - vert : vert;
+        if (x < 0 || x >= size || y < 0 || y >= size) continue;
+        if (reserved[y][x]) continue;
+        grid[y][x] = bitIdx < bits.length ? bits[bitIdx] === '1' : false;
+        bitIdx++;
+      }
+    }
+  }
+
+  // Apply mask pattern 0 (checkerboard): flip if (row + col) % 2 === 0
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      if (!reserved[y][x] && (y + x) % 2 === 0) {
+        grid[y][x] = !grid[y][x];
+      }
+    }
+  }
+
+  // Place format info (ECC-L, mask 0) = 0x77C4 → 111011111000100
+  const formatBits = '111011111000100';
+  // Around top-left finder
+  for (let i = 0; i <= 5; i++) grid[8][i] = formatBits[i] === '1';
+  grid[8][7] = formatBits[6] === '1';
+  grid[8][8] = formatBits[7] === '1';
+  grid[7][8] = formatBits[8] === '1';
+  for (let i = 9; i < 15; i++) grid[14 - i][8] = formatBits[i] === '1';
+  // Around top-right finder
+  for (let i = 0; i < 8; i++) grid[8][size - 8 + i] = formatBits[14 - i] === '1';
+  // Around bottom-left finder
+  for (let i = 0; i < 7; i++) grid[size - 1 - i][8] = formatBits[i] === '1';
+
+  return grid;
+}
+
+// Init server sync after page loads
+setTimeout(initServerSync, 1000);
 </script>
 </body>
 </html>

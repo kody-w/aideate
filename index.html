@@ -10,6 +10,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
+<script>
+(function(){try{var s=localStorage.getItem('aideate-theme');var t=s||'light';if(t==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){document.documentElement.setAttribute('data-theme','light')}})();
+</script>
 <style>
   :root {
     --ms-blue: #0078d4;
@@ -24,9 +27,25 @@
     --text: #e2e8f0;
     --muted: #94a3b8;
     --light: #f5f5f5;
+    --body-color: #fff;
+  }
+  [data-theme="light"] {
+    --dark: #ffffff;
+    --dark-alt: #f6f8fa;
+    --card: #f0f2f5;
+    --border: #d0d7de;
+    --text: #1f2328;
+    --muted: #59636e;
+    --light: #1f2328;
+    --body-color: #1f2328;
+    --ms-blue: #0969da;
+    --ms-green: #1a7f37;
+    --ms-purple: #8250df;
+    --ms-orange: #bc4c00;
+    --ms-red: #cf222e;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--dark); color: #fff; overflow: hidden; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--dark); color: var(--body-color); overflow: hidden; transition: background-color .25s, color .25s; }
 
   /* ══════════════════════════════════════════ */
   /* SLIDE SYSTEM                              */
@@ -122,11 +141,15 @@
   .stat .num { font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, var(--ms-blue), var(--ms-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .stat .label { font-size: .85rem; opacity: .6; margin-top: 4px; }
 
-  /* Backgrounds — Microsoft dark theme */
+  /* Backgrounds — theme-aware */
   .bg-gradient-1 { background: linear-gradient(135deg, #0f0c29, #1b1545, #1a1a2e); }
   .bg-gradient-2 { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); }
   .bg-gradient-3 { background: linear-gradient(135deg, #0d1b2a, #1b2838, #2d4059); }
   .bg-gradient-4 { background: linear-gradient(135deg, #1a0a2e, #2d1b4e, #0f3460); }
+  [data-theme="light"] .bg-gradient-1 { background: linear-gradient(135deg, #f8fafc, #eef2ff, #f0f4ff); }
+  [data-theme="light"] .bg-gradient-2 { background: linear-gradient(135deg, #f0f4ff, #e8f0fe, #dbeafe); }
+  [data-theme="light"] .bg-gradient-3 { background: linear-gradient(135deg, #f0fdf4, #ecfdf5, #f0f9ff); }
+  [data-theme="light"] .bg-gradient-4 { background: linear-gradient(135deg, #faf5ff, #f5f3ff, #eef2ff); }
 
   /* Glow effects */
   .glow-blue { position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,120,212,.12), transparent 70%); pointer-events: none; }
@@ -271,22 +294,23 @@
   .roster-avatar:nth-child(6n+5) { background: #ef4444; }
   .roster-avatar:nth-child(6n)   { background: #06b6d4; }
 
-  /* Ideate grid — flexbox fills available space naturally */
+  /* Ideate grid — fills viewport, auto-scales to fit */
   .ideate-grid {
-    flex: 1; display: flex; flex-wrap: wrap; gap: 16px; padding: 24px 40px;
+    flex: 1; display: flex; flex-wrap: wrap; gap: 10px; padding: 16px 28px;
     overflow-y: auto; align-content: flex-start;
     perspective: 1200px;
   }
 
-  /* Idea card — Jeopardy-style front face */
+  /* Idea card — compact to fit more on screen */
   .idea-card {
-    flex: 1 1 300px; min-width: 240px; max-width: 100%;
+    flex: 1 1 220px; min-width: 180px; max-width: 100%;
     background: linear-gradient(135deg, var(--card), rgba(22,33,62,.95));
-    border: 2px solid var(--border); border-radius: 12px;
+    border: 2px solid var(--border); border-radius: 10px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 32px 16px 24px; position: relative;
+    text-align: center; padding: 20px 12px 16px; position: relative;
     cursor: pointer; animation: cardIn .4s ease;
     transition: transform .3s, box-shadow .3s, border-color .3s;
+    max-height: calc(50vh - 60px);
   }
   .idea-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,120,212,.2); border-color: rgba(0,120,212,.4); }
   .idea-card .dept {
@@ -295,8 +319,8 @@
     text-transform: uppercase; letter-spacing: .5px;
   }
   .idea-card .name {
-    font-weight: 800; font-size: clamp(1.4rem, 2.8vw, 2.2rem);
-    line-height: 1.25; padding: 0 8px;
+    font-weight: 800; font-size: clamp(1rem, 2vw, 1.5rem);
+    line-height: 1.2; padding: 0 4px;
     background: linear-gradient(135deg, #fff, rgba(255,255,255,.8));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
@@ -315,8 +339,9 @@
   .idea-card .front-status.partial { background: rgba(251,191,36,.15); color: #fbbf24; }
   .idea-card .front-status.empty { background: rgba(148,163,184,.1); color: var(--muted); }
   .idea-card .card-details {
-    width: 100%; text-align: left; font-size: clamp(.95rem, 1.4vw, 1.15rem); line-height: 1.5;
-    color: rgba(255,255,255,.65); margin-top: 12px; overflow-y: auto;
+    width: 100%; text-align: left; font-size: clamp(.75rem, 1.1vw, .95rem); line-height: 1.4;
+    color: rgba(255,255,255,.65); margin-top: 8px; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
   }
   .idea-card .card-details .detail-row {
     margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
@@ -988,6 +1013,103 @@
   .drawer .voter-input input { flex: 1; }
 
   /* ══════════════════════════════════════════ */
+  /* LIGHT THEME OVERRIDES                     */
+  /* ══════════════════════════════════════════ */
+  [data-theme="light"] .slide.title-slide { background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 40%, #dbeafe 100%); }
+  [data-theme="light"] .slide.title-slide .glow-blue,
+  [data-theme="light"] .slide.title-slide .glow-purple { opacity: .15; }
+  [data-theme="light"] .title-slide .ms-logo-large span { color: #1f2328; }
+  [data-theme="light"] h1, [data-theme="light"] h2 { color: #1f2328; }
+  [data-theme="light"] .tag { background: rgba(9,105,218,.1) !important; color: #0969da !important; border-color: rgba(9,105,218,.2) !important; }
+  [data-theme="light"] .subtitle { color: #59636e !important; }
+  [data-theme="light"] .card { background: #fff; border-color: #d0d7de; color: #1f2328; }
+  [data-theme="light"] .card p { color: #59636e; }
+  [data-theme="light"] .feature-card { background: #fff; border-color: #d0d7de; }
+  [data-theme="light"] .feature-card .fc-text h3 { color: #1f2328; }
+  [data-theme="light"] .feature-card .fc-text p { color: #59636e; }
+  [data-theme="light"] .intro-card { background: #fff; border-color: #d0d7de; }
+  [data-theme="light"] .intro-card .intro-name { color: #1f2328; }
+  [data-theme="light"] .intro-card .intro-title { color: #59636e; }
+  [data-theme="light"] .stat .num { background: linear-gradient(135deg, #0969da, #8250df); -webkit-background-clip: text; }
+  [data-theme="light"] .top-bar { background: rgba(255,255,255,.88); backdrop-filter: blur(12px); border-color: #d0d7de; }
+  [data-theme="light"] .top-bar .logo { color: #1f2328; }
+  [data-theme="light"] .phase-pill { background: rgba(9,105,218,.1); color: #0969da; }
+  [data-theme="light"] .phase-pill.pp-active { background: rgba(9,105,218,.15); color: #0969da; }
+  [data-theme="light"] .phase-pill.pp-done { background: rgba(26,127,55,.1); color: #1a7f37; }
+  [data-theme="light"] .participants-badge { background: rgba(0,0,0,.05); color: #59636e; border-color: #d0d7de; }
+  [data-theme="light"] .idea-card { background: #fff; border-color: #d0d7de; }
+  [data-theme="light"] .idea-card .name { background: linear-gradient(135deg, #1f2328, #59636e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  [data-theme="light"] .idea-card .front-desc,
+  [data-theme="light"] .idea-card .card-details { color: #59636e; }
+  [data-theme="light"] .idea-card:hover { border-color: #0969da; }
+  [data-theme="light"] .idea-expand-overlay { background: rgba(0,0,0,.25); }
+  [data-theme="light"] .idea-expand-card { background: #fff; border-color: #d0d7de; }
+  [data-theme="light"] .idea-expand-card h2 { color: #1f2328; }
+  [data-theme="light"] .idea-expand-card .ex-field label { color: #59636e; }
+  [data-theme="light"] .idea-expand-card .ex-field input,
+  [data-theme="light"] .idea-expand-card .ex-field textarea,
+  [data-theme="light"] .idea-expand-card .ex-field select { background: #f6f8fa; border-color: #d0d7de; color: #1f2328; }
+  [data-theme="light"] .vote-card { background: #fff; border-color: #d0d7de; }
+  [data-theme="light"] .vote-card .name { color: #1f2328; }
+  [data-theme="light"] .vote-card:hover { border-color: #0969da; }
+  [data-theme="light"] .voter-token { background: #fff; border-color: #d0d7de; }
+  [data-theme="light"] .voter-token .token-name { color: #1f2328; }
+  [data-theme="light"] .voter-token .token-votes { color: #59636e; }
+  [data-theme="light"] .results-table { border-color: #d0d7de; }
+  [data-theme="light"] .results-table th { background: #f6f8fa; color: #1f2328; border-color: #d0d7de; }
+  [data-theme="light"] .results-table td { border-color: #d0d7de; color: #1f2328; }
+  [data-theme="light"] .podium-item { background: #fff; border-color: #d0d7de; }
+  [data-theme="light"] .podium-item .p-name { color: #1f2328; }
+  [data-theme="light"] .deliverable-btn { background: #fff; border-color: #d0d7de; color: #1f2328; }
+  [data-theme="light"] .deliverable-btn:hover { border-color: #0969da; color: #0969da; }
+  [data-theme="light"] .phase-footer { background: rgba(0,0,0,.03); border-color: #d0d7de; }
+  [data-theme="light"] .drawer-fab { background: rgba(255,255,255,.9); border-color: #d0d7de; color: #59636e; }
+  [data-theme="light"] .drawer-overlay { background: rgba(0,0,0,.15); }
+  [data-theme="light"] .drawer { background: #fff; border-color: #d0d7de; }
+  [data-theme="light"] .drawer-header { background: #f6f8fa; border-color: #d0d7de; color: #1f2328; }
+  [data-theme="light"] .drawer-header h2 { color: #1f2328; }
+  [data-theme="light"] .drawer-section { border-color: #d0d7de; }
+  [data-theme="light"] .drawer-section h3 { color: #1f2328; }
+  [data-theme="light"] .drawer input, [data-theme="light"] .drawer select, [data-theme="light"] .drawer textarea { background: #f6f8fa; border-color: #d0d7de; color: #1f2328; }
+  [data-theme="light"] .drawer label { color: #59636e; }
+  [data-theme="light"] .drawer .participant-chip { background: #f6f8fa; border-color: #d0d7de; color: #1f2328; }
+  [data-theme="light"] .drawer .idea-chip { background: #f6f8fa; color: #1f2328; }
+  [data-theme="light"] .export-btn { background: rgba(255,255,255,.8); border-color: #d0d7de; color: #59636e; }
+  [data-theme="light"] .progress-bar { background: linear-gradient(90deg, #0969da, #8250df); }
+  [data-theme="light"] .key-hint { background: rgba(0,0,0,.06); color: #59636e; }
+  [data-theme="light"] .slide-number { color: #8c959f; }
+  [data-theme="light"] .wizard-overlay { background: rgba(0,0,0,.25); }
+  [data-theme="light"] .wizard-card { background: #fff; border-color: #d0d7de; }
+  [data-theme="light"] .wizard-card h2, [data-theme="light"] .wizard-step h3 { color: #1f2328; }
+  [data-theme="light"] .wizard-step .wiz-field label { color: #59636e; }
+  [data-theme="light"] .wizard-step .wiz-field input,
+  [data-theme="light"] .wizard-step .wiz-field textarea,
+  [data-theme="light"] .wizard-step .wiz-field select { background: #f6f8fa; border-color: #d0d7de; color: #1f2328; }
+  [data-theme="light"] .addIdeaOverlay { background: rgba(0,0,0,.25); }
+  [data-theme="light"] .add-idea-popup { background: #fff; border-color: #d0d7de; }
+  [data-theme="light"] .add-idea-popup h2 { color: #1f2328; }
+  [data-theme="light"] .ai-result { background: #f6f8fa; border-color: #d0d7de; }
+  [data-theme="light"] .log { background: #f6f8fa; color: #59636e; border-color: #d0d7de; }
+
+  /* Theme toggle button */
+  .theme-toggle-btn {
+    position: fixed; top: 16px; left: 16px; z-index: 800;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(0,0,0,.4); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.15); color: #94a3b8;
+    cursor: pointer; font-size: 1rem; display: flex;
+    align-items: center; justify-content: center; transition: all .2s;
+    opacity: 0;
+  }
+  body.chrome-visible .theme-toggle-btn { opacity: .5; }
+  .theme-toggle-btn:hover { opacity: 1 !important; border-color: var(--ms-blue); }
+  [data-theme="light"] .theme-toggle-btn { background: rgba(255,255,255,.8); border-color: #d0d7de; color: #59636e; }
+  .theme-toggle-btn .sun { display: none; }
+  .theme-toggle-btn .moon { display: inline; }
+  [data-theme="light"] .theme-toggle-btn .sun { display: inline; }
+  [data-theme="light"] .theme-toggle-btn .moon { display: none; }
+
+  /* ══════════════════════════════════════════ */
   /* RESPONSIVE                                */
   /* ══════════════════════════════════════════ */
   @media (max-width: 800px) {
@@ -1001,6 +1123,9 @@
 </head>
 <body>
 
+<button class="theme-toggle-btn" onclick="toggleAppTheme()" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+  <span class="moon">🌙</span><span class="sun">☀️</span>
+</button>
 <div class="progress-bar" id="progressBar"></div>
 <div class="key-hint">← → arrow keys to navigate · G for controls · F for fullscreen</div>
 <button class="export-btn" id="exportBtn" onclick="exportWorkshop()" title="Export workshop state">💾 Export</button>
@@ -1763,6 +1888,18 @@ function updateProgressBar() {
   document.getElementById('progressBar').style.width = pct + '%';
 }
 
+// Theme toggle
+function toggleAppTheme() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  if (isLight) {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('aideate-theme', 'dark');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('aideate-theme', 'light');
+  }
+}
+
 // Keyboard
 document.addEventListener('keydown', (e) => {
   const tag = document.activeElement ? document.activeElement.tagName : '';
@@ -1785,6 +1922,7 @@ document.addEventListener('keydown', (e) => {
     if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => {}); }
     else { document.exitFullscreen(); }
   }
+  if (e.key === 't' || e.key === 'T') { e.preventDefault(); toggleAppTheme(); }
 });
 
 // ══════════════════════════════════════════════

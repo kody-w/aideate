@@ -315,10 +315,283 @@ p.body{font-size:1.2rem;color:var(--text-dim);margin-bottom:18px;max-width:840px
   <div class="feature"><span class="icon">📦</span><a href="https://github.com/kody-w/aideate">GitHub Repository</a></div>
 </div>
 
+<!-- EXPORT -->
+<h2><span class="emoji">📤</span> Export</h2>
+<div class="feature-grid">
+  <div class="feature" style="cursor:pointer" onclick="downloadRoadmapDocx()"><span class="icon">📄</span><span class="label">Download Word (.docx)</span></div>
+  <div class="feature" style="cursor:pointer" onclick="window.print()"><span class="icon">🖨️</span><span class="label">Save as PDF (Print)</span></div>
+</div>
+
 <div class="footer">
   <p>AIdeate — AI Workshop Acceleration Tool · <a href="https://github.com/kody-w/aideate">GitHub</a></p>
 </div>
 
 </div>
+
+<!-- Print styles for clean PDF export -->
+<style>
+@media print {
+  body{background:#fff!important;color:#1f2328!important}
+  .theme-toggle,.footer{display:none!important}
+  .container{max-width:100%;padding:20px 40px}
+  .hero h1 span{color:#0969da!important;-webkit-text-fill-color:#0969da!important}
+  .feature,.feedback-item,.phase,.decision,.callout{break-inside:avoid;border-color:#d0d7de!important;background:#f6f8fa!important}
+  h2{break-after:avoid;border-color:#d0d7de!important}
+  .badge{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .checklist li.done::before{background:#1a7f37!important;border-color:#1a7f37!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .phase::before{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  *{color:#1f2328!important;--text:#1f2328;--text-dim:#59636e;--muted:#8c959f;--accent:#0969da;--green:#1a7f37;--purple:#8250df;--orange:#bc4c00;--red:#cf222e;--border:#d0d7de;--surface:#f6f8fa}
+}
+</style>
+
+<script>
+// ══════════════════════════════════════════════
+// WORD (.docx) EXPORT — Client-side OOXML
+// ══════════════════════════════════════════════
+function downloadRoadmapDocx() {
+  const today = new Date().toISOString().slice(0,10);
+
+  // Build document body XML
+  let body = '';
+
+  function addP(text, opts) {
+    opts = opts || {};
+    let rPr = '';
+    if (opts.bold) rPr += '<w:b/>';
+    if (opts.size) rPr += '<w:sz w:val="' + opts.size + '"/>';
+    if (opts.color) rPr += '<w:color w:val="' + opts.color + '"/>';
+    if (opts.font) rPr += '<w:rFonts w:ascii="' + opts.font + '" w:hAnsi="' + opts.font + '"/>';
+    rPr = rPr ? '<w:rPr>' + rPr + '</w:rPr>' : '';
+    let pPr = '';
+    if (opts.heading) pPr += '<w:pStyle w:val="Heading' + opts.heading + '"/>';
+    if (opts.spacing) pPr += '<w:spacing w:after="' + opts.spacing + '"/>';
+    pPr = pPr ? '<w:pPr>' + pPr + '</w:pPr>' : '';
+    const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    body += '<w:p>' + pPr + '<w:r>' + rPr + '<w:t xml:space="preserve">' + escaped + '</w:t></w:r></w:p>';
+  }
+
+  function addBreak() { body += '<w:p><w:r><w:br/></w:r></w:p>'; }
+  function addLine() { body += '<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="4" w:space="1" w:color="D0D7DE"/></w:pBdr></w:pPr></w:p>'; }
+
+  // Title
+  addP('AIdeate — Product Roadmap', {bold:true, size:52, color:'0969DA'});
+  addP('Last updated: ' + today, {size:20, color:'8C959F'});
+  addBreak();
+
+  // What's Live
+  addP('What\'s Live Today', {bold:true, size:36, color:'1F2328'});
+  addLine();
+  addP('AIdeate is a static HTML workshop tool hosted on GitHub Pages. No server, no database, no dependencies. All data stays in the browser\'s localStorage. The facilitator drives the session while sharing their screen.', {size:22});
+  addBreak();
+  const features = ['14-slide presentation deck','4-phase workshop flow','14 industry templates','10-step Define Wizard with ROI Calculator','2×2 prioritization matrix','Word, Excel, PDF, JSON export','AI-powered idea extraction','Light/dark theme toggle','Interactive training quest','PWA / offline capable'];
+  features.forEach(f => addP('  •  ' + f, {size:22}));
+  addBreak();
+
+  // Critical Feedback
+  addP('Feedback — Critical', {bold:true, size:36, color:'CF222E'});
+  addLine();
+  addP('Interactive Participant Voting', {bold:true, size:26});
+  addP('Participants should be able to join from their own devices, submit ideas, and vote — rather than verbally directing the facilitator.', {size:22});
+  addBreak();
+  addP('Executive Report Quality', {bold:true, size:26});
+  addP('The exported Word report needs to match the quality of the previous version — polished executive summary, prioritization matrix visualization, multi-perspective evaluation, and ROI data.', {size:22});
+  addBreak();
+  addP('Agent Library Connection', {bold:true, size:26});
+  addP('AIdeate output should link to the Agent Library with recommended use cases. The three components (AIdeate → Agent Library → Agent Build) should work as a connected pipeline.', {size:22});
+  addBreak();
+
+  // Important Feedback
+  addP('Feedback — Important', {bold:true, size:36, color:'9A6700'});
+  addLine();
+  addP('UI Readability for Screenshare', {bold:true, size:26});
+  addP('Text needs to be bigger, with better contrast and bolder elements. Over a Teams screenshare, the current UI is hard to follow.', {size:22});
+  addBreak();
+  addP('Step Progression Indicator', {bold:true, size:26});
+  addP('A visual indicator showing where you are in the workshop flow — which phase is active, what\'s complete, what\'s next.', {size:22});
+  addBreak();
+  addP('Self-Serve Onboarding', {bold:true, size:26});
+  addP('Field teams need to pick this up and run sessions independently. Training quest, recorded walkthroughs, and sample workshops.', {size:22});
+  addBreak();
+
+  // Voting Challenge
+  addP('The Interactive Voting Challenge', {bold:true, size:36, color:'BC4C00'});
+  addLine();
+  addP('The #1 requested feature — audience voting from personal devices — fundamentally conflicts with the local-first architecture. localStorage is per-browser. There is no built-in way for one browser to see another browser\'s data without a shared backend.', {size:22});
+  addBreak();
+  addP('Three approaches explored:', {bold:true, size:22});
+  addP('  •  Local server on facilitator\'s machine — Works on same WiFi, but not for remote Teams participants.', {size:22});
+  addP('  •  Peer-to-peer (WebRTC) — Encrypted, no server for data. But requires third-party signaling, can be blocked by firewalls.', {size:22});
+  addP('  •  Cloud deployment — Full-stack app with database. Supports multi-user but requires infrastructure, deployment, and compliance review.', {size:22});
+  addBreak();
+  addP('Core tension: Local-first eliminates the "what are you doing with our data?" conversation. Interactive participation reopens it.', {bold:true, size:22, color:'BC4C00'});
+  addBreak();
+
+  // Roadmap Phases
+  addP('Roadmap', {bold:true, size:36, color:'0969DA'});
+  addLine();
+
+  addP('Phase 1 — UI & Report Polish  [IN PROGRESS]', {bold:true, size:28, color:'1A7F37'});
+  ['✓ Light/dark theme toggle','✓ Screenshare-optimized typography','✓ Segmented phase progress bar','✓ Agent Library links on training quest','✓ Interactive training quest','⟳ Executive report upgrade','○ Agent Library deep links from results page'].forEach(i => addP('  ' + i, {size:22}));
+  addBreak();
+
+  addP('Phase 2 — Interactive Participation  [DECISION NEEDED]', {bold:true, size:28, color:'0969DA'});
+  ['○ Choose interactive voting approach','○ QR code join flow','○ Real-time idea submission from devices','○ Audience voting from phone','○ Live vote tallying on presenter','○ Voting rule enforcement'].forEach(i => addP('  ' + i, {size:22}));
+  addBreak();
+
+  addP('Phase 3 — Deployment & Scale  [PLANNED]', {bold:true, size:28, color:'8250DF'});
+  ['○ Hosting decision (static vs managed cloud)','○ Session management with join codes','○ Data handling policy','○ Self-serve onboarding package','○ Security and compliance review'].forEach(i => addP('  ' + i, {size:22}));
+  addBreak();
+
+  addP('Phase 4 — Agent Build Pipeline  [PLANNED]', {bold:true, size:28, color:'BC4C00'});
+  ['○ Export-to-agent pipeline','○ Auto-deploy to runtime','○ Demo video generation','○ Feedback loop — iterate from customer response'].forEach(i => addP('  ' + i, {size:22}));
+  addBreak();
+
+  // Key Decisions
+  addP('Key Decisions Pending', {bold:true, size:36, color:'BC4C00'});
+  addLine();
+  addP('1. Interactive voting approach — Local-only / Peer-to-peer / Cloud deployment', {size:22});
+  addP('2. Hosting for org-wide use — GitHub Pages / Azure Static Web Apps / Azure App Service', {size:22});
+  addP('3. Development resourcing — Current team / Dedicated resource / Vendor budget', {size:22});
+  addP('4. Data handling for shared sessions — Required if workshop data leaves the browser (blocks cloud and P2P)', {size:22, color:'CF222E'});
+  addBreak();
+
+  // Links
+  addP('Links', {bold:true, size:36, color:'0969DA'});
+  addLine();
+  addP('AIdeate Live App: https://kody-w.github.io/aideate/', {size:22});
+  addP('Training Quest: https://kody-w.github.io/aideate/quest.html', {size:22});
+  addP('GitHub Repository: https://github.com/kody-w/aideate', {size:22});
+
+  // Build DOCX
+  const docXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">' +
+    '<w:body>' + body +
+    '<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr>' +
+    '</w:body></w:document>';
+
+  const contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+    '<Default Extension="xml" ContentType="application/xml"/>' +
+    '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
+    '</Types>';
+
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' +
+    '</Relationships>';
+
+  const wordRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+
+  // Build ZIP
+  const files = [
+    {name:'[Content_Types].xml', data:contentTypes},
+    {name:'_rels/.rels', data:rels},
+    {name:'word/_rels/document.xml.rels', data:wordRels},
+    {name:'word/document.xml', data:docXml}
+  ];
+
+  const zip = buildZip(files);
+  const blob = new Blob([zip], {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'AIdeate-Roadmap-' + today + '.docx';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// Minimal ZIP builder (same pattern as AIdeate main app)
+function buildZip(files) {
+  const encoder = new TextEncoder();
+  let offset = 0;
+  const centralDir = [];
+  const localParts = [];
+
+  for (const file of files) {
+    const nameBytes = encoder.encode(file.name);
+    const dataBytes = encoder.encode(file.data);
+    const crc = crc32(dataBytes);
+
+    // Local file header
+    const local = new Uint8Array(30 + nameBytes.length + dataBytes.length);
+    const lv = new DataView(local.buffer);
+    lv.setUint32(0, 0x04034b50, true);  // sig
+    lv.setUint16(4, 20, true);           // version
+    lv.setUint16(6, 0, true);            // flags
+    lv.setUint16(8, 0, true);            // compression
+    lv.setUint16(10, 0, true);           // mod time
+    lv.setUint16(12, 0, true);           // mod date
+    lv.setUint32(14, crc, true);         // crc32
+    lv.setUint32(18, dataBytes.length, true); // compressed
+    lv.setUint32(22, dataBytes.length, true); // uncompressed
+    lv.setUint16(26, nameBytes.length, true); // name length
+    lv.setUint16(28, 0, true);           // extra length
+    local.set(nameBytes, 30);
+    local.set(dataBytes, 30 + nameBytes.length);
+    localParts.push(local);
+
+    // Central directory entry
+    const central = new Uint8Array(46 + nameBytes.length);
+    const cv = new DataView(central.buffer);
+    cv.setUint32(0, 0x02014b50, true);
+    cv.setUint16(4, 20, true);
+    cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0, true);
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, dataBytes.length, true);
+    cv.setUint32(24, dataBytes.length, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true);
+    cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true);
+    cv.setUint16(36, 0, true);
+    cv.setUint32(38, 32, true);
+    cv.setUint32(42, offset, true);
+    central.set(nameBytes, 46);
+    centralDir.push(central);
+
+    offset += local.length;
+  }
+
+  const cdOffset = offset;
+  let cdSize = 0;
+  centralDir.forEach(c => cdSize += c.length);
+
+  // End of central directory
+  const eocd = new Uint8Array(22);
+  const ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(4, 0, true);
+  ev.setUint16(6, 0, true);
+  ev.setUint16(8, files.length, true);
+  ev.setUint16(10, files.length, true);
+  ev.setUint32(12, cdSize, true);
+  ev.setUint32(16, cdOffset, true);
+  ev.setUint16(20, 0, true);
+
+  const total = offset + cdSize + 22;
+  const result = new Uint8Array(total);
+  let pos = 0;
+  localParts.forEach(p => { result.set(p, pos); pos += p.length; });
+  centralDir.forEach(c => { result.set(c, pos); pos += c.length; });
+  result.set(eocd, pos);
+  return result;
+}
+
+function crc32(data) {
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < data.length; i++) {
+    crc ^= data[i];
+    for (let j = 0; j < 8; j++) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+    }
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+</script>
 </body>
 </html>

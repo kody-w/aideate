@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIdeate — Product Roadmap</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='28'%3E💡%3C/text%3E%3C/svg%3E">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d1117;--surface:#161b22;--surface2:#1c2128;--border:#30363d;
+  --text:#e6edf3;--text-dim:#8b949e;--muted:#484f58;
+  --accent:#58a6ff;--green:#3fb950;--purple:#a78bfa;--orange:#f0883e;--yellow:#e3b341;--red:#f85149;
+  --chrome-bg:rgba(22,27,34,.92);
+  --grad-1:#7df0c8;--grad-2:#58a6ff;--grad-3:#a78bfa;
+}
+[data-theme="light"]{
+  --bg:#ffffff;--surface:#f6f8fa;--surface2:#eaeef2;--border:#d0d7de;
+  --text:#1f2328;--text-dim:#59636e;--muted:#8c959f;
+  --accent:#0969da;--green:#1a7f37;--purple:#8250df;--orange:#bc4c00;--yellow:#9a6700;--red:#cf222e;
+  --chrome-bg:rgba(255,255,255,.88);
+  --grad-1:#2da44e;--grad-2:#0969da;--grad-3:#8250df;
+}
+html,body{min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;transition:background-color .25s,color .25s}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+
+.container{max-width:960px;margin:0 auto;padding:48px 24px 80px}
+.theme-toggle{position:fixed;top:16px;right:20px;z-index:50;width:38px;height:38px;border-radius:50%;background:var(--chrome-bg);backdrop-filter:blur(12px);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.theme-toggle:hover{color:var(--text);border-color:var(--accent)}
+.theme-toggle .sun{display:none}.theme-toggle .moon{display:inline}
+[data-theme="light"] .theme-toggle .sun{display:inline}
+[data-theme="light"] .theme-toggle .moon{display:none}
+
+/* Hero */
+.hero{text-align:center;margin-bottom:56px}
+.hero .icon{font-size:56px;margin-bottom:8px}
+.hero h1{font-size:2.8rem;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+.hero h1 span{background:linear-gradient(135deg,var(--grad-1),var(--grad-2),var(--grad-3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:1.15rem;color:var(--text-dim);max-width:640px;margin:0 auto}
+.hero .updated{font-size:.8rem;color:var(--muted);margin-top:12px}
+
+/* Section */
+h2{font-size:1.6rem;font-weight:700;margin:48px 0 20px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+h2 .emoji{margin-right:8px}
+h3{font-size:1.15rem;font-weight:600;margin:24px 0 10px;color:var(--text)}
+p.body{font-size:1.05rem;color:var(--text-dim);margin-bottom:16px;max-width:800px}
+
+/* Status badges */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.badge-done{background:rgba(63,185,80,.15);color:var(--green)}
+.badge-progress{background:rgba(88,166,255,.15);color:var(--accent)}
+.badge-planned{background:rgba(167,139,250,.15);color:var(--purple)}
+.badge-blocked{background:rgba(248,81,73,.15);color:var(--red)}
+.badge-decision{background:rgba(240,136,62,.15);color:var(--orange)}
+
+/* Current state cards */
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:16px 0 24px}
+.feature{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:.95rem}
+.feature .icon{font-size:1.2rem;margin-right:6px}
+.feature .label{color:var(--text);font-weight:500}
+
+/* Feedback table */
+.feedback-group{margin:20px 0}
+.feedback-group h3{display:flex;align-items:center;gap:8px}
+.feedback-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:10px}
+.feedback-item .title{font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:4px}
+.feedback-item .detail{font-size:.9rem;color:var(--text-dim);line-height:1.55}
+
+/* Callout */
+.callout{border-radius:12px;padding:20px 24px;margin:24px 0;border-left:4px solid}
+.callout-orange{background:rgba(240,136,62,.08);border-color:var(--orange)}
+.callout-orange .callout-title{color:var(--orange);font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.callout p{font-size:.95rem;color:var(--text-dim);margin:6px 0}
+.callout strong{color:var(--text)}
+.callout ul{margin:8px 0 0 20px;font-size:.95rem;color:var(--text-dim)}
+.callout ul li{margin-bottom:4px}
+
+/* Roadmap phases */
+.phase{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.phase::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px}
+.phase.p1::before{background:var(--green)}.phase.p2::before{background:var(--accent)}.phase.p3::before{background:var(--purple)}.phase.p4::before{background:var(--orange)}
+.phase-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.phase-header h3{margin:0;font-size:1.15rem}
+.phase-desc{font-size:.95rem;color:var(--text-dim);margin-bottom:14px}
+.checklist{list-style:none;display:flex;flex-direction:column;gap:6px}
+.checklist li{font-size:.95rem;color:var(--text-dim);padding-left:26px;position:relative;line-height:1.5}
+.checklist li::before{content:'';position:absolute;left:0;top:5px;width:16px;height:16px;border-radius:50%;border:2px solid var(--border)}
+.checklist li.done{color:var(--green)}.checklist li.done::before{background:var(--green);border-color:var(--green)}
+.checklist li.done::after{content:'✓';position:absolute;left:3px;top:3px;font-size:11px;color:#fff;font-weight:700}
+.checklist li.progress{color:var(--accent)}.checklist li.progress::before{border-color:var(--accent);background:rgba(88,166,255,.2)}
+
+/* Decisions table */
+.decision-grid{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.decision{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px}
+.decision .q{flex:1}
+.decision .q .label{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.decision .q .options{font-size:.85rem;color:var(--text-dim)}
+
+/* Footer */
+.footer{text-align:center;margin-top:64px;padding-top:24px;border-top:1px solid var(--border);font-size:.8rem;color:var(--muted)}
+.footer a{color:var(--accent)}
+
+@media(max-width:640px){
+  .hero h1{font-size:1.8rem}
+  .feature-grid{grid-template-columns:1fr}
+  .container{padding:32px 16px 60px}
+}
+</style>
+<script>
+(function(){try{var s=localStorage.getItem('aideate-roadmap-theme');var p=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches;var t=s||(p?'light':'dark');if(t==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();
+</script>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="var l=document.documentElement.getAttribute('data-theme')==='light';document.documentElement.setAttribute('data-theme',l?'':'light');localStorage.setItem('aideate-roadmap-theme',l?'dark':'light')" aria-label="Toggle theme">
+  <span class="moon">🌙</span><span class="sun">☀️</span>
+</button>
+
+<div class="container">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="icon">💡</div>
+  <h1><span>AIdeate</span> Product Roadmap</h1>
+  <p>Local-first, privacy-safe workshop tool for identifying and prioritizing AI use cases with customers.</p>
+  <div class="updated">Last updated: April 22, 2026</div>
+</div>
+
+<!-- CURRENT STATE -->
+<h2><span class="emoji">✅</span> What's Live Today</h2>
+<p class="body">AIdeate is a static HTML application hosted on GitHub Pages. No server, no database, no dependencies. All data stays in the browser's localStorage. The facilitator drives the session while sharing their screen.</p>
+
+<div class="feature-grid">
+  <div class="feature"><span class="icon">🎯</span><span class="label">14-slide presentation deck</span></div>
+  <div class="feature"><span class="icon">💡</span><span class="label">4-phase workshop flow</span></div>
+  <div class="feature"><span class="icon">📂</span><span class="label">14 industry templates</span></div>
+  <div class="feature"><span class="icon">🧙</span><span class="label">10-step Define Wizard</span></div>
+  <div class="feature"><span class="icon">💰</span><span class="label">ROI Calculator (NPV, payback)</span></div>
+  <div class="feature"><span class="icon">📊</span><span class="label">2×2 prioritization matrix</span></div>
+  <div class="feature"><span class="icon">📄</span><span class="label">Word, Excel, PDF, JSON export</span></div>
+  <div class="feature"><span class="icon">✨</span><span class="label">AI-powered idea extraction</span></div>
+  <div class="feature"><span class="icon">🌗</span><span class="label">Light/dark theme toggle</span></div>
+  <div class="feature"><span class="icon">🎓</span><span class="label">Interactive training quest</span></div>
+  <div class="feature"><span class="icon">⌨️</span><span class="label">Full keyboard navigation</span></div>
+  <div class="feature"><span class="icon">📱</span><span class="label">PWA / offline capable</span></div>
+</div>
+
+<!-- FEEDBACK -->
+<h2><span class="emoji">💬</span> Feedback &amp; Priorities</h2>
+
+<div class="feedback-group">
+  <h3>🔴 Critical</h3>
+  <div class="feedback-item">
+    <div class="title">Interactive Participant Voting</div>
+    <div class="detail">Participants should be able to join from their own devices, submit ideas, and vote — rather than verbally directing the facilitator. This is the most requested feature and a key differentiator in how the tool is pitched externally.</div>
+  </div>
+  <div class="feedback-item">
+    <div class="title">Executive Report Quality</div>
+    <div class="detail">The exported Word report needs to match the quality of the previous version — polished executive summary, prioritization matrix visualization, multi-perspective evaluation, and ROI data. This report is what stakeholders show their executives to justify AI investment.</div>
+  </div>
+  <div class="feedback-item">
+    <div class="title">Agent Library Connection</div>
+    <div class="detail">AIdeate output should link to the Agent Library with recommended use cases. The three components (AIdeate → Agent Library → Agent Build) should work as a connected pipeline.</div>
+  </div>
+</div>
+
+<div class="feedback-group">
+  <h3>🟡 Important</h3>
+  <div class="feedback-item">
+    <div class="title">UI Readability for Screenshare</div>
+    <div class="detail">Text needs to be bigger, with better contrast and bolder elements. Over a Teams screenshare, the current UI is hard to follow. Should match the readability of the pitch-playbook template.</div>
+  </div>
+  <div class="feedback-item">
+    <div class="title">Step Progression Indicator</div>
+    <div class="detail">A visual indicator showing where you are in the workshop flow — which phase is active, what's complete, what's next. Helps remote participants follow along.</div>
+  </div>
+  <div class="feedback-item">
+    <div class="title">Self-Serve Onboarding</div>
+    <div class="detail">Field teams need to pick this up and run sessions independently. Training quest, recorded walkthroughs, and sample workshops should make this possible without 1:1 coaching.</div>
+  </div>
+</div>
+
+<div class="feedback-group">
+  <h3>🟢 Nice to Have</h3>
+  <div class="feedback-item">
+    <div class="title">Automated Demo Video Pipeline</div>
+    <div class="detail">Take the top-voted ideas from a workshop, auto-generate agent prototypes, deploy to a runtime, and record a demo — closing the loop from ideation to proof-of-concept.</div>
+  </div>
+  <div class="feedback-item">
+    <div class="title">Hybrid Voting via Teams Chat</div>
+    <div class="detail">Push a voting prompt to the Teams meeting chat, collect responses, and feed results back into AIdeate — leveraging existing meeting infrastructure instead of a separate join flow.</div>
+  </div>
+</div>
+
+<!-- VOTING CHALLENGE -->
+<h2><span class="emoji">⚠️</span> The Interactive Voting Challenge</h2>
+
+<div class="callout callout-orange">
+  <div class="callout-title">Why This Is Hard for Local-First</div>
+  <p>The #1 requested feature — audience voting from personal devices — fundamentally conflicts with the local-first architecture. <strong>localStorage is per-browser.</strong> There is no built-in way for one browser to see another browser's data without a shared backend.</p>
+  <p>Three approaches have been explored:</p>
+  <ul>
+    <li><strong>Local server on facilitator's machine</strong> — Works on the same WiFi network, zero external dependencies. But doesn't work for remote participants joining over Teams.</li>
+    <li><strong>Peer-to-peer (WebRTC)</strong> — Encrypted data channels between browsers, no server needed for data. But requires a third-party signaling service, can be blocked by corporate firewalls, and the room code is the only authentication.</li>
+    <li><strong>Cloud deployment</strong> — Full-stack app with database (like the previous version). Supports multi-user sessions natively, but requires infrastructure, deployment pipeline, data handling review, and ongoing maintenance.</li>
+  </ul>
+  <p><strong>The core tension:</strong> Local-first means no data leaves the device, which eliminates the "what are you doing with our data?" conversation. Interactive participation means data must travel between devices, which reopens it.</p>
+  <p>The facilitator-driven approach works well in practice — participants talk, facilitator types. But the expectation of interactive participation has been set externally, and the team needs to decide which tradeoff to accept.</p>
+</div>
+
+<!-- ROADMAP -->
+<h2><span class="emoji">🗺️</span> Roadmap</h2>
+
+<div class="phase p1">
+  <div class="phase-header">
+    <h3>Phase 1 — UI &amp; Report Polish</h3>
+    <span class="badge badge-progress">In Progress</span>
+  </div>
+  <div class="phase-desc">Improve readability, add visual indicators, and upgrade the export report to match executive expectations.</div>
+  <ul class="checklist">
+    <li class="done">Light / dark theme toggle</li>
+    <li class="done">Screenshare-optimized typography (bigger text, better contrast)</li>
+    <li class="done">Segmented phase progress bar</li>
+    <li class="done">Agent Library links on training quest</li>
+    <li class="done">Interactive training quest for onboarding</li>
+    <li class="progress">Executive report upgrade — polished Word export with matrix, multi-perspective eval, ROI</li>
+    <li>Agent Library deep links from results page</li>
+  </ul>
+</div>
+
+<div class="phase p2">
+  <div class="phase-header">
+    <h3>Phase 2 — Interactive Participation</h3>
+    <span class="badge badge-decision">Decision Needed</span>
+  </div>
+  <div class="phase-desc">Enable audience members to join and vote from their own devices. Requires an architectural decision on the approach.</div>
+  <ul class="checklist">
+    <li>Choose interactive voting approach (local / P2P / cloud)</li>
+    <li>QR code join flow — scan, enter name, see ideas</li>
+    <li>Real-time idea submission from participant devices</li>
+    <li>Audience voting — tap to vote from phone</li>
+    <li>Live vote tallying on presenter screen</li>
+    <li>Voting rule enforcement (max votes, no duplicates)</li>
+  </ul>
+</div>
+
+<div class="phase p3">
+  <div class="phase-header">
+    <h3>Phase 3 — Deployment &amp; Scale</h3>
+    <span class="badge badge-planned">Planned</span>
+  </div>
+  <div class="phase-desc">Enable org-wide rollout so field teams, technical specialists, and account teams can run sessions independently.</div>
+  <ul class="checklist">
+    <li>Hosting decision (static GitHub Pages vs managed cloud)</li>
+    <li>Session management with join codes</li>
+    <li>Data handling policy for shared sessions</li>
+    <li>Self-serve onboarding package (quest + video + samples)</li>
+    <li>Security and compliance review (if data travels)</li>
+  </ul>
+</div>
+
+<div class="phase p4">
+  <div class="phase-header">
+    <h3>Phase 4 — Agent Build Pipeline</h3>
+    <span class="badge badge-planned">Planned</span>
+  </div>
+  <div class="phase-desc">Automate the flow from workshop output to working agent prototypes and demo videos.</div>
+  <ul class="checklist">
+    <li>Export-to-agent pipeline — top ideas → agent definitions</li>
+    <li>Auto-deploy to runtime (Copilot Studio / custom)</li>
+    <li>Demo video generation from built agents</li>
+    <li>Feedback loop — customer response → iterate</li>
+  </ul>
+</div>
+
+<!-- DECISIONS -->
+<h2><span class="emoji">🔑</span> Key Decisions Pending</h2>
+
+<div class="decision-grid">
+  <div class="decision">
+    <span class="badge badge-decision">Decision</span>
+    <div class="q">
+      <div class="label">Interactive voting approach</div>
+      <div class="options">Local-only (facilitator-driven) · Peer-to-peer (WebRTC) · Cloud deployment</div>
+    </div>
+  </div>
+  <div class="decision">
+    <span class="badge badge-decision">Decision</span>
+    <div class="q">
+      <div class="label">Hosting for org-wide use</div>
+      <div class="options">GitHub Pages (static) · Azure Static Web Apps · Azure App Service</div>
+    </div>
+  </div>
+  <div class="decision">
+    <span class="badge badge-decision">Decision</span>
+    <div class="q">
+      <div class="label">Development resourcing</div>
+      <div class="options">Current team · Dedicated engineering resource · Vendor budget</div>
+    </div>
+  </div>
+  <div class="decision">
+    <span class="badge badge-blocked">Blocker</span>
+    <div class="q">
+      <div class="label">Data handling for shared sessions</div>
+      <div class="options">Required if any workshop data leaves the facilitator's browser. Blocks cloud and P2P approaches.</div>
+    </div>
+  </div>
+</div>
+
+<!-- LINKS -->
+<h2><span class="emoji">🔗</span> Links</h2>
+<div class="feature-grid">
+  <div class="feature"><span class="icon">💡</span><a href="https://kody-w.github.io/aideate/">AIdeate Live App</a></div>
+  <div class="feature"><span class="icon">🎓</span><a href="https://kody-w.github.io/aideate/quest.html">Training Quest</a></div>
+  <div class="feature"><span class="icon">📦</span><a href="https://github.com/kody-w/aideate">GitHub Repository</a></div>
+</div>
+
+<div class="footer">
+  <p>AIdeate — AI Workshop Acceleration Tool · <a href="https://github.com/kody-w/aideate">GitHub</a></p>
+</div>
+
+</div>
+</body>
+</html>
